@@ -1,6 +1,6 @@
 <img align="left" width="115px" height="115px" src="icon.png">
 
-# a4kSubtitles - SubtitlecatMod Edition
+# PolyglotSubs-Kodi
 [![Kodi version](https://img.shields.io/badge/kodi%20versions-20--21-blue)](https://kodi.tv/)
 [![View Releases](https://img.shields.io/badge/releases-on%20GitHub-blue)](https://github.com/sevannistel/a4kSubtitles/releases)
 
@@ -10,7 +10,7 @@ This is a fork of the original [a4kSubtitles](https://github.com/a4k-openproject
 
 a4kSubtitles is a subtitle addon for KODI. This version retains the features and providers of the original while adding support for Subtitlecat.com.
 
-**Key Features of this Fork (SubtitlecatMod):**
+**Key Features of PolyglotSubs-Kodi:**
 *   Includes all original providers from a4kSubtitles.
 *   **Adds Subtitlecat.com:**
     *   Searches for subtitles on Subtitlecat.com.
