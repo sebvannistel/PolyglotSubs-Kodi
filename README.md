@@ -1,4 +1,4 @@
-<img align="left" width="115px" height="115px" src="icon.png">
+<img align="left" width="115px" height="115px" src="ico.png">
 
 # PolyglotSubs-Kodi
 [![Kodi version](https://img.shields.io/badge/kodi%20versions-20--21-blue)](https://kodi.tv/)
