@@ -1,6 +1,8 @@
 <img align="left" width="115px" height="115px" src="icon.png">
 
+
 # PolyglotSubs-Kodi
+
 [![Kodi version](https://img.shields.io/badge/kodi%20versions-20--21-blue)](https://kodi.tv/)
 [![View Releases](https://img.shields.io/badge/releases-on%20GitHub-blue)](https://github.com/sevannistel/a4kSubtitles/releases)
 
