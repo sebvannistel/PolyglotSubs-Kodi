@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="service.subtitles.a4ksubtitlecat"
        name="a4kSubtitles (Subtitlecat Mod)"
-       version="3.20.0-scmod.9"
+       version="3.20.0-scmod.10"
        provider-name="sebvannistel">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/> <!-- Make sure this is still here from previous advice! -->
@@ -13,7 +13,7 @@
     <extension point="xbmc.subtitle.module" library="main.py"/>
     <extension point="xbmc.service" library="main_service.py" />
     <extension point="xbmc.addon.metadata">
-        <summary lang="en">a4kSubtitles (Subtitlecat Mod) - Multi-Source Subtitles Addon</summary>
+        <summary lang="en">PolyglotSubs-Kodi</summary>
         <description>
 Fork of a4kSubtitles with added support for Subtitlecat.com, providing original and AI-translated subtitles.
 Original Supports: OpenSubtitles, BSPlayer, Podnadpisi.NET, SubDL, Addic7ed

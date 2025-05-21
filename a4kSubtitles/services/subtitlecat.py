@@ -1,3 +1,5 @@
+#--- START OF FILE subtitlecat.py ---
+
 
 
 # C:\...\a4kSubtitles-SubtitlecatMod\a4kSubtitles\services\subtitlecat.py
@@ -133,6 +135,14 @@ def parse_search_response(core, service_name, meta, response):
     # START OF MODIFICATION: Pre-compute wanted languages set (Review Point 4)
     wanted_languages_lower = {lang.lower() for lang in meta.languages}
     # END OF MODIFICATION: Pre-compute wanted languages set
+    # ---- just below the existing wanted_languages_lower line ----
+    wanted_iso2 = {core.utils.get_lang_id(l, core.kodi.xbmc.ISO_639_1).lower()
+                   for l in meta.languages
+                   if core.utils.get_lang_id(l, core.kodi.xbmc.ISO_639_1)}
+
+    def _base_name(name: str) -> str:
+        """Return the part before the first '(' or space to help loose matches."""
+        return re.split(r'[ (]', name, 1)[0].lower()
 
     # START OF MODIFICATION (5 Remaining edge-cases): seen_lang_conv_errors set
     seen_lang_conv_errors = set()
@@ -209,10 +219,9 @@ def parse_search_response(core, service_name, meta, response):
                     seen_lang_conv_errors.add(sc_lang_code)
                 # END OF MODIFICATION (5 Remaining edge-cases): Log lang conversion error once
 
-            # START OF MODIFICATION: Use pre-computed set for language filter (Review Point 4)
-            # Original: if kodi_target_lang_full.lower() not in [l.lower() for l in meta.languages]:
-            if kodi_target_lang_full.lower() not in wanted_languages_lower:
-            # END OF MODIFICATION: Use pre-computed set for language filter
+            # ---- inside the loop, replace the single test ---------------
+            if (_base_name(kodi_target_lang_full) not in wanted_languages_lower
+                    and kodi_target_lang_2_letter not in wanted_iso2):
                 continue
 
             patch_determined_href = None
@@ -361,3 +370,4 @@ def build_download_request(core, service_name, args):
         'headers': {'User-Agent': __user_agent},
         'stream': True
     }
+#--- END OF FILE subtitlecat.py ---
