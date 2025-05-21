@@ -1,4 +1,4 @@
-<img align="left" width="100px" height="100px" src="icon.png">
+<img align="left" width="90px" height="90px" src="icon.png">
 
 
 # PolyglotSubs-Kodi
