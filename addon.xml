@@ -21,8 +21,8 @@ Original Supports: OpenSubtitles, BSPlayer, Podnadpisi.NET, SubDL, Addic7ed
         <platform>all</platform>
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <license>MIT License</license>
-        <website>https://github.com/sevannistel/a4kSubtitles</website>
-        <source>https://github.com/sevannistel/a4kSubtitles</source>
+        <website>https://github.com/sevannistel/PolyglotSubs-Kodi</website>
+        <source>https://github.com/sevannistel/PolyglotSubs-Kodi</source>
         <assets>
             <icon>icon.png</icon>
             <screenshot>screenshot-01.png</screenshot>
