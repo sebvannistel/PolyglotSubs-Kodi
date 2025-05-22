@@ -13,8 +13,9 @@ from bs4 import BeautifulSoup
 import urllib.parse
 from urllib.parse import urljoin # Added for robust URL building
 
-import re
-import time # Retained as it will be used by _wait_for_translated
+import re, time # Retained as it will be used by _wait_for_translated
+from functools import lru_cache                # ← simple cache
+from rapidfuzz import fuzz                    # ← fuzzy title match
 # import tempfile # Removed as no longer creating temp files in build_download_request
 # import os # Not directly used by this provider's logic now
 
@@ -22,6 +23,19 @@ import time # Retained as it will be used by _wait_for_translated
 # chardet and charset_normalizer are also imported locally within that function.
 
 # No 'log = logger.Logger.get_logger(__name__)' needed; use 'core.logger' directly.
+
+# light-weight cache (detail_url, lang_code) ➜ final .srt URL
+_TRANSLATED_CACHE = {}     # survives for the lifetime of the add-on
+
+#######################################################################
+# 1. helper ­- title similarity
+#######################################################################
+# ≥85 % token_set_ratio ≈ “same movie”, order unimportant
+def _is_title_close(wanted: str, got: str) -> bool:
+    return fuzz.token_set_ratio(
+        (wanted or "").lower(),
+        (got or "").lower()
+    ) >= 85
 
 __subtitlecat_base_url = "https://www.subtitlecat.com"
 __user_agent = (
@@ -57,16 +71,25 @@ def _extract_ajax(link):
 def _wait_for_translated(core, detail_url, lang_code, service_name, tries=80, delay=6): # MODIFIED: tries and delay defaults
     # core.logger.debug(f"[{service_name}] Starting polling for lang '{lang_code}' on {detail_url} (tries={tries}, delay={delay}s)") # REMOVED THIS LINE
     for attempt in range(tries):
-        if attempt > 0:
-             time.sleep(delay)
+        if attempt:                                # skip sleep on loop-0
+            # exponential back-off after 30 probes
+            sleep_for = delay * (2 ** max(0, attempt-30))
+            # but don’t let it grow unbounded (>30 s is wasteful)
+            sleep_for = min(sleep_for, 30)
+            time.sleep(sleep_for)
         try:
             page = _SC_SESSION.get(detail_url, timeout=10) # MODIFIED: use _SC_SESSION and removed explicit headers
             page.raise_for_status()
             soup = BeautifulSoup(page.text, 'html.parser')
-            tag = soup.select_one(f'a[href$="-{lang_code}.srt" i]')
+            # accept “…lb.srt” and “…lb.srt?download=1”
+            tag = soup.select_one(f'a[href*="-{lang_code}.srt" i]')
             if tag and tag.get('href'):
                 found_url = urljoin(__subtitlecat_base_url, tag['href'])
-                core.logger.debug(f"[{service_name}] Poll attempt {attempt+1}/{tries}: Found link for '{lang_code}': {found_url}")
+                # store in cache for next time
+                _TRANSLATED_CACHE[(detail_url, lang_code.lower())] = found_url
+                core.logger.debug(
+                    f"[{service_name}] Poll {attempt+1}/{tries}: link {found_url}"
+                )
                 return found_url
             else:
                 core.logger.debug(f"[{service_name}] Polling for '{lang_code}' - {attempt+1}/{tries}") # MODIFIED: log message
@@ -222,6 +245,14 @@ def parse_search_response(core, service_name, meta, response):
             core.logger.debug(f"[{service_name}] Link href '{href}' doesn't match expected pattern. Skipping.")
             continue
         movie_title_on_page = link_tag.get_text(strip=True) or "Unknown Title"
+
+        # ─────────────────────────────────────────────────────────────
+        #  A.  filter rows whose TITLE is not close enough
+        # ─────────────────────────────────────────────────────────────
+        if not _is_title_close(meta.title, movie_title_on_page):
+            core.logger.debug(f"[{service_name}] Title '{movie_title_on_page}' (from search result row) not close enough to wanted title '{meta.title}'. Skipping this row.")
+            continue
+
         movie_page_full_url = urljoin(__subtitlecat_base_url, href)
         year_guard_fetched_soup = None
         if meta.year:
@@ -312,9 +343,12 @@ def parse_search_response(core, service_name, meta, response):
                     if sc_lang_code not in seen_lang_conv_errors:
                         core.logger.debug(f"[{service_name}] Error converting lang code '{sc_lang_code}' (name: '{sc_lang_name_full}'): {e_lang_conv}. Using fallbacks: Full='{kodi_target_lang_full}', ISO2='{kodi_target_lang_2_letter}'. (This message will be shown once per problematic code for this provider run)")
                         seen_lang_conv_errors.add(sc_lang_code)
+            
+            #  B.  filter rows whose LANGUAGE is not requested
             if (_base_name(kodi_target_lang_full) not in wanted_languages_lower
                     and kodi_target_lang_2_letter not in wanted_iso2):
                 continue
+            
             patch_determined_href = None
             patch_kind_is_translate = False
             a_tag = entry_div.select_one('a[href$=".srt"]')
@@ -322,6 +356,17 @@ def parse_search_response(core, service_name, meta, response):
                 _raw_href = a_tag.get('href')
                 if _raw_href: patch_determined_href = _raw_href
                 else: a_tag = None
+            
+            # ─────────────────────────────────────────────────────────
+            #  C.  do we have a cached translation already?
+            # ─────────────────────────────────────────────────────────
+            cache_key = (movie_page_full_url, sc_lang_code_lower)
+            cached_url = _TRANSLATED_CACHE.get(cache_key)
+            if cached_url:
+                patch_determined_href = cached_url   # instant green link!
+                core.logger.debug(f"[{service_name}] Using cached translated URL: {cached_url} for {sc_lang_name_full} on {movie_page_full_url}")
+
+
             if patch_determined_href is None:
                 btn = entry_div.select_one('button[onclick*="translate_from_server_folder"]')
                 if not btn: continue
@@ -336,9 +381,10 @@ def parse_search_response(core, service_name, meta, response):
                 try:
                     core.logger.debug(f"[{service_name}] Triggering server-side translation for '{sc_lang_name_full}' (file: {orig}, folder: {folder}, lang: {lng})")
                     # CRITICAL FIX 1: Use _SC_SESSION for translate.php call
-                    _SC_SESSION.get(
+                    _SC_SESSION.get(                       # keep cookie & UA
                         f"{__subtitlecat_base_url}/translate.php",
                         params={'lng': lng, 'file': orig, 'folder': folder},
+                        headers={'Referer': movie_page_full_url},  # some pages 403 without it
                         timeout=5)
                 except system_requests.exceptions.Timeout:
                     core.logger.debug(f"[{service_name}] AJAX call for '{sc_lang_name_full}' timed out. Assuming server might process; will attempt poll.")
@@ -417,7 +463,7 @@ def build_download_request(core, service_name, args):
         core.logger.debug(f"[{service_name}] _save callback: Downloading from {final_url} to {repr(path_from_core)} with timeout {_timeout}s")
         try:
             # CRITICAL FIX 2: Use _SC_SESSION.get() for final download
-            resp_for_save = _SC_SESSION.get(final_url, timeout=_timeout) # Removed headers as _SC_SESSION already has them
+            resp_for_save = _SC_SESSION.get(final_url, timeout=_timeout)  # re-uses TCP pool # Removed headers as _SC_SESSION already has them
             resp_for_save.raise_for_status()
             raw_bytes = resp_for_save.content
             core.logger.debug(f"[{service_name}] _save callback: Download successful, {len(raw_bytes)} bytes received from {final_url}")
