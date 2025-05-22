@@ -166,16 +166,41 @@ def download(core, params):
     service = core.services[service_name]
     request = service.build_download_request(core, service_name, actions_args)
 
-    if actions_args.get('raw', False):
+    # --- START OF MODIFIED SECTION ---
+    _is_raw_download = actions_args.get('raw', False)
+
+    if _is_raw_download:
+        # For raw downloads, `filepath` is the direct path to the subtitle file.
         filepath = core.os.path.join(core.utils.temp_dir, filename)
-        __download(core, filepath, request)
     else:
-        __download(core, archivepath, request)
+        # For archive downloads, the initial download target is `archivepath`.
+        # The patch uses `filepath` as its argument, so we set `filepath` to `archivepath` here.
+        # After download (or callback), `filepath` will be updated if extraction occurs.
+        filepath = archivepath
+
+    # Apply the patch logic: use save_callback if available, otherwise use __download.
+    # `filepath` at this point is the target path for the download operation.
+    cb = request.pop('save_callback', None)
+    if cb:
+        if not cb(filepath): # Call provider's helper to save to `filepath`
+            raise Exception('save_callback failed')
+    else:
+        __download(core, filepath, request) # Standard download to `filepath`
+
+    # If an archive was downloaded, `filepath` currently points to the archive.
+    # We need to extract the subtitle file from it and update `filepath` to the extracted file's path.
+    if not _is_raw_download: # This means an archive was downloaded (to the path stored in `filepath`)
+        # The source for extraction is the `filepath` variable (which holds the path to the downloaded archive).
+        # The `filename` variable is the base name for the extracted subtitle.
         if actions_args.get('gzip', False):
-            filepath = __extract_gzip(core, archivepath, filename)
+            # __extract_gzip will save the extracted file and return its path. This becomes the new `filepath`.
+            filepath = __extract_gzip(core, filepath, filename)
         else:
             episodeid = actions_args.get('episodeid', '')
-            filepath = __extract_zip(core, archivepath, filename, episodeid)
+            # __extract_zip will save the extracted file and return its path. This becomes the new `filepath`.
+            filepath = __extract_zip(core, filepath, filename, episodeid)
+    # If it was a raw download, `filepath` is already correctly set to the path of the downloaded subtitle file.
+    # --- END OF MODIFIED SECTION ---
 
     __postprocess(core, filepath, lang_code)
 
