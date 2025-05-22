@@ -30,6 +30,10 @@ __user_agent = (
     "Safari/537.36 a4kSubtitles-SubtitlecatMod/1.0.1" # Ensure your addon version is reflected if desired
 )
 
+# Keep a persistent session across *all* calls in this provider
+_SC_SESSION = system_requests.Session()
+_SC_SESSION.headers.update({'User-Agent': __user_agent})
+
 # START OF MODIFICATION: Added regional language map
 __kodi_regional_lang_map = {
     # site_lang_code.lower(): (kodi_english_name, kodi_iso_639_1_code)
@@ -50,15 +54,13 @@ def _extract_ajax(link):
     return m.groups() if m else (None, None, None)
 
 # START OF MODIFICATION: Added _wait_for_translated helper function
-def _wait_for_translated(core, detail_url, lang_code, service_name, tries=50, delay=5):
-    core.logger.debug(f"[{service_name}] Starting polling for lang '{lang_code}' on {detail_url} (tries={tries}, delay={delay}s)")
+def _wait_for_translated(core, detail_url, lang_code, service_name, tries=80, delay=6): # MODIFIED: tries and delay defaults
+    # core.logger.debug(f"[{service_name}] Starting polling for lang '{lang_code}' on {detail_url} (tries={tries}, delay={delay}s)") # REMOVED THIS LINE
     for attempt in range(tries):
         if attempt > 0:
              time.sleep(delay)
         try:
-            page = system_requests.get(detail_url,
-                                       headers={'User-Agent': __user_agent},
-                                       timeout=10)
+            page = _SC_SESSION.get(detail_url, timeout=10) # MODIFIED: use _SC_SESSION and removed explicit headers
             page.raise_for_status()
             soup = BeautifulSoup(page.text, 'html.parser')
             tag = soup.select_one(f'a[href$="-{lang_code}.srt" i]')
@@ -67,7 +69,7 @@ def _wait_for_translated(core, detail_url, lang_code, service_name, tries=50, de
                 core.logger.debug(f"[{service_name}] Poll attempt {attempt+1}/{tries}: Found link for '{lang_code}': {found_url}")
                 return found_url
             else:
-                core.logger.debug(f"[{service_name}] Poll attempt {attempt+1}/{tries}: '{lang_code}' not ready yet on {detail_url}")
+                core.logger.debug(f"[{service_name}] Polling for '{lang_code}' - {attempt+1}/{tries}") # MODIFIED: log message
         except system_requests.exceptions.RequestException as e_req:
             core.logger.debug(f"[{service_name}] Poll attempt {attempt+1}/{tries}: Request error for {detail_url}: {e_req}")
         except Exception as e_parse:
@@ -174,7 +176,7 @@ def build_search_requests(core, service_name, meta):
     return [{
         'method': 'GET',
         'url': search_url,
-        'headers': {'User-Agent': __user_agent},
+        'headers': {'User-Agent': __user_agent}, # Retained for this initial search as per previous logic
     }]
 
 # ---------------------------------------------------------------------------
@@ -226,7 +228,8 @@ def parse_search_response(core, service_name, meta, response):
             if str(meta.year) not in row.text:
                 core.logger.debug(f"[{service_name}] Year '{meta.year}' not in row text for '{movie_title_on_page}'. Attempting fallback: checking detail page title from {movie_page_full_url}.")
                 try:
-                    temp_detail_response = system_requests.get(movie_page_full_url, headers={'User-Agent': __user_agent}, timeout=15)
+                    # Using _SC_SESSION for consistency, though original used system_requests here
+                    temp_detail_response = _SC_SESSION.get(movie_page_full_url, timeout=15)
                     temp_detail_response.raise_for_status()
                     temp_detail_soup_for_year_check = BeautifulSoup(temp_detail_response.text, 'html.parser')
                     title_tag_element = temp_detail_soup_for_year_check.find('title')
@@ -255,7 +258,8 @@ def parse_search_response(core, service_name, meta, response):
             detail_soup = year_guard_fetched_soup
         else:
             try:
-                detail_response = system_requests.get(movie_page_full_url, headers={'User-Agent': __user_agent}, timeout=15)
+                # Using _SC_SESSION for consistency
+                detail_response = _SC_SESSION.get(movie_page_full_url, timeout=15)
                 detail_response.raise_for_status()
                 detail_soup = BeautifulSoup(detail_response.text, 'html.parser')
             except Exception as exc:
@@ -331,10 +335,11 @@ def parse_search_response(core, service_name, meta, response):
                     continue
                 try:
                     core.logger.debug(f"[{service_name}] Triggering server-side translation for '{sc_lang_name_full}' (file: {orig}, folder: {folder}, lang: {lng})")
-                    system_requests.get(
+                    # CRITICAL FIX 1: Use _SC_SESSION for translate.php call
+                    _SC_SESSION.get(
                         f"{__subtitlecat_base_url}/translate.php",
                         params={'lng': lng, 'file': orig, 'folder': folder},
-                        headers={'User-Agent': __user_agent}, timeout=5)
+                        timeout=5)
                 except system_requests.exceptions.Timeout:
                     core.logger.debug(f"[{service_name}] AJAX call for '{sc_lang_name_full}' timed out. Assuming server might process; will attempt poll.")
                 except Exception as e_ajax:
@@ -411,7 +416,8 @@ def build_download_request(core, service_name, args):
         resp_for_save = None
         core.logger.debug(f"[{service_name}] _save callback: Downloading from {final_url} to {repr(path_from_core)} with timeout {_timeout}s")
         try:
-            resp_for_save = system_requests.get(final_url, headers={'User-Agent': __user_agent}, timeout=_timeout)
+            # CRITICAL FIX 2: Use _SC_SESSION.get() for final download
+            resp_for_save = _SC_SESSION.get(final_url, timeout=_timeout) # Removed headers as _SC_SESSION already has them
             resp_for_save.raise_for_status()
             raw_bytes = resp_for_save.content
             core.logger.debug(f"[{service_name}] _save callback: Download successful, {len(raw_bytes)} bytes received from {final_url}")
@@ -439,7 +445,7 @@ def build_download_request(core, service_name, args):
     return {
         'method': 'GET',
         'url': final_url, # This is the remote HTTP/HTTPS URL
-        'headers': {'User-Agent': __user_agent},
+        'headers': {'User-Agent': __user_agent}, # Retained for compatibility if core doesn't use save_callback
         'stream': True, # Standard practice
         'save_callback': _save
     }
