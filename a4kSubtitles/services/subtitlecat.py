@@ -64,16 +64,21 @@ def _get_setting(core, key, default=None):
 
 # helper -------------------------------------
 def _extract_ajax(link):
-    m = re.search(r"'([^']*)',\s*'([^']*)',\s*'([^']*)'", link)
+    # FIX 2: Parse four-argument onclicks safely
+    m = re.search(
+        r"translate_from_server_folder\([^,]*,\s*'([^']*)',\s*'([^']*)',\s*'([^']*)'",
+        link
+    )
     return m.groups() if m else (None, None, None)
 
 # START OF MODIFICATION: Added _wait_for_translated helper function
-def _wait_for_translated(core, detail_url, lang_code, service_name, tries=80, delay=6): # MODIFIED: tries and delay defaults
+# FIX 5: Trim poll duration
+def _wait_for_translated(core, detail_url, lang_code, service_name, tries=25, delay=3):
     # core.logger.debug(f"[{service_name}] Starting polling for lang '{lang_code}' on {detail_url} (tries={tries}, delay={delay}s)") # REMOVED THIS LINE
     for attempt in range(tries):
         if attempt:                                # skip sleep on loop-0
             # exponential back-off after 30 probes
-            sleep_for = delay * (2 ** max(0, attempt-30))
+            sleep_for = delay * (2 ** max(0, attempt-30)) # This will be max(0, attempt-30) = 0 for tries=25
             # but don’t let it grow unbounded (>30 s is wasteful)
             sleep_for = min(sleep_for, 30)
             time.sleep(sleep_for)
@@ -81,10 +86,27 @@ def _wait_for_translated(core, detail_url, lang_code, service_name, tries=80, de
             page = _SC_SESSION.get(detail_url, timeout=10) # MODIFIED: use _SC_SESSION and removed explicit headers
             page.raise_for_status()
             soup = BeautifulSoup(page.text, 'html.parser')
-            # accept “…lb.srt” and “…lb.srt?download=1”
-            tag = soup.select_one(f'a[href*="-{lang_code}.srt" i]')
-            if tag and tag.get('href'):
-                found_url = urljoin(__subtitlecat_base_url, tag['href'])
+
+            # --- Start of Fix 3 application for polling link ---
+            href_for_polling = None
+            try:
+                # Attempt 1: select_one (preferred for BS >= 4.7 but might fail on older BS with 'i' flag)
+                tag_object = soup.select_one(f'a[href*="-{lang_code}.srt" i]')
+                if tag_object and tag_object.get('href'):
+                    href_for_polling = tag_object.get('href')
+            except: # Catch any exception from select_one (e.g., Malformed attribute selector on old BS)
+                    # This allows fallback to regex, as intended by Fix 3.
+                pass # href_for_polling remains None, proceed to regex.
+
+            if not href_for_polling:
+                # Attempt 2: regex (fallback if select_one failed or found nothing)
+                pat = re.compile(rf'href=["\']([^"\']*-\b{re.escape(lang_code)}\.srt[^"\']*)', re.I)
+                match = pat.search(page.text) 
+                if match:
+                    href_for_polling = match.group(1)
+
+            if href_for_polling:
+                found_url = urljoin(__subtitlecat_base_url, href_for_polling)
                 # store in cache for next time
                 _TRANSLATED_CACHE[(detail_url, lang_code.lower())] = found_url
                 core.logger.debug(
@@ -93,6 +115,7 @@ def _wait_for_translated(core, detail_url, lang_code, service_name, tries=80, de
                 return found_url
             else:
                 core.logger.debug(f"[{service_name}] Polling for '{lang_code}' - {attempt+1}/{tries}") # MODIFIED: log message
+            # --- End of Fix 3 application ---
         except system_requests.exceptions.RequestException as e_req:
             core.logger.debug(f"[{service_name}] Poll attempt {attempt+1}/{tries}: Request error for {detail_url}: {e_req}")
         except Exception as e_parse:
@@ -351,11 +374,12 @@ def parse_search_response(core, service_name, meta, response):
             
             patch_determined_href = None
             patch_kind_is_translate = False
-            a_tag = entry_div.select_one('a[href$=".srt"]')
+            # FIX 4: Catch "*.srt?download=1" links
+            a_tag = entry_div.select_one(r'a[href$=".srt"], a[href*=".srt?download="]')
             if a_tag:
                 _raw_href = a_tag.get('href')
                 if _raw_href: patch_determined_href = _raw_href
-                else: a_tag = None
+                else: a_tag = None # This line seems to ensure a_tag is None if href is empty, though _raw_href check is primary.
             
             # ─────────────────────────────────────────────────────────
             #  C.  do we have a cached translation already?
@@ -380,12 +404,13 @@ def parse_search_response(core, service_name, meta, response):
                     continue
                 try:
                     core.logger.debug(f"[{service_name}] Triggering server-side translation for '{sc_lang_name_full}' (file: {orig}, folder: {folder}, lang: {lng})")
-                    # CRITICAL FIX 1: Use _SC_SESSION for translate.php call
-                    _SC_SESSION.get(                       # keep cookie & UA
-                        f"{__subtitlecat_base_url}/translate.php",
-                        params={'lng': lng, 'file': orig, 'folder': folder},
-                        headers={'Referer': movie_page_full_url},  # some pages 403 without it
-                        timeout=5)
+                    # FIX 1: Use POST for the translation trigger
+                    _SC_SESSION.post(f"{__subtitlecat_base_url}/translate.php",
+                                     data={'lng': lng, 'file': orig, 'folder': folder},
+                                     headers={
+                                         'Referer': movie_page_full_url,
+                                         'X-Requested-With': 'XMLHttpRequest'},
+                                     timeout=10)
                 except system_requests.exceptions.Timeout:
                     core.logger.debug(f"[{service_name}] AJAX call for '{sc_lang_name_full}' timed out. Assuming server might process; will attempt poll.")
                 except Exception as e_ajax:
