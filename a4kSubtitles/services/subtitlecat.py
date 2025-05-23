@@ -549,7 +549,12 @@ def parse_search_response(core, service_name, meta, response):
                         core.logger.debug(f"[{service_name}] Failed to extract AJAX params for '{sc_lang_name_full}' from onclick. Skipping.")
                         continue
 
-                    source_srt_url = urljoin(__subtitlecat_base_url, folder_id_part + orig_srt_name_part + '.srt')
+                    # START OF MODIFICATION: Guarded .srt addition
+                    filename_for_url = orig_srt_name_part
+                    if not filename_for_url.lower().endswith('.srt'):
+                        filename_for_url += '.srt'
+                    source_srt_url = urljoin(__subtitlecat_base_url, folder_id_part + filename_for_url)
+                    # END OF MODIFICATION: Guarded .srt addition
                     
                     core.logger.debug(f"[{service_name}] Setting up client-side translation for '{sc_lang_name_full}'. Original SRT: {source_srt_url}, Target Google lang: {lng_for_google}")
 
@@ -595,7 +600,8 @@ def build_download_request(core, service_name, args):
     core.logger.debug(f"[{service_name}] Building download request for: {_filename_from_args}, Args: {args}")
 
     if args.get('needs_client_side_translation'):
-        core.logger.info(f"[{service_name}] Starting client-side translation for '{_filename_from_args}'")
+        # MODIFICATION: core.logger.info -> core.logger.debug
+        core.logger.debug(f"[{service_name}] Starting client-side translation for '{_filename_from_args}'")
         original_srt_url = args['original_srt_url']
         target_gtranslate_lang = args['target_translation_lang'] 
         
@@ -678,8 +684,9 @@ def build_download_request(core, service_name, args):
                 # This is the number of original segments from translatable_items_info that formed this chunk
                 num_original_segments_this_chunk = original_segments_for_chunks_count[i] 
                 
+                # MODIFICATION: core.logger.warning -> core.logger.debug
                 if len(translated_segments_in_chunk) != num_original_segments_this_chunk:
-                    core.logger.warning(f"[{service_name}] Mismatch in segment count for translated chunk {i+1}. Expected {num_original_segments_this_chunk} original segments for this chunk, got {len(translated_segments_in_chunk)} translated segments. Translation quality may be affected.")
+                    core.logger.debug(f"[{service_name}] Mismatch in segment count for translated chunk {i+1}. Expected {num_original_segments_this_chunk} original segments for this chunk, got {len(translated_segments_in_chunk)} translated segments. Translation quality may be affected.")
 
                 # Iterate over each segment returned by Google for this chunk
                 # k_zip is the index within the current translated_segments_in_chunk
@@ -710,14 +717,16 @@ def build_download_request(core, service_name, args):
                             core.logger.debug(f"[{service_name}] Overshoot (2.4): Appended segment to content of original sub idx {final_cue_original_idx}.")
                         else:
                             # This case (overshoot with no translatable items) should be rare.
-                            core.logger.warning(f"[{service_name}] Overshoot (2.4): No translatable items to append to. Discarding segment: {translated_segment_text_raw[:60]}")
+                            # MODIFICATION: core.logger.warning -> core.logger.debug
+                            core.logger.debug(f"[{service_name}] Overshoot (2.4): No translatable items to append to. Discarding segment: {translated_segment_text_raw[:60]}")
                 
                 # Advance current_TII_pointer by the number of segments Google returned for *this* chunk (Fix #4 behavior)
                 current_TII_pointer += len(translated_segments_in_chunk) 
                 
                 if current_TII_pointer >= len(translatable_items_info) and len(translatable_items_info) > 0 : # Check if all translatable items have been 'pointed to'
                     if i < len(chunks) -1 : # If there were more chunks but we've notionally processed all translatable item slots
-                         core.logger.warning(f"[{service_name}] All translatable item slots considered; subsequent chunks (if any) will primarily cause overshoot appends to the final cue.")
+                         # MODIFICATION: core.logger.warning -> core.logger.debug
+                         core.logger.debug(f"[{service_name}] All translatable item slots considered; subsequent chunks (if any) will primarily cause overshoot appends to the final cue.")
                     # Continue processing remaining chunks, as they might still contain segments that need to be appended due to overshoot
                     # The original break was: break # Break from the outer loop over chunks
                     # Keeping the break, as Fix #4 original code also had a similar break condition logic.
@@ -727,9 +736,11 @@ def build_download_request(core, service_name, args):
             # Final logging for pointer state relative to translatable items
             if len(chunks) > 0: # Only if translation attempt was made
                 if current_TII_pointer < len(translatable_items_info):
-                     core.logger.warning(f"[{service_name}] Final TII pointer ({current_TII_pointer}) is less than total translatable items ({len(translatable_items_info)}). Some items might not have received translations if Google returned fewer segments than expected overall.")
+                     # MODIFICATION: core.logger.warning -> core.logger.debug
+                     core.logger.debug(f"[{service_name}] Final TII pointer ({current_TII_pointer}) is less than total translatable items ({len(translatable_items_info)}). Some items might not have received translations if Google returned fewer segments than expected overall.")
                 elif current_TII_pointer > len(translatable_items_info) and len(translatable_items_info) > 0:
-                     core.logger.info(f"[{service_name}] Final TII pointer ({current_TII_pointer}) overshot total translatable items ({len(translatable_items_info)}). Overshoot logic (2.4) should have appended to the last item.")
+                     # MODIFICATION: core.logger.info -> core.logger.debug
+                     core.logger.debug(f"[{service_name}] Final TII pointer ({current_TII_pointer}) overshot total translatable items ({len(translatable_items_info)}). Overshoot logic (2.4) should have appended to the last item.")
 
 
             final_translated_srt_str = srt.compose(parsed_subs)
@@ -742,7 +753,8 @@ def build_download_request(core, service_name, args):
                     final_encoding = 'utf-8-sig' if bom else 'utf-8'
                     with io.open(path_from_core, 'w', encoding=final_encoding) as f:
                         f.write(final_translated_srt_str)
-                    core.logger.info(f"[{service_name}] Client-translated SRT saved to '{path_from_core}' with encoding '{final_encoding}'.")
+                    # MODIFICATION: core.logger.info -> core.logger.debug
+                    core.logger.debug(f"[{service_name}] Client-translated SRT saved to '{path_from_core}' with encoding '{final_encoding}'.")
                     return True
                 except Exception as e_save:
                     core.logger.error(f"[{service_name}] Failed to save client-translated SRT to '{path_from_core}': {e_save}")
