@@ -1,0 +1,1 @@
+python subtitlecat_batch_debug.py --random 40 -l en -l de -l lb -l zh -j 8 --timeout 180
