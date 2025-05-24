@@ -1,0 +1,9 @@
+<div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/md.png" alt="mo" class="flag"></span>
+          <span>Moldavian</span>
+<span><button id="mo" onclick="translate_from_server_folder('mo', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link" disabled="">21.9% done</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>

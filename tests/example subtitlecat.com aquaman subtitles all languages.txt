@@ -1,0 +1,1201 @@
+<div class="all-sub">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <h2 class="sec-title">All language subtitles for Aquaman (2018)</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/za.png" alt="af" class="flag"></span>
+          <span>Afrikaans</span>
+<span><a id="download_af" onclick="log_download(517770); show_voting('af');" href="/subs/51/Aquaman (2018)-af.srt" class="green-link">Download</a>    <span id="voting_af" style="display:none;">        <a href="javascript:vote('af',517770,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('af',517770,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gh.png" alt="ak" class="flag"></span>
+          <span>Akan</span>
+<span><button id="ak" onclick="translate_from_server_folder('ak', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/al.png" alt="sq" class="flag"></span>
+          <span>Albanian</span>
+<span><a id="download_sq" onclick="log_download(525425); show_voting('sq');" href="/subs/52/Aquaman (2018)-sq.srt" class="green-link">Download</a>    <span id="voting_sq" style="display:none;">        <a href="javascript:vote('sq',525425,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('sq',525425,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/et.png" alt="am" class="flag"></span>
+          <span>Amharic</span>
+<span><a id="download_am" onclick="log_download(1014026); show_voting('am');" href="/subs/101/Aquaman (2018)-am.srt" class="green-link">Download</a>    <span id="voting_am" style="display:none;">        <a href="javascript:vote('am',1014026,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('am',1014026,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ae.png" alt="ar" class="flag"></span>
+          <span>Arabic</span>
+<span><a id="download_ar" onclick="log_download(516305); show_voting('ar');" href="/subs/51/Aquaman (2018)-ar.srt" class="green-link">Download</a>    <span id="voting_ar" style="display:none;">        <a href="javascript:vote('ar',516305,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ar',516305,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/am.png" alt="hy" class="flag"></span>
+          <span>Armenian</span>
+<span><a id="download_hy" onclick="log_download(519198); show_voting('hy');" href="/subs/51/Aquaman (2018)-hy.srt" class="green-link">Download</a>    <span id="voting_hy" style="display:none;">        <a href="javascript:vote('hy',519198,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('hy',519198,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/az.png" alt="az" class="flag"></span>
+          <span>Azerbaijani</span>
+<span><a id="download_az" onclick="log_download(518819); show_voting('az');" href="/subs/51/Aquaman (2018)-az.srt" class="green-link">Download</a>    <span id="voting_az" style="display:none;">        <a href="javascript:vote('az',518819,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('az',518819,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/es-pv.png" alt="eu" class="flag"></span>
+          <span>Basque</span>
+<span><button id="eu" onclick="translate_from_server_folder('eu', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/by.png" alt="be" class="flag"></span>
+          <span>Belarusian</span>
+<span><a id="download_be" onclick="log_download(807467); show_voting('be');" href="/subs/80/Aquaman (2018)-be.srt" class="green-link">Download</a>    <span id="voting_be" style="display:none;">        <a href="javascript:vote('be',807467,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('be',807467,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/zm.png" alt="bem" class="flag"></span>
+          <span>Bemba</span>
+<span><button id="bem" onclick="translate_from_server_folder('bem', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/bd.png" alt="bn" class="flag"></span>
+          <span>Bengali</span>
+<span><a id="download_bn" onclick="log_download(515560); show_voting('bn');" href="/subs/51/Aquaman (2018)-bn.srt" class="green-link">Download</a>    <span id="voting_bn" style="display:none;">        <a href="javascript:vote('bn',515560,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('bn',515560,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="bh" class="flag"></span>
+          <span>Bihari</span>
+<span><button id="bh" onclick="translate_from_server_folder('bh', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ba.png" alt="bs" class="flag"></span>
+          <span>Bosnian</span>
+<span><a id="download_bs" onclick="log_download(515994); show_voting('bs');" href="/subs/51/Aquaman (2018)-bs.srt" class="green-link">Download</a>    <span id="voting_bs" style="display:none;">        <a href="javascript:vote('bs',515994,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('bs',515994,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/fr.png" alt="br" class="flag"></span>
+          <span>Breton</span>
+<span><button id="br" onclick="translate_from_server_folder('br', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/bg.png" alt="bg" class="flag"></span>
+          <span>Bulgarian</span>
+<span><a id="download_bg" onclick="log_download(515943); show_voting('bg');" href="/subs/51/Aquaman (2018)-bg.srt" class="green-link">Download</a>    <span id="voting_bg" style="display:none;">        <a href="javascript:vote('bg',515943,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('bg',515943,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/kh.png" alt="km" class="flag"></span>
+          <span>Cambodian</span>
+<span><a id="download_km" onclick="log_download(522126); show_voting('km');" href="/subs/52/Aquaman (2018)-km.srt" class="green-link">Download</a>    <span id="voting_km" style="display:none;">        <a href="javascript:vote('km',522126,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('km',522126,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ad.png" alt="ca" class="flag"></span>
+          <span>Catalan</span>
+<span><a id="download_ca" onclick="log_download(528051); show_voting('ca');" href="/subs/52/Aquaman (2018)-ca.srt" class="green-link">Download</a>    <span id="voting_ca" style="display:none;">        <a href="javascript:vote('ca',528051,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ca',528051,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ph.png" alt="ceb" class="flag"></span>
+          <span>Cebuano</span>
+<span><a id="download_ceb" onclick="log_download(973527); show_voting('ceb');" href="/subs/97/Aquaman (2018)-ceb.srt" class="green-link">Download</a>    <span id="voting_ceb" style="display:none;">        <a href="javascript:vote('ceb',973527,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ceb',973527,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/us.png" alt="chr" class="flag"></span>
+          <span>Cherokee</span>
+<span><button id="chr" onclick="translate_from_server_folder('chr', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/mw.png" alt="ny" class="flag"></span>
+          <span>Chichewa</span>
+<span><button id="ny" onclick="translate_from_server_folder('ny', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/cn.png" alt="zh-CN" class="flag"></span>
+          <span>Chinese (Simplified)</span>
+<span><a id="download_zh-CN" onclick="log_download(521338); show_voting('zh-CN');" href="/subs/52/Aquaman (2018)-zh-CN.srt" class="green-link">Download</a>    <span id="voting_zh-CN" style="display:none;">        <a href="javascript:vote('zh-CN',521338,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('zh-CN',521338,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/tw.png" alt="zh-TW" class="flag"></span>
+          <span>Chinese (Traditional)</span>
+<span><a id="download_zh-TW" onclick="log_download(526247); show_voting('zh-TW');" href="/subs/52/Aquaman (2018)-zh-TW.srt" class="green-link">Download</a>    <span id="voting_zh-TW" style="display:none;">        <a href="javascript:vote('zh-TW',526247,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('zh-TW',526247,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/co.png" alt="co" class="flag"></span>
+          <span>Corsican</span>
+<span><button id="co" onclick="translate_from_server_folder('co', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/hr.png" alt="hr" class="flag"></span>
+          <span>Croatian</span>
+<span><a id="download_hr" onclick="log_download(516136); show_voting('hr');" href="/subs/51/Aquaman (2018)-hr.srt" class="green-link">Download</a>    <span id="voting_hr" style="display:none;">        <a href="javascript:vote('hr',516136,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('hr',516136,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/cz.png" alt="cs" class="flag"></span>
+          <span>Czech</span>
+<span><a id="download_cs" onclick="log_download(514074); show_voting('cs');" href="/subs/51/Aquaman (2018)-cs.srt" class="green-link">Download</a>    <span id="voting_cs" style="display:none;">        <a href="javascript:vote('cs',514074,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('cs',514074,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/dk.png" alt="da" class="flag"></span>
+          <span>Danish</span>
+<span><a id="download_da" onclick="log_download(519641); show_voting('da');" href="/subs/51/Aquaman (2018)-da.srt" class="green-link">Download</a>    <span id="voting_da" style="display:none;">        <a href="javascript:vote('da',519641,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('da',519641,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/nl.png" alt="nl" class="flag"></span>
+          <span>Dutch</span>
+<span><a id="download_nl" onclick="log_download(513907); show_voting('nl');" href="/subs/51/Aquaman (2018)-nl.srt" class="green-link">Download</a>    <span id="voting_nl" style="display:none;">        <a href="javascript:vote('nl',513907,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('nl',513907,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gb.png" alt="en" class="flag"></span>
+          <span>English</span>
+<span><a id="download_en" onclick="log_download(514178); show_voting('en');" href="/subs/51/Aquaman (2018)-en.srt" class="green-link">Download</a>    <span id="voting_en" style="display:none;">        <a href="javascript:vote('en',514178,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('en',514178,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/esperanto.png" alt="eo" class="flag"></span>
+          <span>Esperanto</span>
+<span><a id="download_eo" onclick="log_download(523748); show_voting('eo');" href="/subs/52/Aquaman (2018)-eo.srt" class="green-link">Download</a>    <span id="voting_eo" style="display:none;">        <a href="javascript:vote('eo',523748,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('eo',523748,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ee.png" alt="et" class="flag"></span>
+          <span>Estonian</span>
+<span><a id="download_et" onclick="log_download(961669); show_voting('et');" href="/subs/96/Aquaman (2018)-et.srt" class="green-link">Download</a>    <span id="voting_et" style="display:none;">        <a href="javascript:vote('et',961669,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('et',961669,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gh.png" alt="ee" class="flag"></span>
+          <span>Ewe</span>
+<span><button id="ee" onclick="translate_from_server_folder('ee', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/fo.png" alt="fo" class="flag"></span>
+          <span>Faroese</span>
+<span><button id="fo" onclick="translate_from_server_folder('fo', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ph.png" alt="tl" class="flag"></span>
+          <span>Filipino</span>
+<span><a id="download_tl" onclick="log_download(515198); show_voting('tl');" href="/subs/51/Aquaman (2018)-tl.srt" class="green-link">Download</a>    <span id="voting_tl" style="display:none;">        <a href="javascript:vote('tl',515198,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('tl',515198,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/fi.png" alt="fi" class="flag"></span>
+          <span>Finnish</span>
+<span><a id="download_fi" onclick="log_download(1167818); show_voting('fi');" href="/subs/116/Aquaman (2018)-fi.srt" class="green-link">Download</a>    <span id="voting_fi" style="display:none;">        <a href="javascript:vote('fi',1167818,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('fi',1167818,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/fr.png" alt="fr" class="flag"></span>
+          <span>French</span>
+<span><a id="download_fr" onclick="log_download(515031); show_voting('fr');" href="/subs/51/Aquaman (2018)-fr.srt" class="green-link">Download</a>    <span id="voting_fr" style="display:none;">        <a href="javascript:vote('fr',515031,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('fr',515031,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/nl.png" alt="fy" class="flag"></span>
+          <span>Frisian</span>
+<span><button id="fy" onclick="translate_from_server_folder('fy', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gh.png" alt="gaa" class="flag"></span>
+          <span>Ga</span>
+<span><button id="gaa" onclick="translate_from_server_folder('gaa', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gl.png" alt="gl" class="flag"></span>
+          <span>Galician</span>
+<span><button id="gl" onclick="translate_from_server_folder('gl', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ge.png" alt="ka" class="flag"></span>
+          <span>Georgian</span>
+<span><button id="ka" onclick="translate_from_server_folder('ka', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/de.png" alt="de" class="flag"></span>
+          <span>German</span>
+<span><a id="download_de" onclick="log_download(519808); show_voting('de');" href="/subs/51/Aquaman (2018)-de.srt" class="green-link">Download</a>    <span id="voting_de" style="display:none;">        <a href="javascript:vote('de',519808,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('de',519808,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gr.png" alt="el" class="flag"></span>
+          <span>Greek</span>
+<span><a id="download_el" onclick="log_download(514357); show_voting('el');" href="/subs/51/Aquaman (2018)-el.srt" class="green-link">Download</a>    <span id="voting_el" style="display:none;">        <a href="javascript:vote('el',514357,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('el',514357,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/py.png" alt="gn" class="flag"></span>
+          <span>Guarani</span>
+<span><button id="gn" onclick="translate_from_server_folder('gn', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="gu" class="flag"></span>
+          <span>Gujarati</span>
+<span><button id="gu" onclick="translate_from_server_folder('gu', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ht.png" alt="ht" class="flag"></span>
+          <span>Haitian Creole</span>
+<span><button id="ht" onclick="translate_from_server_folder('ht', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ng.png" alt="ha" class="flag"></span>
+          <span>Hausa</span>
+<span><button id="ha" onclick="translate_from_server_folder('ha', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/us-hi.png" alt="haw" class="flag"></span>
+          <span>Hawaiian</span>
+<span><button id="haw" onclick="translate_from_server_folder('haw', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/il.png" alt="iw" class="flag"></span>
+          <span>Hebrew</span>
+<span><a id="download_iw" onclick="log_download(516263); show_voting('iw');" href="/subs/51/Aquaman (2018)-iw.srt" class="green-link">Download</a>    <span id="voting_iw" style="display:none;">        <a href="javascript:vote('iw',516263,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('iw',516263,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="hi" class="flag"></span>
+          <span>Hindi</span>
+<span><a id="download_hi" onclick="log_download(519992); show_voting('hi');" href="/subs/51/Aquaman (2018)-hi.srt" class="green-link">Download</a>    <span id="voting_hi" style="display:none;">        <a href="javascript:vote('hi',519992,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('hi',519992,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/none.png" alt="hmn" class="flag"></span>
+          <span>Hmong</span>
+<span><button id="hmn" onclick="translate_from_server_folder('hmn', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/hu.png" alt="hu" class="flag"></span>
+          <span>Hungarian</span>
+<span><a id="download_hu" onclick="log_download(776817); show_voting('hu');" href="/subs/77/Aquaman (2018)-hu.srt" class="green-link">Download</a>    <span id="voting_hu" style="display:none;">        <a href="javascript:vote('hu',776817,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('hu',776817,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/is.png" alt="is" class="flag"></span>
+          <span>Icelandic</span>
+<span><button id="is" onclick="translate_from_server_folder('is', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ng.png" alt="ig" class="flag"></span>
+          <span>Igbo</span>
+<span><button id="ig" onclick="translate_from_server_folder('ig', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/id.png" alt="id" class="flag"></span>
+          <span>Indonesian</span>
+<span><a id="download_id" onclick="log_download(514080); show_voting('id');" href="/subs/51/Aquaman (2018)-id.srt" class="green-link">Download</a>    <span id="voting_id" style="display:none;">        <a href="javascript:vote('id',514080,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('id',514080,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/none.png" alt="ia" class="flag"></span>
+          <span>Interlingua</span>
+<span><button id="ia" onclick="translate_from_server_folder('ia', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ie.png" alt="ga" class="flag"></span>
+          <span>Irish</span>
+<span><button id="ga" onclick="translate_from_server_folder('ga', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/it.png" alt="it" class="flag"></span>
+          <span>Italian</span>
+<span><a id="download_it" onclick="log_download(514042); show_voting('it');" href="/subs/51/Aquaman (2018)-it.srt" class="green-link">Download</a>    <span id="voting_it" style="display:none;">        <a href="javascript:vote('it',514042,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('it',514042,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/jp.png" alt="ja" class="flag"></span>
+          <span>Japanese</span>
+<span><a id="download_ja" onclick="log_download(807849); show_voting('ja');" href="/subs/80/Aquaman (2018)-ja.srt" class="green-link">Download</a>    <span id="voting_ja" style="display:none;">        <a href="javascript:vote('ja',807849,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ja',807849,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/id.png" alt="jw" class="flag"></span>
+          <span>Javanese</span>
+<span><button id="jw" onclick="translate_from_server_folder('jw', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="kn" class="flag"></span>
+          <span>Kannada</span>
+<span><button id="kn" onclick="translate_from_server_folder('kn', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/kz.png" alt="kk" class="flag"></span>
+          <span>Kazakh</span>
+<span><button id="kk" onclick="translate_from_server_folder('kk', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/rw.png" alt="rw" class="flag"></span>
+          <span>Kinyarwanda</span>
+<span><button id="rw" onclick="translate_from_server_folder('rw', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/bi.png" alt="rn" class="flag"></span>
+          <span>Kirundi</span>
+<span><button id="rn" onclick="translate_from_server_folder('rn', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/cd.png" alt="kg" class="flag"></span>
+          <span>Kongo</span>
+<span><button id="kg" onclick="translate_from_server_folder('kg', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/kr.png" alt="ko" class="flag"></span>
+          <span>Korean</span>
+<span><button id="ko" onclick="translate_from_server_folder('ko', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/sl.png" alt="kri" class="flag"></span>
+          <span>Krio (Sierra Leone)</span>
+<span><button id="kri" onclick="translate_from_server_folder('kri', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/iq.png" alt="ku" class="flag"></span>
+          <span>Kurdish</span>
+<span><button id="ku" onclick="translate_from_server_folder('ku', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/iq.png" alt="ckb" class="flag"></span>
+          <span>Kurdish (Soranî)</span>
+<span><button id="ckb" onclick="translate_from_server_folder('ckb', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/kg.png" alt="ky" class="flag"></span>
+          <span>Kyrgyz</span>
+<span><button id="ky" onclick="translate_from_server_folder('ky', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/la.png" alt="lo" class="flag"></span>
+          <span>Laothian</span>
+<span><button id="lo" onclick="translate_from_server_folder('lo', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/va.png" alt="la" class="flag"></span>
+          <span>Latin</span>
+<span><button id="la" onclick="translate_from_server_folder('la', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/lv.png" alt="lv" class="flag"></span>
+          <span>Latvian</span>
+<span><button id="lv" onclick="translate_from_server_folder('lv', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/cd.png" alt="ln" class="flag"></span>
+          <span>Lingala</span>
+<span><button id="ln" onclick="translate_from_server_folder('ln', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/lt.png" alt="lt" class="flag"></span>
+          <span>Lithuanian</span>
+<span><button id="lt" onclick="translate_from_server_folder('lt', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/zm.png" alt="loz" class="flag"></span>
+          <span>Lozi</span>
+<span><button id="loz" onclick="translate_from_server_folder('loz', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ug.png" alt="lg" class="flag"></span>
+          <span>Luganda</span>
+<span><button id="lg" onclick="translate_from_server_folder('lg', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ke.png" alt="ach" class="flag"></span>
+          <span>Luo</span>
+<span><button id="ach" onclick="translate_from_server_folder('ach', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/lu.png" alt="lb" class="flag"></span>
+          <span>Luxembourgish</span>
+<span><a id="download_lb" onclick="log_download(1059757); show_voting('lb');" href="/subs/105/Aquaman (2018)-lb.srt" class="green-link">Download</a>    <span id="voting_lb" style="display:none;">        <a href="javascript:vote('lb',1059757,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('lb',1059757,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/mk.png" alt="mk" class="flag"></span>
+          <span>Macedonian</span>
+<span><a id="download_mk" onclick="log_download(518048); show_voting('mk');" href="/subs/51/Aquaman (2018)-mk.srt" class="green-link">Download</a>    <span id="voting_mk" style="display:none;">        <a href="javascript:vote('mk',518048,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('mk',518048,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/mg.png" alt="mg" class="flag"></span>
+          <span>Malagasy</span>
+<span><a id="download_mg" onclick="log_download(855788); show_voting('mg');" href="/subs/85/Aquaman (2018)-mg.srt" class="green-link">Download</a>    <span id="voting_mg" style="display:none;">        <a href="javascript:vote('mg',855788,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('mg',855788,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/my.png" alt="ms" class="flag"></span>
+          <span>Malay</span>
+<span><a id="download_ms" onclick="log_download(515079); show_voting('ms');" href="/subs/51/Aquaman (2018)-ms.srt" class="green-link">Download</a>    <span id="voting_ms" style="display:none;">        <a href="javascript:vote('ms',515079,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ms',515079,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="ml" class="flag"></span>
+          <span>Malayalam</span>
+<span><a id="download_ml" onclick="log_download(515045); show_voting('ml');" href="/subs/51/Aquaman (2018)-ml.srt" class="green-link">Download</a>    <span id="voting_ml" style="display:none;">        <a href="javascript:vote('ml',515045,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ml',515045,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/mt.png" alt="mt" class="flag"></span>
+          <span>Maltese</span>
+<span><a id="download_mt" onclick="log_download(877124); show_voting('mt');" href="/subs/87/Aquaman (2018)-mt.srt" class="green-link">Download</a>    <span id="voting_mt" style="display:none;">        <a href="javascript:vote('mt',877124,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('mt',877124,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/nz.png" alt="mi" class="flag"></span>
+          <span>Maori</span>
+<span><button id="mi" onclick="translate_from_server_folder('mi', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="mr" class="flag"></span>
+          <span>Marathi</span>
+<span><button id="mr" onclick="translate_from_server_folder('mr', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/mu.png" alt="mfe" class="flag"></span>
+          <span>Mauritian Creole</span>
+<span><button id="mfe" onclick="translate_from_server_folder('mfe', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/md.png" alt="mo" class="flag"></span>
+          <span>Moldavian</span>
+<span><button id="mo" onclick="translate_from_server_folder('mo', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/mn.png" alt="mn" class="flag"></span>
+          <span>Mongolian</span>
+<span><a id="download_mn" onclick="log_download(529497); show_voting('mn');" href="/subs/52/Aquaman (2018)-mn.srt" class="green-link">Download</a>    <span id="voting_mn" style="display:none;">        <a href="javascript:vote('mn',529497,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('mn',529497,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/mm.png" alt="my" class="flag"></span>
+          <span>Myanmar (Burmese)</span>
+<span><a id="download_my" onclick="log_download(515174); show_voting('my');" href="/subs/51/Aquaman (2018)-my.srt" class="green-link">Download</a>    <span id="voting_my" style="display:none;">        <a href="javascript:vote('my',515174,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('my',515174,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/me.png" alt="sr-ME" class="flag"></span>
+          <span>Montenegrin</span>
+<span><button id="sr-ME" onclick="translate_from_server_folder('sr-ME', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/np.png" alt="ne" class="flag"></span>
+          <span>Nepali</span>
+<span><button id="ne" onclick="translate_from_server_folder('ne', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ng.png" alt="pcm" class="flag"></span>
+          <span>Nigerian Pidgin</span>
+<span><button id="pcm" onclick="translate_from_server_folder('pcm', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/za.png" alt="nso" class="flag"></span>
+          <span>Northern Sotho</span>
+<span><button id="nso" onclick="translate_from_server_folder('nso', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/no.png" alt="no" class="flag"></span>
+          <span>Norwegian</span>
+<span><a id="download_no" onclick="log_download(583977); show_voting('no');" href="/subs/58/Aquaman (2018)-no.srt" class="green-link">Download</a>    <span id="voting_no" style="display:none;">        <a href="javascript:vote('no',583977,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('no',583977,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/no.png" alt="nn" class="flag"></span>
+          <span>Norwegian (Nynorsk)</span>
+<span><button id="nn" onclick="translate_from_server_folder('nn', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/fr.png" alt="oc" class="flag"></span>
+          <span>Occitan</span>
+<span><button id="oc" onclick="translate_from_server_folder('oc', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="or" class="flag"></span>
+          <span>Oriya</span>
+<span><button id="or" onclick="translate_from_server_folder('or', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/et.png" alt="om" class="flag"></span>
+          <span>Oromo</span>
+<span><button id="om" onclick="translate_from_server_folder('om', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/af.png" alt="ps" class="flag"></span>
+          <span>Pashto</span>
+<span><button id="ps" onclick="translate_from_server_folder('ps', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ir.png" alt="fa" class="flag"></span>
+          <span>Persian</span>
+<span><a id="download_fa" onclick="log_download(516986); show_voting('fa');" href="/subs/51/Aquaman (2018)-fa.srt" class="green-link">Download</a>    <span id="voting_fa" style="display:none;">        <a href="javascript:vote('fa',516986,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('fa',516986,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/pl.png" alt="pl" class="flag"></span>
+          <span>Polish</span>
+<span><a id="download_pl" onclick="log_download(516369); show_voting('pl');" href="/subs/51/Aquaman (2018)-pl.srt" class="green-link">Download</a>    <span id="voting_pl" style="display:none;">        <a href="javascript:vote('pl',516369,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('pl',516369,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/br.png" alt="pt-BR" class="flag"></span>
+          <span>Portuguese (Brazil)</span>
+<span><button id="pt-BR" onclick="translate_from_server_folder('pt-BR', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/pt.png" alt="pt" class="flag"></span>
+          <span>Portuguese (Portugal)</span>
+<span><a id="download_pt" onclick="log_download(514590); show_voting('pt');" href="/subs/51/Aquaman (2018)-pt.srt" class="green-link">Download</a>    <span id="voting_pt" style="display:none;">        <a href="javascript:vote('pt',514590,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('pt',514590,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="pa" class="flag"></span>
+          <span>Punjabi</span>
+<span><a id="download_pa" onclick="log_download(1032843); show_voting('pa');" href="/subs/103/Aquaman (2018)-pa.srt" class="green-link">Download</a>    <span id="voting_pa" style="display:none;">        <a href="javascript:vote('pa',1032843,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('pa',1032843,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/pe.png" alt="qu" class="flag"></span>
+          <span>Quechua</span>
+<span><button id="qu" onclick="translate_from_server_folder('qu', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ro.png" alt="ro" class="flag"></span>
+          <span>Romanian</span>
+<span><a id="download_ro" onclick="log_download(514418); show_voting('ro');" href="/subs/51/Aquaman (2018)-ro.srt" class="green-link">Download</a>    <span id="voting_ro" style="display:none;">        <a href="javascript:vote('ro',514418,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ro',514418,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ch.png" alt="rm" class="flag"></span>
+          <span>Romansh</span>
+<span><button id="rm" onclick="translate_from_server_folder('rm', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ug.png" alt="nyn" class="flag"></span>
+          <span>Runyakitara</span>
+<span><button id="nyn" onclick="translate_from_server_folder('nyn', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ru.png" alt="ru" class="flag"></span>
+          <span>Russian</span>
+<span><a id="download_ru" onclick="log_download(514412); show_voting('ru');" href="/subs/51/Aquaman (2018)-ru.srt" class="green-link">Download</a>    <span id="voting_ru" style="display:none;">        <a href="javascript:vote('ru',514412,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ru',514412,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/as.png" alt="sm" class="flag"></span>
+          <span>Samoan</span>
+<span><button id="sm" onclick="translate_from_server_folder('sm', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gb-sct.png" alt="gd" class="flag"></span>
+          <span>Scots Gaelic</span>
+<span><button id="gd" onclick="translate_from_server_folder('gd', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/rs.png" alt="sr" class="flag"></span>
+          <span>Serbian</span>
+<span><a id="download_sr" onclick="log_download(517113); show_voting('sr');" href="/subs/51/Aquaman (2018)-sr.srt" class="green-link">Download</a>    <span id="voting_sr" style="display:none;">        <a href="javascript:vote('sr',517113,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('sr',517113,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/rs.png" alt="sh" class="flag"></span>
+          <span>Serbo-Croatian</span>
+<span><button id="sh" onclick="translate_from_server_folder('sh', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ls.png" alt="st" class="flag"></span>
+          <span>Sesotho</span>
+<span><button id="st" onclick="translate_from_server_folder('st', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/bw.png" alt="tn" class="flag"></span>
+          <span>Setswana</span>
+<span><button id="tn" onclick="translate_from_server_folder('tn', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/sc.png" alt="crs" class="flag"></span>
+          <span>Seychellois Creole</span>
+<span><button id="crs" onclick="translate_from_server_folder('crs', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/zw.png" alt="sn" class="flag"></span>
+          <span>Shona</span>
+<span><button id="sn" onclick="translate_from_server_folder('sn', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/pk.png" alt="sd" class="flag"></span>
+          <span>Sindhi</span>
+<span><button id="sd" onclick="translate_from_server_folder('sd', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/lk.png" alt="si" class="flag"></span>
+          <span>Sinhalese</span>
+<span><a id="download_si" onclick="log_download(516171); show_voting('si');" href="/subs/51/Aquaman (2018)-si.srt" class="green-link">Download</a>    <span id="voting_si" style="display:none;">        <a href="javascript:vote('si',516171,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('si',516171,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/sk.png" alt="sk" class="flag"></span>
+          <span>Slovak</span>
+<span><button id="sk" onclick="translate_from_server_folder('sk', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/si.png" alt="sl" class="flag"></span>
+          <span>Slovenian</span>
+<span><button id="sl" onclick="translate_from_server_folder('sl', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/so.png" alt="so" class="flag"></span>
+          <span>Somali</span>
+<span><button id="so" onclick="translate_from_server_folder('so', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/es.png" alt="es" class="flag"></span>
+          <span>Spanish</span>
+<span><a id="download_es" onclick="log_download(514591); show_voting('es');" href="/subs/51/Aquaman (2018)-es.srt" class="green-link">Download</a>    <span id="voting_es" style="display:none;">        <a href="javascript:vote('es',514591,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('es',514591,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/es.png" alt="es-419" class="flag"></span>
+          <span>Spanish (Latin American)</span>
+<span><button id="es-419" onclick="translate_from_server_folder('es-419', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/id.png" alt="su" class="flag"></span>
+          <span>Sundanese</span>
+<span><a id="download_su" onclick="log_download(743910); show_voting('su');" href="/subs/74/Aquaman (2018)-su.srt" class="green-link">Download</a>    <span id="voting_su" style="display:none;">        <a href="javascript:vote('su',743910,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('su',743910,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ke.png" alt="sw" class="flag"></span>
+          <span>Swahili</span>
+<span><button id="sw" onclick="translate_from_server_folder('sw', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/se.png" alt="sv" class="flag"></span>
+          <span>Swedish</span>
+<span><a id="download_sv" onclick="log_download(524137); show_voting('sv');" href="/subs/52/Aquaman (2018)-sv.srt" class="green-link">Download</a>    <span id="voting_sv" style="display:none;">        <a href="javascript:vote('sv',524137,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('sv',524137,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/tj.png" alt="tg" class="flag"></span>
+          <span>Tajik</span>
+<span><button id="tg" onclick="translate_from_server_folder('tg', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/lk.png" alt="ta" class="flag"></span>
+          <span>Tamil</span>
+<span><a id="download_ta" onclick="log_download(522143); show_voting('ta');" href="/subs/52/Aquaman (2018)-ta.srt" class="green-link">Download</a>    <span id="voting_ta" style="display:none;">        <a href="javascript:vote('ta',522143,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ta',522143,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ru.png" alt="tt" class="flag"></span>
+          <span>Tatar</span>
+<span><button id="tt" onclick="translate_from_server_folder('tt', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/in.png" alt="te" class="flag"></span>
+          <span>Telugu</span>
+<span><a id="download_te" onclick="log_download(519374); show_voting('te');" href="/subs/51/Aquaman (2018)-te.srt" class="green-link">Download</a>    <span id="voting_te" style="display:none;">        <a href="javascript:vote('te',519374,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('te',519374,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/th.png" alt="th" class="flag"></span>
+          <span>Thai</span>
+<span><a id="download_th" onclick="log_download(518388); show_voting('th');" href="/subs/51/Aquaman (2018)-th.srt" class="green-link">Download</a>    <span id="voting_th" style="display:none;">        <a href="javascript:vote('th',518388,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('th',518388,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/er.png" alt="ti" class="flag"></span>
+          <span>Tigrinya</span>
+<span><button id="ti" onclick="translate_from_server_folder('ti', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/to.png" alt="to" class="flag"></span>
+          <span>Tonga</span>
+<span><button id="to" onclick="translate_from_server_folder('to', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/cd.png" alt="lua" class="flag"></span>
+          <span>Tshiluba</span>
+<span><button id="lua" onclick="translate_from_server_folder('lua', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/mw.png" alt="tum" class="flag"></span>
+          <span>Tumbuka</span>
+<span><button id="tum" onclick="translate_from_server_folder('tum', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/tr.png" alt="tr" class="flag"></span>
+          <span>Turkish</span>
+<span><a id="download_tr" onclick="log_download(518888); show_voting('tr');" href="/subs/51/Aquaman (2018)-tr.srt" class="green-link">Download</a>    <span id="voting_tr" style="display:none;">        <a href="javascript:vote('tr',518888,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('tr',518888,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/tm.png" alt="tk" class="flag"></span>
+          <span>Turkmen</span>
+<span><button id="tk" onclick="translate_from_server_folder('tk', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gh.png" alt="tw" class="flag"></span>
+          <span>Twi</span>
+<span><button id="tw" onclick="translate_from_server_folder('tw', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/cn.png" alt="ug" class="flag"></span>
+          <span>Uighur</span>
+<span><button id="ug" onclick="translate_from_server_folder('ug', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ua.png" alt="uk" class="flag"></span>
+          <span>Ukrainian</span>
+<span><a id="download_uk" onclick="log_download(843623); show_voting('uk');" href="/subs/84/Aquaman (2018)-uk.srt" class="green-link">Download</a>    <span id="voting_uk" style="display:none;">        <a href="javascript:vote('uk',843623,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('uk',843623,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/pk.png" alt="ur" class="flag"></span>
+          <span>Urdu</span>
+<span><a id="download_ur" onclick="log_download(516126); show_voting('ur');" href="/subs/51/Aquaman (2018)-ur.srt" class="green-link">Download</a>    <span id="voting_ur" style="display:none;">        <a href="javascript:vote('ur',516126,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('ur',516126,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/uz.png" alt="uz" class="flag"></span>
+          <span>Uzbek</span>
+<span><button id="uz" onclick="translate_from_server_folder('uz', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/vn.png" alt="vi" class="flag"></span>
+          <span>Vietnamese</span>
+<span><a id="download_vi" onclick="log_download(518181); show_voting('vi');" href="/subs/51/Aquaman (2018)-vi.srt" class="green-link">Download</a>    <span id="voting_vi" style="display:none;">        <a href="javascript:vote('vi',518181,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('vi',518181,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/gb-wls.png" alt="cy" class="flag"></span>
+          <span>Welsh</span>
+<span><button id="cy" onclick="translate_from_server_folder('cy', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/sn.png" alt="wo" class="flag"></span>
+          <span>Wolof</span>
+<span><button id="wo" onclick="translate_from_server_folder('wo', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/za.png" alt="xh" class="flag"></span>
+          <span>Xhosa</span>
+<span><a id="download_xh" onclick="log_download(10020220); show_voting('xh');" href="/subs/1002/Aquaman (2018)-xh.srt" class="green-link">Download</a>    <span id="voting_xh" style="display:none;">        <a href="javascript:vote('xh',10020220,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('xh',10020220,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/none.png" alt="yi" class="flag"></span>
+          <span>Yiddish</span>
+<span><a id="download_yi" onclick="log_download(514999); show_voting('yi');" href="/subs/51/Aquaman (2018)-yi.srt" class="green-link">Download</a>    <span id="voting_yi" style="display:none;">        <a href="javascript:vote('yi',514999,+1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👍</a>        <a href="javascript:vote('yi',514999,-1)" style="display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; background-color: black; border-radius: 5px; color: white; font-size: 1.5em;">👎</a>    </span></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/ng.png" alt="yo" class="flag"></span>
+          <span>Yoruba</span>
+<span><button id="yo" onclick="translate_from_server_folder('yo', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>      <div class="col-md-6 col-lg-4">
+        <!-- Sub single -->
+        <div class="sub-single">
+          <span><img src="/assets/flags/za.png" alt="zu" class="flag"></span>
+          <span>Zulu</span>
+<span><button id="zu" onclick="translate_from_server_folder('zu', 'Aquaman (2018)-orig.srt', '/subs/51/')" class="yellow-link">Translate</button></span>
+        </div>
+        <!-- ./Sub single -->
+      </div>    </div>

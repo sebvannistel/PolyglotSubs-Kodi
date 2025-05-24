@@ -1,0 +1,978 @@
+<div class="subtitles">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <table class="table sub-table">
+            <thead>
+              <tr>
+                <th colspan="2">
+<h2 class="sec-title">120 subtitles found <span>(we have 10,878,849 subtitles)</span></h2>
+                </th>
+                <th>
+                  <img src="assets/images/arrow-down.png" alt=""> DOWNLOADS
+                </th>
+                <th>
+                  <img src="assets/images/lang.png" alt=""> LANGUAGES
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+
+	<tr>
+		<td><a href="subs/17/Aquaman%20Rage%20of%20Atlantis%202018%20720p%20WEB-DL%20H264%20AC3-EVO.html">Aquaman Rage of Atlantis 2018 720p WEB-DL H264 AC3-EVO</a> (translated from Spanish)</td>
+		<td><i class="fas fa-thumbs-up">👍</i></td>
+		<td>2555 downloads</td>
+		<td>60 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/45/Aquaman.Rage.of.Atlantis.2018.BDRip.XviD.AC3-EVO%5BEtMovies%5D.html">Aquaman.Rage.of.Atlantis.2018.BDRip.XviD.AC3-EVO[EtMovies]</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>181 downloads</td>
+		<td>23 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/47/Aquaman%20-%2001x01%20-%20Pilot%20HR.html">Aquaman - 01x01 - Pilot HR</a></td>
+		<td>&nbsp;</td>
+		<td>16 downloads</td>
+		<td>7 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/47/Aquaman%20-%20Extended%20Video%20CZ%20titulky.html">Aquaman - Extended Video CZ titulky</a> (translated from Czech)</td>
+		<td>&nbsp;</td>
+		<td>36 downloads</td>
+		<td>12 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/47/Aquaman%202018%20-%20English.html">Aquaman 2018 - English</a> (translated from English)</td>
+		<td><i class="fas fa-thumbs-up">👍</i></td>
+		<td>1276 downloads</td>
+		<td>58 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/49/Aquaman%20Rage%20of%20Atlantis%202018%20720p%20WEB-DL%20H264%20AC3-EVO-en.html">Aquaman Rage of Atlantis 2018 720p WEB-DL H264 AC3-EVO-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1048 downloads</td>
+		<td>46 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/50/Aquaman.cam.tr.html">Aquaman.cam.tr</a> (translated from Turkish)</td>
+		<td>&nbsp;</td>
+		<td>210 downloads</td>
+		<td>22 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/50/AQUAMAN%20Extended%20Trailer%20%232%20%282018%29.html">AQUAMAN Extended Trailer #2 (2018)</a></td>
+		<td>&nbsp;</td>
+		<td>1 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/50/Aquaman.cam.translet.eng.html">Aquaman.cam.translet.eng</a></td>
+		<td>&nbsp;</td>
+		<td>62 downloads</td>
+		<td>12 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%20%282018%29.html">Aquaman (2018)</a> (translated from English)</td>
+		<td><i class="fas fa-thumbs-up">👍</i></td>
+		<td>3509 downloads</td>
+		<td>62 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman.cam.tr-en.html">Aquaman.cam.tr-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>12 downloads</td>
+		<td>3 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%20%282018%29-en.html">Aquaman (2018)-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1487 downloads</td>
+		<td>47 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman.html">Aquaman</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>120 downloads</td>
+		<td>18 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%20-%2069%20-.html">Aquaman - 69 -</a></td>
+		<td>&nbsp;</td>
+		<td>9 downloads</td>
+		<td>6 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman.2018.HDTS.Pahe.in.html">Aquaman.2018.HDTS.Pahe.in</a> (translated from Indonesian)</td>
+		<td>&nbsp;</td>
+		<td>123 downloads</td>
+		<td>15 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman.2018.HDTS.eng.html">Aquaman.2018.HDTS.eng</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>27436 downloads</td>
+		<td>100 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD-por.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD-por</a> (translated from Portuguese)</td>
+		<td>&nbsp;</td>
+		<td>2436 downloads</td>
+		<td>50 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman.2018.HDTS.eng-fr.html">Aquaman.2018.HDTS.eng-fr</a> (translated from French)</td>
+		<td>&nbsp;</td>
+		<td>252 downloads</td>
+		<td>26 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD-por-el.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD-por-el</a></td>
+		<td>&nbsp;</td>
+		<td>1998 downloads</td>
+		<td>41 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%20%282018%29-en-fr.html">Aquaman (2018)-en-fr</a> (translated from French)</td>
+		<td>&nbsp;</td>
+		<td>36 downloads</td>
+		<td>8 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%202018%20720p%20HD-TC-1XBET.tr.html">Aquaman 2018 720p HD-TC-1XBET.tr</a> (translated from Turkish)</td>
+		<td>&nbsp;</td>
+		<td>728 downloads</td>
+		<td>31 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%20Rage%20of%20Atlantis%202018%20720p%20WEB-DL%20H264%20AC3-EVO-ms.html">Aquaman Rage of Atlantis 2018 720p WEB-DL H264 AC3-EVO-ms</a> (translated from Malay)</td>
+		<td>&nbsp;</td>
+		<td>49 downloads</td>
+		<td>7 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Aquaman%202018%20720p%20HD-TC-1XBET.html">Aquaman 2018 720p HD-TC-1XBET</a></td>
+		<td>&nbsp;</td>
+		<td>426 downloads</td>
+		<td>34 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/AQUAMAN%20VOSTFR.html">AQUAMAN VOSTFR</a></td>
+		<td>&nbsp;</td>
+		<td>5 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman.2018.HDTC.x264.AC3-ETRG.html">Aquaman.2018.HDTC.x264.AC3-ETRG</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1332 downloads</td>
+		<td>46 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/aquaman2018CAM.html">aquaman2018CAM</a> (translated from Indonesian)</td>
+		<td>&nbsp;</td>
+		<td>65 downloads</td>
+		<td>13 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman.cam.ro.html">Aquaman.cam.ro</a></td>
+		<td>&nbsp;</td>
+		<td>6 downloads</td>
+		<td>4 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman%20%282018%29-en-en.html">Aquaman (2018)-en-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>14 downloads</td>
+		<td>3 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman%20%282018%29-en-en-en.html">Aquaman (2018)-en-en-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>15 downloads</td>
+		<td>2 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman%202018%20TC%201080p.html">Aquaman 2018 TC 1080p</a> (translated from Portuguese)</td>
+		<td>&nbsp;</td>
+		<td>98 downloads</td>
+		<td>9 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman.HQ-TS.1080p.DD5.1.x264.OmNiC.html">Aquaman.HQ-TS.1080p.DD5.1.x264.OmNiC</a> (translated from Indonesian)</td>
+		<td>&nbsp;</td>
+		<td>136 downloads</td>
+		<td>17 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman.2018.720p.HDTC.MkvCage.html">Aquaman.2018.720p.HDTC.MkvCage</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>972 downloads</td>
+		<td>44 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman.2018.HDTS.eng-fr-en.html">Aquaman.2018.HDTS.eng-fr-en</a></td>
+		<td>&nbsp;</td>
+		<td>9 downloads</td>
+		<td>2 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD</a></td>
+		<td>&nbsp;</td>
+		<td>383 downloads</td>
+		<td>35 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD-eng.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD-eng</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>262 downloads</td>
+		<td>27 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/53/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD-por-el-es.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD-por-el-es</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>45 downloads</td>
+		<td>13 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/53/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD%20%282%29.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD (2)</a> (translated from Spanish)</td>
+		<td>&nbsp;</td>
+		<td>2269 downloads</td>
+		<td>52 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/53/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD.HEB.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD.HEB</a></td>
+		<td>&nbsp;</td>
+		<td>26 downloads</td>
+		<td>2 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/53/Aquaman.2018.PROPER.HD-TC.HQ.X264-SeeHD.html">Aquaman.2018.PROPER.HD-TC.HQ.X264-SeeHD</a> (translated from Spanish)</td>
+		<td>&nbsp;</td>
+		<td>107 downloads</td>
+		<td>17 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/53/Aquaman.2018.HDTC.x264.AC3-MP4KiNG.html">Aquaman.2018.HDTC.x264.AC3-MP4KiNG</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>912 downloads</td>
+		<td>25 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/53/AQUAMAN%20Extended%20Trailer%20.2%20%282018%29.html">AQUAMAN Extended Trailer .2 (2018)</a></td>
+		<td>&nbsp;</td>
+		<td>2 downloads</td>
+		<td>2 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/53/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD.AW.-.NoTag.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD.AW.-.NoTag</a> (translated from Aragonese)</td>
+		<td>&nbsp;</td>
+		<td>32 downloads</td>
+		<td>7 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/54/Aquaman%202018%20720p%20PROPER%20HD-TC%20HQ%20X264-SeeHD-por-en.html">Aquaman 2018 720p PROPER HD-TC HQ X264-SeeHD-por-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>91 downloads</td>
+		<td>12 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/54/Aquaman.2018.HDTC.x264.AC3-ETRG-eng.html">Aquaman.2018.HDTC.x264.AC3-ETRG-eng</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>5628 downloads</td>
+		<td>63 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/55/Aquaman.2018.BLURRED.WEBRip.1080p.x264.DD2.0.AC-3-CRYS.html">Aquaman.2018.BLURRED.WEBRip.1080p.x264.DD2.0.AC-3-CRYS</a> (translated from Romanian)</td>
+		<td>&nbsp;</td>
+		<td>145 downloads</td>
+		<td>18 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/55/Aquaman%202018.html">Aquaman 2018</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>181 downloads</td>
+		<td>20 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/57/Aquaman.2018.BLURRED.HDTC.x264.AC3-ETRG.html">Aquaman.2018.BLURRED.HDTC.x264.AC3-ETRG</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>449 downloads</td>
+		<td>29 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/57/aquaman-2018-720p-proper-hd-tc-hq-x264-seehd%281%29.html">aquaman-2018-720p-proper-hd-tc-hq-x264-seehd(1)</a> (translated from Greek)</td>
+		<td>&nbsp;</td>
+		<td>18 downloads</td>
+		<td>7 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/58/Aquaman%202018%201080p%20HDTC-1XBET.html">Aquaman 2018 1080p HDTC-1XBET</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>2166 downloads</td>
+		<td>52 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/60/Aquaman.2018.720p.HDTC.AW.-.Tag.html">Aquaman.2018.720p.HDTC.AW.-.Tag</a> (translated from Aragonese)</td>
+		<td>&nbsp;</td>
+		<td>18 downloads</td>
+		<td>6 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/60/aquaman-2018-720p-proper-hd-tc-hq-x264-seehd.html">aquaman-2018-720p-proper-hd-tc-hq-x264-seehd</a> (translated from Greek)</td>
+		<td>&nbsp;</td>
+		<td>508 downloads</td>
+		<td>22 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/61/Aquaman%202018%20720p%20HD-TC%20x264%20-%20LOKiHD%20-%20ZTRG.html">Aquaman 2018 720p HD-TC x264 - LOKiHD - ZTRG</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>36 downloads</td>
+		<td>6 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/64/Aquaman.2018.1080p.KORSUB.HDRip.x264.AAC2.0-STUTTERSHIT.html">Aquaman.2018.1080p.KORSUB.HDRip.x264.AAC2.0-STUTTERSHIT</a> (translated from Portuguese)</td>
+		<td>&nbsp;</td>
+		<td>2053 downloads</td>
+		<td>44 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/64/Aquaman.2018.WEBRip.1080p.x264.html">Aquaman.2018.WEBRip.1080p.x264</a> (translated from Romanian)</td>
+		<td>&nbsp;</td>
+		<td>479 downloads</td>
+		<td>22 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/64/Aquaman.2018.1080p.KORSUB.HDRip.x264.AAC2.0-STUTTERSHIT-en.html">Aquaman.2018.1080p.KORSUB.HDRip.x264.AAC2.0-STUTTERSHIT-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>2059 downloads</td>
+		<td>54 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/64/Aquaman.2018..html">Aquaman.2018.</a> (translated from Portuguese)</td>
+		<td>&nbsp;</td>
+		<td>119 downloads</td>
+		<td>15 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/64/Aquaman.2018.1080p.KORSUB.HDRip.x264.AAC2.0-STUTTERSHIT.Brazilian.html">Aquaman.2018.1080p.KORSUB.HDRip.x264.AAC2.0-STUTTERSHIT.Brazilian</a> (translated from Portuguese)</td>
+		<td>&nbsp;</td>
+		<td>389 downloads</td>
+		<td>25 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/65/Aquaman.2018.HC.HDRip.XviD.AC3-EVO.html">Aquaman.2018.HC.HDRip.XviD.AC3-EVO</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>921 downloads</td>
+		<td>38 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/65/Aquaman.2018.HC.HDRip.XviD.AC3-EVO-Colored.html">Aquaman.2018.HC.HDRip.XviD.AC3-EVO-Colored</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>73 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/65/Aquaman.2018.1080p.HDRip.BLURRED.AC3.X264-CMRG.html">Aquaman.2018.1080p.HDRip.BLURRED.AC3.X264-CMRG</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>120 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/66/Aquaman.2018.HC.HDRip.XviD.AC3-EVO-en.html">Aquaman.2018.HC.HDRip.XviD.AC3-EVO-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>2362 downloads</td>
+		<td>53 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/66/Aquaman%202018%20Hindi%20Dual%20Audio.html">Aquaman 2018 Hindi Dual Audio</a> (translated from Danish)</td>
+		<td>&nbsp;</td>
+		<td>514 downloads</td>
+		<td>24 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/66/Aquaman.2018.KORSUB.HDRip.x264-STUTTERSHIT.html">Aquaman.2018.KORSUB.HDRip.x264-STUTTERSHIT</a> (translated from Portuguese)</td>
+		<td>&nbsp;</td>
+		<td>842 downloads</td>
+		<td>25 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/68/Aquaman.2018.HC.HDRip.XviD.AC3-EVO-en-en.html">Aquaman.2018.HC.HDRip.XviD.AC3-EVO-en-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1103 downloads</td>
+		<td>36 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/71/Aquaman.2018.1080p.HDRip.BLURRED.AC3.X264-CMRG.es.html">Aquaman.2018.1080p.HDRip.BLURRED.AC3.X264-CMRG.es</a> (translated from Spanish)</td>
+		<td>&nbsp;</td>
+		<td>153 downloads</td>
+		<td>15 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/72/Aquaman.2018.480p.HDRip.BLURRED.DD2.0.x264-BDP%5Bmoj%5D.html">Aquaman.2018.480p.HDRip.BLURRED.DD2.0.x264-BDP[moj]</a> (translated from Croatian)</td>
+		<td>&nbsp;</td>
+		<td>10 downloads</td>
+		<td>4 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/76/Aquaman.2018.HC.HDRip.XviD.AC3-EVO-HI.html">Aquaman.2018.HC.HDRip.XviD.AC3-EVO-HI</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>33 downloads</td>
+		<td>7 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/80/Aquaman%20%5B2018%5DHC%20HDRip%20480p%20x264%40TROFFICIAL.html">Aquaman [2018]HC HDRip 480p x264@TROFFICIAL</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>75 downloads</td>
+		<td>10 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/80/Aquaman%202018%20HDRip.html">Aquaman 2018 HDRip</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>21 downloads</td>
+		<td>6 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/80/Aquaman.2018.1080p.WEB-DL.H264.AC3-EVO-HI.html">Aquaman.2018.1080p.WEB-DL.H264.AC3-EVO-HI</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>474 downloads</td>
+		<td>31 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/80/Aquaman.2018.IMAX.720p.WEB-DL.XviD.AC3-FGT.html">Aquaman.2018.IMAX.720p.WEB-DL.XviD.AC3-FGT</a> (translated from Bosnian)</td>
+		<td>&nbsp;</td>
+		<td>1007 downloads</td>
+		<td>32 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/80/Aquaman.2018.IMAX.720p.WEB-DL.H264.AC3-EVO.html">Aquaman.2018.IMAX.720p.WEB-DL.H264.AC3-EVO</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>285 downloads</td>
+		<td>4 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/80/Aquaman.2018.720p.WEBRip.x264-%5BYTS.AM%5D.html">Aquaman.2018.720p.WEBRip.x264-[YTS.AM]</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>2381 downloads</td>
+		<td>42 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/80/Aquaman.2018.720p.WEBRip.x264-%5BYTS.AM%5D-eng.html">Aquaman.2018.720p.WEBRip.x264-[YTS.AM]-eng</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1171 downloads</td>
+		<td>32 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/81/Aquaman.2018.1080p.WEB-DL.H264.AC3-EVO.html">Aquaman.2018.1080p.WEB-DL.H264.AC3-EVO</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1368 downloads</td>
+		<td>31 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/81/Aquaman.2018.1080p.WEBRip.x264-%5BYTS.AM%5D.html">Aquaman.2018.1080p.WEBRip.x264-[YTS.AM]</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>4438 downloads</td>
+		<td>53 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/81/Aquaman.2018.IMAX.HDRip.XviD.AC3-EVO.html">Aquaman.2018.IMAX.HDRip.XviD.AC3-EVO</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>2 downloads</td>
+		<td>2 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/81/Aquaman.2018.1080p.WEBRip.x264-%5BYTS.AM%5D-eng.html">Aquaman.2018.1080p.WEBRip.x264-[YTS.AM]-eng</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1318 downloads</td>
+		<td>32 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/81/Aquaman.2018.1080p.WEB.h264-STRiFE.hun.html">Aquaman.2018.1080p.WEB.h264-STRiFE.hun</a> (translated from Hungarian)</td>
+		<td>&nbsp;</td>
+		<td>397 downloads</td>
+		<td>14 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/81/aquaman.2018.1080p.web.h264-strife.html">aquaman.2018.1080p.web.h264-strife</a> (translated from Dutch)</td>
+		<td>&nbsp;</td>
+		<td>907 downloads</td>
+		<td>21 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/85/Aquaman.2018.IMAX.Edition.1080p.WEBRip.DDP.5.1.x264-NTb.html">Aquaman.2018.IMAX.Edition.1080p.WEBRip.DDP.5.1.x264-NTb</a> (translated from Romanian)</td>
+		<td>&nbsp;</td>
+		<td>13 downloads</td>
+		<td>5 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/85/Aquaman.2018.720p.BluRay.x264-SPARKS.html">Aquaman.2018.720p.BluRay.x264-SPARKS</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>185 downloads</td>
+		<td>19 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/85/Aquaman%20%282018%29%204K%20UHD%20HDR%20Latino.en..html">Aquaman (2018) 4K UHD HDR Latino.en.</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>12 downloads</td>
+		<td>8 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/86/Aquaman.2018.720p.BluRay.x264-%5BYTS.AM%5D.html">Aquaman.2018.720p.BluRay.x264-[YTS.AM]</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>922 downloads</td>
+		<td>29 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/86/Aquaman.2018.WEB-DL.x264-FGT.Fr.html">Aquaman.2018.WEB-DL.x264-FGT.Fr</a> (translated from French)</td>
+		<td>&nbsp;</td>
+		<td>6 downloads</td>
+		<td>4 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/86/Aquaman.2018.IMAX.1080p.WEB.H264-EXTREME.html">Aquaman.2018.IMAX.1080p.WEB.H264-EXTREME</a> (translated from French)</td>
+		<td>&nbsp;</td>
+		<td>14 downloads</td>
+		<td>7 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/86/Aquaman.2018.1080p.BluRay.x264-.YTS.AM.html">Aquaman.2018.1080p.BluRay.x264-.YTS.AM</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>231 downloads</td>
+		<td>32 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/87/Aquaman.2018.3D.HSBS.BluRay.x264.Eng.html">Aquaman.2018.3D.HSBS.BluRay.x264.Eng</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>57 downloads</td>
+		<td>21 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/89/Aquaman.2018.1080p.BluRay.x264-%5BYTS.AM%5D.html">Aquaman.2018.1080p.BluRay.x264-[YTS.AM]</a> (translated from English)</td>
+		<td><i class="fas fa-thumbs-up">👍</i></td>
+		<td>103 downloads</td>
+		<td>37 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/99/Aquaman.2018.IMAX.2160p.WEB-DL.x265.HEVCBay.com.html">Aquaman.2018.IMAX.2160p.WEB-DL.x265.HEVCBay.com</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>6 downloads</td>
+		<td>3 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/130/Aquaman%20%282018%29%203D-HSBS-1080p-H264-AC%203%20%28DolbyDigital-5.1%29%20%26%20nickarad.html">Aquaman (2018) 3D-HSBS-1080p-H264-AC 3 (DolbyDigital-5.1) &amp; nickarad</a> (translated from Romanian)</td>
+		<td>&nbsp;</td>
+		<td>25 downloads</td>
+		<td>11 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/137/Aquaman%20%282006%20TV%20pilot%29%20-%2001x01%20-%20Pilot.SCREENER.Fre.html">Aquaman (2006 TV pilot) - 01x01 - Pilot.SCREENER.Fre</a> (translated from French)</td>
+		<td>&nbsp;</td>
+		<td>3 downloads</td>
+		<td>3 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/229/Aquaman.2018.IMAX.1080p.BluRay.x265-RARBG_English.html">Aquaman.2018.IMAX.1080p.BluRay.x265-RARBG_English</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>22 downloads</td>
+		<td>22 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/229/Aquaman.2018.IMAX.1080p.BluRay.x265-RARBG.html">Aquaman.2018.IMAX.1080p.BluRay.x265-RARBG</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>5 downloads</td>
+		<td>5 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/249/Aquaman.S01E03_English.html">Aquaman.S01E03_English</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/249/Aquaman.S01E01_English.html">Aquaman.S01E01_English</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/249/Aquaman.S01E06_English.html">Aquaman.S01E06_English</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/249/Aquaman.S01E09_English.html">Aquaman.S01E09_English</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/249/Aquaman.S01E07_English.html">Aquaman.S01E07_English</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>1 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/18/LEGO%20DC%20Comics%20Super%20Heroes%20Aquaman%20Rage%20of%20Atlantis%202018%20720p%20WEB-DL%20H264%20AC3-EVO.html">LEGO DC Comics Super Heroes Aquaman Rage of Atlantis 2018 720p WEB-DL H264 AC3-EVO</a> (translated from Spanish)</td>
+		<td>&nbsp;</td>
+		<td>733 downloads</td>
+		<td>34 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/19/LEGO%20DC%20Comics%20Super%20Heroes%20Aquaman%20-%20Rage%20of%20Atlantis.html">LEGO DC Comics Super Heroes Aquaman - Rage of Atlantis</a> (translated from Indonesian)</td>
+		<td>&nbsp;</td>
+		<td>147 downloads</td>
+		<td>15 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/21/LEGO.DC.Comics.Super.Heroes.Aquaman.Rage.of.Atlantis.2018.720p.WEB-DL.H264.AC3-EVO%20en.html">LEGO.DC.Comics.Super.Heroes.Aquaman.Rage.of.Atlantis.2018.720p.WEB-DL.H264.AC3-EVO en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>13 downloads</td>
+		<td>5 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/22/lego-dc-comics-super-heroes-aquaman-rage-of-atlantis-2018-720p-bluray-x264-dts-mt.html">lego-dc-comics-super-heroes-aquaman-rage-of-atlantis-2018-720p-bluray-x264-dts-mt</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>11 downloads</td>
+		<td>7 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/34/LEGO.DC.Comics.Super.Heroes.Aquaman.Rage.of.Atlantis.2018.720p.WEB-DL.H264.AC3-EVO-HI.html">LEGO.DC.Comics.Super.Heroes.Aquaman.Rage.of.Atlantis.2018.720p.WEB-DL.H264.AC3-EVO-HI</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>6 downloads</td>
+		<td>5 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/34/LEGO.DC.Comics.Super.Heroes.Aquaman.Rage.of.Atlantis.2018.720p.BluRay.x264.DTS-MT-HI.html">LEGO.DC.Comics.Super.Heroes.Aquaman.Rage.of.Atlantis.2018.720p.BluRay.x264.DTS-MT-HI</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>54 downloads</td>
+		<td>15 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/42/LEGO.DC.Comics.Super.Heroes.Aquaman.-.Rage.Of.Atlantis.2018.1080p.BluRay.x264-%5BYTS.AM%5D.en.html">LEGO.DC.Comics.Super.Heroes.Aquaman.-.Rage.Of.Atlantis.2018.1080p.BluRay.x264-[YTS.AM].en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>227 downloads</td>
+		<td>26 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/44/LEGO.DC.Comics.Super.Heroes.Aquaman.-.Rage.Of.Atlantis.2018.720p.BluRay.x264-%5BYTS.AM%5D-eng.html">LEGO.DC.Comics.Super.Heroes.Aquaman.-.Rage.Of.Atlantis.2018.720p.BluRay.x264-[YTS.AM]-eng</a></td>
+		<td>&nbsp;</td>
+		<td>30 downloads</td>
+		<td>10 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/50/%20www.1MovieRulz.com%20-%20Aquaman%20%282018%29%20720p%20English%20HDCAM-Rip%20-%20x264%20-%20AAC%20-%20850B.html"> www.1MovieRulz.com - Aquaman (2018) 720p English HDCAM-Rip - x264 - AAC - 850B</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>426 downloads</td>
+		<td>17 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/Copy%20of%20aquaman.html">Copy of aquaman</a></td>
+		<td>&nbsp;</td>
+		<td>22 downloads</td>
+		<td>9 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/51/ZONAFILM.XYZ%20-%20Aquaman.2018.HDTC.html">ZONAFILM.XYZ - Aquaman.2018.HDTC</a></td>
+		<td>&nbsp;</td>
+		<td>84 downloads</td>
+		<td>12 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/INDOXXI-.Aquaman-HD.720p.-Indonesia-1.html">INDOXXI-.Aquaman-HD.720p.-Indonesia-1</a> (translated from Indonesian)</td>
+		<td>&nbsp;</td>
+		<td>61 downloads</td>
+		<td>9 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/Watch%20Aquaman%20%282018%29%20Full%20Movie%20on%20FMovies.to.html">Watch Aquaman (2018) Full Movie on FMovies.to</a> (translated from Japanese)</td>
+		<td>&nbsp;</td>
+		<td>123 downloads</td>
+		<td>15 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/www.2MovieRulz.com%20-%20Aquaman%20%282018%29%20720p%20HDTC-Rip%20x264%20AAC%20850MB.html">www.2MovieRulz.com - Aquaman (2018) 720p HDTC-Rip x264 AAC 850MB</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>629 downloads</td>
+		<td>28 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/52/ZONAFILM.XYZ%20-%20Aquaman.2018.HDTC-en.html">ZONAFILM.XYZ - Aquaman.2018.HDTC-en</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>36 downloads</td>
+		<td>6 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/63/LEGO.DC.Comics.Super.Heroes.Aquaman.-.Rage.Of.Atlantis.2018.720p.BluRay.x264-%5BYTS.AM%5D.html">LEGO.DC.Comics.Super.Heroes.Aquaman.-.Rage.Of.Atlantis.2018.720p.BluRay.x264-[YTS.AM]</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>110 downloads</td>
+		<td>15 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/70/LEGO.DC.Comics.Super.Heroes.Aquaman.Rage.of.Atlantis.2018.720p.BluRay.x264-x0r_track3_eng.html">LEGO.DC.Comics.Super.Heroes.Aquaman.Rage.of.Atlantis.2018.720p.BluRay.x264-x0r_track3_eng</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>5 downloads</td>
+		<td>1 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/80/Watch%20Aquaman%20%282018%29%20Online%20Full%20Movie%20Free%20On%20123Movies.html">Watch Aquaman (2018) Online Full Movie Free On 123Movies</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>9 downloads</td>
+		<td>7 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/81/Gurram%20Group%20~%20Aquaman.2018.720p.WEBRip.x264-%5BYTS.AM%5D.srt.html">Gurram Group ~ Aquaman.2018.720p.WEBRip.x264-[YTS.AM].srt</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>20 downloads</td>
+		<td>9 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/84/Batman%20TBATB%20s02e04%20Aquamans%20Outrageous%20Adventure.eng.html">Batman TBATB s02e04 Aquamans Outrageous Adventure.eng</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>2 downloads</td>
+		<td>2 languages</td>
+	</tr>
+	<tr>
+		<td><a href="subs/116/LEGO%20DC%20Comics%20Super%20Heroes%20Aquaman%20Rage%20of%20Atlantis%20%282018%29%201080p.html">LEGO DC Comics Super Heroes Aquaman Rage of Atlantis (2018) 1080p</a> (translated from English)</td>
+		<td>&nbsp;</td>
+		<td>6 downloads</td>
+		<td>6 languages</td>
+	</tr>
+
+            </tbody>
+          </table>
+
+          <!-- Load More -->
+                    <!-- Load More -->
+
+          <!-- Upload Subtitle -->
+          <div class="upload-sub">
+            <div class="container">
+              <div class="row">
+                <div class="col-12">
+                  <div class="custom-upload">
+                    <label for="file">
+                      <input id="file" type="file" name="subtitles" accept="file_extension/srt">
+                      <span class="upload-path"></span>
+                      <span>
+                        <i class="fa fa-upload"></i>
+                        Upload Sub &amp; translate your own subtitles here
+                      </span>
+                    </label>
+                    <br>
+<div id="translate_form">
+            Target language:
+
+            <div class="dropdown bootstrap-select form-control lang_selector"><select id="language" class="form-control lang_selector selectpicker" title="Select language" data-live-search="true" tabindex="-98"><option class="bs-title-option" value=""></option>
+<option value="af" data-content="<img src='/assets/flags/za.png' class='flag'> Afrikaans">Afrikaans</option>
+<option value="ak" data-content="<img src='/assets/flags/gh.png' class='flag'> Akan">Akan</option>
+<option value="sq" data-content="<img src='/assets/flags/al.png' class='flag'> Albanian">Albanian</option>
+<option value="am" data-content="<img src='/assets/flags/et.png' class='flag'> Amharic">Amharic</option>
+<option value="ar" data-content="<img src='/assets/flags/ae.png' class='flag'> Arabic">Arabic</option>
+<option value="hy" data-content="<img src='/assets/flags/am.png' class='flag'> Armenian">Armenian</option>
+<option value="az" data-content="<img src='/assets/flags/az.png' class='flag'> Azerbaijani">Azerbaijani</option>
+<option value="eu" data-content="<img src='/assets/flags/es-pv.png' class='flag'> Basque">Basque</option>
+<option value="be" data-content="<img src='/assets/flags/by.png' class='flag'> Belarusian">Belarusian</option>
+<option value="bem" data-content="<img src='/assets/flags/zm.png' class='flag'> Bemba">Bemba</option>
+<option value="bn" data-content="<img src='/assets/flags/bd.png' class='flag'> Bengali">Bengali</option>
+<option value="bh" data-content="<img src='/assets/flags/in.png' class='flag'> Bihari">Bihari</option>
+<option value="bs" data-content="<img src='/assets/flags/ba.png' class='flag'> Bosnian">Bosnian</option>
+<option value="br" data-content="<img src='/assets/flags/fr.png' class='flag'> Breton">Breton</option>
+<option value="bg" data-content="<img src='/assets/flags/bg.png' class='flag'> Bulgarian">Bulgarian</option>
+<option value="km" data-content="<img src='/assets/flags/kh.png' class='flag'> Cambodian">Cambodian</option>
+<option value="ca" data-content="<img src='/assets/flags/ad.png' class='flag'> Catalan">Catalan</option>
+<option value="ceb" data-content="<img src='/assets/flags/ph.png' class='flag'> Cebuano">Cebuano</option>
+<option value="chr" data-content="<img src='/assets/flags/us.png' class='flag'> Cherokee">Cherokee</option>
+<option value="ny" data-content="<img src='/assets/flags/mw.png' class='flag'> Chichewa">Chichewa</option>
+<option value="zh-CN" data-content="<img src='/assets/flags/cn.png' class='flag'> Chinese (Simplified)">Chinese (Simplified)</option>
+<option value="zh-TW" data-content="<img src='/assets/flags/tw.png' class='flag'> Chinese (Traditional)">Chinese (Traditional)</option>
+<option value="co" data-content="<img src='/assets/flags/co.png' class='flag'> Corsican">Corsican</option>
+<option value="hr" data-content="<img src='/assets/flags/hr.png' class='flag'> Croatian">Croatian</option>
+<option value="cs" data-content="<img src='/assets/flags/cz.png' class='flag'> Czech">Czech</option>
+<option value="da" data-content="<img src='/assets/flags/dk.png' class='flag'> Danish">Danish</option>
+<option value="nl" data-content="<img src='/assets/flags/nl.png' class='flag'> Dutch">Dutch</option>
+<option value="en" data-content="<img src='/assets/flags/gb.png' class='flag'> English" selected="selected">English</option>
+<option value="eo" data-content="<img src='/assets/flags/esperanto.png' class='flag'> Esperanto">Esperanto</option>
+<option value="et" data-content="<img src='/assets/flags/ee.png' class='flag'> Estonian">Estonian</option>
+<option value="ee" data-content="<img src='/assets/flags/gh.png' class='flag'> Ewe">Ewe</option>
+<option value="fo" data-content="<img src='/assets/flags/fo.png' class='flag'> Faroese">Faroese</option>
+<option value="tl" data-content="<img src='/assets/flags/ph.png' class='flag'> Filipino">Filipino</option>
+<option value="fi" data-content="<img src='/assets/flags/fi.png' class='flag'> Finnish">Finnish</option>
+<option value="fr" data-content="<img src='/assets/flags/fr.png' class='flag'> French">French</option>
+<option value="fy" data-content="<img src='/assets/flags/nl.png' class='flag'> Frisian">Frisian</option>
+<option value="gaa" data-content="<img src='/assets/flags/gh.png' class='flag'> Ga">Ga</option>
+<option value="gl" data-content="<img src='/assets/flags/gl.png' class='flag'> Galician">Galician</option>
+<option value="ka" data-content="<img src='/assets/flags/ge.png' class='flag'> Georgian">Georgian</option>
+<option value="de" data-content="<img src='/assets/flags/de.png' class='flag'> German">German</option>
+<option value="el" data-content="<img src='/assets/flags/gr.png' class='flag'> Greek">Greek</option>
+<option value="gn" data-content="<img src='/assets/flags/py.png' class='flag'> Guarani">Guarani</option>
+<option value="gu" data-content="<img src='/assets/flags/in.png' class='flag'> Gujarati">Gujarati</option>
+<option value="ht" data-content="<img src='/assets/flags/ht.png' class='flag'> Haitian Creole">Haitian Creole</option>
+<option value="ha" data-content="<img src='/assets/flags/ng.png' class='flag'> Hausa">Hausa</option>
+<option value="haw" data-content="<img src='/assets/flags/us-hi.png' class='flag'> Hawaiian">Hawaiian</option>
+<option value="iw" data-content="<img src='/assets/flags/il.png' class='flag'> Hebrew">Hebrew</option>
+<option value="hi" data-content="<img src='/assets/flags/in.png' class='flag'> Hindi">Hindi</option>
+<option value="hmn" data-content="<img src='/assets/flags/none.png' class='flag'> Hmong">Hmong</option>
+<option value="hu" data-content="<img src='/assets/flags/hu.png' class='flag'> Hungarian">Hungarian</option>
+<option value="is" data-content="<img src='/assets/flags/is.png' class='flag'> Icelandic">Icelandic</option>
+<option value="ig" data-content="<img src='/assets/flags/ng.png' class='flag'> Igbo">Igbo</option>
+<option value="id" data-content="<img src='/assets/flags/id.png' class='flag'> Indonesian">Indonesian</option>
+<option value="ia" data-content="<img src='/assets/flags/none.png' class='flag'> Interlingua">Interlingua</option>
+<option value="ga" data-content="<img src='/assets/flags/ie.png' class='flag'> Irish">Irish</option>
+<option value="it" data-content="<img src='/assets/flags/it.png' class='flag'> Italian">Italian</option>
+<option value="ja" data-content="<img src='/assets/flags/jp.png' class='flag'> Japanese">Japanese</option>
+<option value="jw" data-content="<img src='/assets/flags/id.png' class='flag'> Javanese">Javanese</option>
+<option value="kn" data-content="<img src='/assets/flags/in.png' class='flag'> Kannada">Kannada</option>
+<option value="kk" data-content="<img src='/assets/flags/kz.png' class='flag'> Kazakh">Kazakh</option>
+<option value="rw" data-content="<img src='/assets/flags/rw.png' class='flag'> Kinyarwanda">Kinyarwanda</option>
+<option value="rn" data-content="<img src='/assets/flags/bi.png' class='flag'> Kirundi">Kirundi</option>
+<option value="kg" data-content="<img src='/assets/flags/cd.png' class='flag'> Kongo">Kongo</option>
+<option value="ko" data-content="<img src='/assets/flags/kr.png' class='flag'> Korean">Korean</option>
+<option value="kri" data-content="<img src='/assets/flags/sl.png' class='flag'> Krio (Sierra Leone)">Krio (Sierra Leone)</option>
+<option value="ku" data-content="<img src='/assets/flags/iq.png' class='flag'> Kurdish">Kurdish</option>
+<option value="ckb" data-content="<img src='/assets/flags/iq.png' class='flag'> Kurdish (Soranî)">Kurdish (Soranî)</option>
+<option value="ky" data-content="<img src='/assets/flags/kg.png' class='flag'> Kyrgyz">Kyrgyz</option>
+<option value="lo" data-content="<img src='/assets/flags/la.png' class='flag'> Laothian">Laothian</option>
+<option value="la" data-content="<img src='/assets/flags/va.png' class='flag'> Latin">Latin</option>
+<option value="lv" data-content="<img src='/assets/flags/lv.png' class='flag'> Latvian">Latvian</option>
+<option value="ln" data-content="<img src='/assets/flags/cd.png' class='flag'> Lingala">Lingala</option>
+<option value="lt" data-content="<img src='/assets/flags/lt.png' class='flag'> Lithuanian">Lithuanian</option>
+<option value="loz" data-content="<img src='/assets/flags/zm.png' class='flag'> Lozi">Lozi</option>
+<option value="lg" data-content="<img src='/assets/flags/ug.png' class='flag'> Luganda">Luganda</option>
+<option value="ach" data-content="<img src='/assets/flags/ke.png' class='flag'> Luo">Luo</option>
+<option value="lb" data-content="<img src='/assets/flags/lu.png' class='flag'> Luxembourgish">Luxembourgish</option>
+<option value="mk" data-content="<img src='/assets/flags/mk.png' class='flag'> Macedonian">Macedonian</option>
+<option value="mg" data-content="<img src='/assets/flags/mg.png' class='flag'> Malagasy">Malagasy</option>
+<option value="ms" data-content="<img src='/assets/flags/my.png' class='flag'> Malay">Malay</option>
+<option value="ml" data-content="<img src='/assets/flags/in.png' class='flag'> Malayalam">Malayalam</option>
+<option value="mt" data-content="<img src='/assets/flags/mt.png' class='flag'> Maltese">Maltese</option>
+<option value="mi" data-content="<img src='/assets/flags/nz.png' class='flag'> Maori">Maori</option>
+<option value="mr" data-content="<img src='/assets/flags/in.png' class='flag'> Marathi">Marathi</option>
+<option value="mfe" data-content="<img src='/assets/flags/mu.png' class='flag'> Mauritian Creole">Mauritian Creole</option>
+<option value="mo" data-content="<img src='/assets/flags/md.png' class='flag'> Moldavian">Moldavian</option>
+<option value="mn" data-content="<img src='/assets/flags/mn.png' class='flag'> Mongolian">Mongolian</option>
+<option value="my" data-content="<img src='/assets/flags/mm.png' class='flag'> Myanmar (Burmese)">Myanmar (Burmese)</option>
+<option value="sr-ME" data-content="<img src='/assets/flags/me.png' class='flag'> Montenegrin">Montenegrin</option>
+<option value="ne" data-content="<img src='/assets/flags/np.png' class='flag'> Nepali">Nepali</option>
+<option value="pcm" data-content="<img src='/assets/flags/ng.png' class='flag'> Nigerian Pidgin">Nigerian Pidgin</option>
+<option value="nso" data-content="<img src='/assets/flags/za.png' class='flag'> Northern Sotho">Northern Sotho</option>
+<option value="no" data-content="<img src='/assets/flags/no.png' class='flag'> Norwegian">Norwegian</option>
+<option value="nn" data-content="<img src='/assets/flags/no.png' class='flag'> Norwegian (Nynorsk)">Norwegian (Nynorsk)</option>
+<option value="oc" data-content="<img src='/assets/flags/fr.png' class='flag'> Occitan">Occitan</option>
+<option value="or" data-content="<img src='/assets/flags/in.png' class='flag'> Oriya">Oriya</option>
+<option value="om" data-content="<img src='/assets/flags/et.png' class='flag'> Oromo">Oromo</option>
+<option value="ps" data-content="<img src='/assets/flags/af.png' class='flag'> Pashto">Pashto</option>
+<option value="fa" data-content="<img src='/assets/flags/ir.png' class='flag'> Persian">Persian</option>
+<option value="pl" data-content="<img src='/assets/flags/pl.png' class='flag'> Polish">Polish</option>
+<option value="pt-BR" data-content="<img src='/assets/flags/br.png' class='flag'> Portuguese (Brazil)">Portuguese (Brazil)</option>
+<option value="pt" data-content="<img src='/assets/flags/pt.png' class='flag'> Portuguese (Portugal)">Portuguese (Portugal)</option>
+<option value="pa" data-content="<img src='/assets/flags/in.png' class='flag'> Punjabi">Punjabi</option>
+<option value="qu" data-content="<img src='/assets/flags/pe.png' class='flag'> Quechua">Quechua</option>
+<option value="ro" data-content="<img src='/assets/flags/ro.png' class='flag'> Romanian">Romanian</option>
+<option value="rm" data-content="<img src='/assets/flags/ch.png' class='flag'> Romansh">Romansh</option>
+<option value="nyn" data-content="<img src='/assets/flags/ug.png' class='flag'> Runyakitara">Runyakitara</option>
+<option value="ru" data-content="<img src='/assets/flags/ru.png' class='flag'> Russian">Russian</option>
+<option value="sm" data-content="<img src='/assets/flags/as.png' class='flag'> Samoan">Samoan</option>
+<option value="gd" data-content="<img src='/assets/flags/gb-sct.png' class='flag'> Scots Gaelic">Scots Gaelic</option>
+<option value="sr" data-content="<img src='/assets/flags/rs.png' class='flag'> Serbian">Serbian</option>
+<option value="sh" data-content="<img src='/assets/flags/rs.png' class='flag'> Serbo-Croatian">Serbo-Croatian</option>
+<option value="st" data-content="<img src='/assets/flags/ls.png' class='flag'> Sesotho">Sesotho</option>
+<option value="tn" data-content="<img src='/assets/flags/bw.png' class='flag'> Setswana">Setswana</option>
+<option value="crs" data-content="<img src='/assets/flags/sc.png' class='flag'> Seychellois Creole">Seychellois Creole</option>
+<option value="sn" data-content="<img src='/assets/flags/zw.png' class='flag'> Shona">Shona</option>
+<option value="sd" data-content="<img src='/assets/flags/pk.png' class='flag'> Sindhi">Sindhi</option>
+<option value="si" data-content="<img src='/assets/flags/lk.png' class='flag'> Sinhalese">Sinhalese</option>
+<option value="sk" data-content="<img src='/assets/flags/sk.png' class='flag'> Slovak">Slovak</option>
+<option value="sl" data-content="<img src='/assets/flags/si.png' class='flag'> Slovenian">Slovenian</option>
+<option value="so" data-content="<img src='/assets/flags/so.png' class='flag'> Somali">Somali</option>
+<option value="es" data-content="<img src='/assets/flags/es.png' class='flag'> Spanish">Spanish</option>
+<option value="es-419" data-content="<img src='/assets/flags/es.png' class='flag'> Spanish (Latin American)">Spanish (Latin American)</option>
+<option value="su" data-content="<img src='/assets/flags/id.png' class='flag'> Sundanese">Sundanese</option>
+<option value="sw" data-content="<img src='/assets/flags/ke.png' class='flag'> Swahili">Swahili</option>
+<option value="sv" data-content="<img src='/assets/flags/se.png' class='flag'> Swedish">Swedish</option>
+<option value="tg" data-content="<img src='/assets/flags/tj.png' class='flag'> Tajik">Tajik</option>
+<option value="ta" data-content="<img src='/assets/flags/lk.png' class='flag'> Tamil">Tamil</option>
+<option value="tt" data-content="<img src='/assets/flags/ru.png' class='flag'> Tatar">Tatar</option>
+<option value="te" data-content="<img src='/assets/flags/in.png' class='flag'> Telugu">Telugu</option>
+<option value="th" data-content="<img src='/assets/flags/th.png' class='flag'> Thai">Thai</option>
+<option value="ti" data-content="<img src='/assets/flags/er.png' class='flag'> Tigrinya">Tigrinya</option>
+<option value="to" data-content="<img src='/assets/flags/to.png' class='flag'> Tonga">Tonga</option>
+<option value="lua" data-content="<img src='/assets/flags/cd.png' class='flag'> Tshiluba">Tshiluba</option>
+<option value="tum" data-content="<img src='/assets/flags/mw.png' class='flag'> Tumbuka">Tumbuka</option>
+<option value="tr" data-content="<img src='/assets/flags/tr.png' class='flag'> Turkish">Turkish</option>
+<option value="tk" data-content="<img src='/assets/flags/tm.png' class='flag'> Turkmen">Turkmen</option>
+<option value="tw" data-content="<img src='/assets/flags/gh.png' class='flag'> Twi">Twi</option>
+<option value="ug" data-content="<img src='/assets/flags/cn.png' class='flag'> Uighur">Uighur</option>
+<option value="uk" data-content="<img src='/assets/flags/ua.png' class='flag'> Ukrainian">Ukrainian</option>
+<option value="ur" data-content="<img src='/assets/flags/pk.png' class='flag'> Urdu">Urdu</option>
+<option value="uz" data-content="<img src='/assets/flags/uz.png' class='flag'> Uzbek">Uzbek</option>
+<option value="vi" data-content="<img src='/assets/flags/vn.png' class='flag'> Vietnamese">Vietnamese</option>
+<option value="cy" data-content="<img src='/assets/flags/gb-wls.png' class='flag'> Welsh">Welsh</option>
+<option value="wo" data-content="<img src='/assets/flags/sn.png' class='flag'> Wolof">Wolof</option>
+<option value="xh" data-content="<img src='/assets/flags/za.png' class='flag'> Xhosa">Xhosa</option>
+<option value="yi" data-content="<img src='/assets/flags/none.png' class='flag'> Yiddish">Yiddish</option>
+<option value="yo" data-content="<img src='/assets/flags/ng.png' class='flag'> Yoruba">Yoruba</option>
+<option value="zu" data-content="<img src='/assets/flags/za.png' class='flag'> Zulu">Zulu</option>
+            </select><button type="button" class="btn dropdown-toggle btn-light" data-toggle="dropdown" role="button" data-id="language" title="English"><div class="filter-option"><div class="filter-option-inner"><div class="filter-option-inner-inner"><img src="/assets/flags/gb.png" class="flag"> English</div></div> </div></button><div class="dropdown-menu " role="combobox"><div class="bs-searchbox"><input type="text" class="form-control" autocomplete="off" role="textbox" aria-label="Search"></div><div class="inner show" role="listbox" aria-expanded="false" tabindex="-1"><ul class="dropdown-menu inner show"></ul></div></div></div>
+            <br>
+            <button class="btn btn-outline-secondary btn--yellow" onclick="translate_new_file(document.getElementById(&quot;language&quot;).value);">translate</button>
+</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+    <script type="text/javascript">
+    (function ($) {
+      $(document).ready(function () {
+
+        $('input[type="file"]').change(function(){
+            var f = this.files[0];
+            var name = f.name;
+            $(this).next('.upload-path').text(name);
+        });
+      });
+    })(jQuery);
+
+    </script>
+    <!-- ./Upload Subtitle -->
+
+  <!-- Top Banner -->
+  <div class="top-banner">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+                      <a href="register.php">
+                        <div class="t-banner-inner">
+              <div class="b-item txt">
+                <span>Get Your</span>
+                <span class="yellow">VIP</span>
+                <span>
+                  Access<br>Today
+                </span>
+              </div>
+              <div class="b-item">
+                <div class="circle-tag">
+                  <span>Just only</span>
+                  <span>
+                    $6                  </span>
+                  <span>per month</span>
+                </div>
+              </div>
+              <div class="b-item">
+                <img src="assets/images/img-1.webp" alt="">
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ./Top Banner -->
+
+        </div>
+      </div>
+    </div>
+  </div>
