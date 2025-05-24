@@ -74,22 +74,7 @@ def _get_setting(core, key, default=None):
 # END OF MODIFICATION
 
 # helper -------------------------------------
-# START OF Fix 1 applied to _extract_ajax  -> THIS IS IMAGE FIX #2 TARGETING _extract_ajax
-def _extract_ajax(link): # Kept original argument name 'link'
-    # Accept both single and double quotes and any number of leading args
-    m = re.search(
-        r"translate_from_server_folder\([^)]*?['\"]([^'\"]+)['\"]\s*,\s*['\"]([^'\"]+)['\"]\s*,\s*['\"]([^'\"]+)['\"]",
-        link # Use the passed argument name
-    )
-    # START OF PATCH (IMAGE FIX #2): REMOVE STRIPPING OF LEADING SLASH from folder arg
-    if m:
-        lng, orig, folder = m.groups()
-        # The line "if folder and folder.startswith('/'): folder = folder.lstrip('/')" was here and is now removed as per Fix #2.
-        return lng, orig, folder
-    else:
-        return None, None, None
-    # END OF PATCH (IMAGE FIX #2)
-# END OF Fix 1 applied to _extract_ajax (THIS IS IMAGE FIX #2)
+# _extract_ajax function removed as per plan.
 
 # START OF REPLACEMENT: _wait_for_translated replaced with "Take-away code"
 def _wait_for_translated(core, detail_url, lang_code, service_name,
@@ -605,27 +590,28 @@ def parse_search_response(core, service_name, meta, response):
                         core.logger.debug(f"[{service_name}] Translate button for '{sc_lang_name_full}' has no onclick. Skipping.")
                         continue
                     
-                    lng_for_google, orig_srt_name_part, folder_id_part = _extract_ajax(_onclick_attr)
-                    
-                    if not all([lng_for_google, orig_srt_name_part, folder_id_part]):
-                        core.logger.debug(f"[{service_name}] Failed to extract AJAX params for '{sc_lang_name_full}' from onclick. Skipping.")
-                        continue
+                    # Parameters derived from already extracted page data
+                    # original_id_from_href and filename_base_from_href are from the main movie page URL.
+                    # sc_lang_code is from the alt attribute of the flag image for this language entry.
+                    target_translation_lang = sc_lang_code # This is what was passed as the first param to translate_from_server_folder
 
-                    # START OF MODIFICATION: Guarded .srt addition
-                    filename_for_url = orig_srt_name_part
-                    if not filename_for_url.lower().endswith('.srt'):
-                        filename_for_url += '.srt'
-                    source_srt_url = urljoin(__subtitlecat_base_url, folder_id_part + filename_for_url)
-                    # END OF MODIFICATION: Guarded .srt addition
+                    derived_folder_path = "/subs/%s/" % original_id_from_href
+                    derived_orig_filename_stem = filename_base_from_href + "-orig" # Matches the typical pattern for source files
                     
-                    core.logger.debug(f"[{service_name}] Setting up client-side translation for '{sc_lang_name_full}'. Original SRT: {source_srt_url}, Target Google lang: {lng_for_google}")
+                    # Construct the source URL for the original subtitle file
+                    source_srt_filename = derived_orig_filename_stem + '.srt'
+                    source_srt_url = urljoin(__subtitlecat_base_url, derived_folder_path + source_srt_filename)
+                    
+                    core.logger.debug(f"[{service_name}] Derived for client translation: target_lang='{target_translation_lang}', source_url='{source_srt_url}'")
 
                     action_args.update({
                         'needs_client_side_translation': True,
                         'original_srt_url': source_srt_url,
-                        'target_translation_lang': lng_for_google, 
+                        'target_translation_lang': target_translation_lang, 
                         'needs_poll': False, 
                         'url': '', 
+                        # 'lang_code': sc_lang_code, # Already in action_args
+                        # 'filename': constructed_filename, # Already in action_args
                     })
                     item_color = 'yellow' 
                 else:
