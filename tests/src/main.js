@@ -1,0 +1,1 @@
+!function(n){n(document).ready(function(){n(window).width()>767&&n("li.dropdown").hover(function(){n(this).find(".dropdown-menu").stop(!0,!0).fadeIn()},function(){n(this).find(".dropdown-menu").stop(!0,!0).fadeOut()})})}(jQuery);
