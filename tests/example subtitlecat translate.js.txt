@@ -1,0 +1,254 @@
+var bar, responseText, this_batch_id, translated_file_contents, total_batches_to_translate, processed_batches, batches, lines_in_batch, result, where_to_update, dest_language, source_language, exhausted_capacity_error = !1, be_quiet = !1, re = /[\0-\x1F\x7F-\x9F\xAD\u0378\u0379\u037F-\u0383\u038B\u038D\u03A2\u0528-\u0530\u0557\u0558\u0560\u0588\u058B-\u058E\u0590\u05C8-\u05CF\u05EB-\u05EF\u05F5-\u0605\u061C\u061D\u06DD\u070E\u070F\u074B\u074C\u07B2-\u07BF\u07FB-\u07FF\u082E\u082F\u083F\u085C\u085D\u085F-\u089F\u08A1\u08AD-\u08E3\u08FF\u0978\u0980\u0984\u098D\u098E\u0991\u0992\u09A9\u09B1\u09B3-\u09B5\u09BA\u09BB\u09C5\u09C6\u09C9\u09CA\u09CF-\u09D6\u09D8-\u09DB\u09DE\u09E4\u09E5\u09FC-\u0A00\u0A04\u0A0B-\u0A0E\u0A11\u0A12\u0A29\u0A31\u0A34\u0A37\u0A3A\u0A3B\u0A3D\u0A43-\u0A46\u0A49\u0A4A\u0A4E-\u0A50\u0A52-\u0A58\u0A5D\u0A5F-\u0A65\u0A76-\u0A80\u0A84\u0A8E\u0A92\u0AA9\u0AB1\u0AB4\u0ABA\u0ABB\u0AC6\u0ACA\u0ACE\u0ACF\u0AD1-\u0ADF\u0AE4\u0AE5\u0AF2-\u0B00\u0B04\u0B0D\u0B0E\u0B11\u0B12\u0B29\u0B31\u0B34\u0B3A\u0B3B\u0B45\u0B46\u0B49\u0B4A\u0B4E-\u0B55\u0B58-\u0B5B\u0B5E\u0B64\u0B65\u0B78-\u0B81\u0B84\u0B8B-\u0B8D\u0B91\u0B96-\u0B98\u0B9B\u0B9D\u0BA0-\u0BA2\u0BA5-\u0BA7\u0BAB-\u0BAD\u0BBA-\u0BBD\u0BC3-\u0BC5\u0BC9\u0BCE\u0BCF\u0BD1-\u0BD6\u0BD8-\u0BE5\u0BFB-\u0C00\u0C04\u0C0D\u0C11\u0C29\u0C34\u0C3A-\u0C3C\u0C45\u0C49\u0C4E-\u0C54\u0C57\u0C5A-\u0C5F\u0C64\u0C65\u0C70-\u0C77\u0C80\u0C81\u0C84\u0C8D\u0C91\u0CA9\u0CB4\u0CBA\u0CBB\u0CC5\u0CC9\u0CCE-\u0CD4\u0CD7-\u0CDD\u0CDF\u0CE4\u0CE5\u0CF0\u0CF3-\u0D01\u0D04\u0D0D\u0D11\u0D3B\u0D3C\u0D45\u0D49\u0D4F-\u0D56\u0D58-\u0D5F\u0D64\u0D65\u0D76-\u0D78\u0D80\u0D81\u0D84\u0D97-\u0D99\u0DB2\u0DBC\u0DBE\u0DBF\u0DC7-\u0DC9\u0DCB-\u0DCE\u0DD5\u0DD7\u0DE0-\u0DF1\u0DF5-\u0E00\u0E3B-\u0E3E\u0E5C-\u0E80\u0E83\u0E85\u0E86\u0E89\u0E8B\u0E8C\u0E8E-\u0E93\u0E98\u0EA0\u0EA4\u0EA6\u0EA8\u0EA9\u0EAC\u0EBA\u0EBE\u0EBF\u0EC5\u0EC7\u0ECE\u0ECF\u0EDA\u0EDB\u0EE0-\u0EFF\u0F48\u0F6D-\u0F70\u0F98\u0FBD\u0FCD\u0FDB-\u0FFF\u10C6\u10C8-\u10CC\u10CE\u10CF\u1249\u124E\u124F\u1257\u1259\u125E\u125F\u1289\u128E\u128F\u12B1\u12B6\u12B7\u12BF\u12C1\u12C6\u12C7\u12D7\u1311\u1316\u1317\u135B\u135C\u137D-\u137F\u139A-\u139F\u13F5-\u13FF\u169D-\u169F\u16F1-\u16FF\u170D\u1715-\u171F\u1737-\u173F\u1754-\u175F\u176D\u1771\u1774-\u177F\u17DE\u17DF\u17EA-\u17EF\u17FA-\u17FF\u180F\u181A-\u181F\u1878-\u187F\u18AB-\u18AF\u18F6-\u18FF\u191D-\u191F\u192C-\u192F\u193C-\u193F\u1941-\u1943\u196E\u196F\u1975-\u197F\u19AC-\u19AF\u19CA-\u19CF\u19DB-\u19DD\u1A1C\u1A1D\u1A5F\u1A7D\u1A7E\u1A8A-\u1A8F\u1A9A-\u1A9F\u1AAE-\u1AFF\u1B4C-\u1B4F\u1B7D-\u1B7F\u1BF4-\u1BFB\u1C38-\u1C3A\u1C4A-\u1C4C\u1C80-\u1CBF\u1CC8-\u1CCF\u1CF7-\u1CFF\u1DE7-\u1DFB\u1F16\u1F17\u1F1E\u1F1F\u1F46\u1F47\u1F4E\u1F4F\u1F58\u1F5A\u1F5C\u1F5E\u1F7E\u1F7F\u1FB5\u1FC5\u1FD4\u1FD5\u1FDC\u1FF0\u1FF1\u1FF5\u1FFF\u200B-\u200F\u202A-\u202E\u2060-\u206F\u2072\u2073\u208F\u209D-\u209F\u20BB-\u20CF\u20F1-\u20FF\u218A-\u218F\u23F4-\u23FF\u2427-\u243F\u244B-\u245F\u2700\u2B4D-\u2B4F\u2B5A-\u2BFF\u2C2F\u2C5F\u2CF4-\u2CF8\u2D26\u2D28-\u2D2C\u2D2E\u2D2F\u2D68-\u2D6E\u2D71-\u2D7E\u2D97-\u2D9F\u2DA7\u2DAF\u2DB7\u2DBF\u2DC7\u2DCF\u2DD7\u2DDF\u2E3C-\u2E7F\u2E9A\u2EF4-\u2EFF\u2FD6-\u2FEF\u2FFC-\u2FFF\u3040\u3097\u3098\u3100-\u3104\u312E-\u3130\u318F\u31BB-\u31BF\u31E4-\u31EF\u321F\u32FF\u4DB6-\u4DBF\u9FCD-\u9FFF\uA48D-\uA48F\uA4C7-\uA4CF\uA62C-\uA63F\uA698-\uA69E\uA6F8-\uA6FF\uA78F\uA794-\uA79F\uA7AB-\uA7F7\uA82C-\uA82F\uA83A-\uA83F\uA878-\uA87F\uA8C5-\uA8CD\uA8DA-\uA8DF\uA8FC-\uA8FF\uA954-\uA95E\uA97D-\uA97F\uA9CE\uA9DA-\uA9DD\uA9E0-\uA9FF\uAA37-\uAA3F\uAA4E\uAA4F\uAA5A\uAA5B\uAA7C-\uAA7F\uAAC3-\uAADA\uAAF7-\uAB00\uAB07\uAB08\uAB0F\uAB10\uAB17-\uAB1F\uAB27\uAB2F-\uABBF\uABEE\uABEF\uABFA-\uABFF\uD7A4-\uD7AF\uD7C7-\uD7CA\uD7FC-\uF8FF\uFA6E\uFA6F\uFADA-\uFAFF\uFB07-\uFB12\uFB18-\uFB1C\uFB37\uFB3D\uFB3F\uFB42\uFB45\uFBC2-\uFBD2\uFD40-\uFD4F\uFD90\uFD91\uFDC8-\uFDEF\uFDFE\uFDFF\uFE1A-\uFE1F\uFE27-\uFE2F\uFE53\uFE67\uFE6C-\uFE6F\uFE75\uFEFD-\uFF00\uFFBF-\uFFC1\uFFC8\uFFC9\uFFD0\uFFD1\uFFD8\uFFD9\uFFDD-\uFFDF\uFFE7\uFFEF-\uFFFB\uFFFE\uFFFF\uFFFD]/g;
+function xhrSuccess() {
+    this.callback.apply(this, this.arguments)
+}
+function xhrError(u) {
+    exhausted_capacity_error = !0,
+    be_quiet || "undefined" != typeof user && 1 == user.paid || (console.log("Exhausted free capacity! Use shared translation."),
+    alert("You are out of free translations. You can either wait one hour, or sign up to a VIP account for unlimited translations!")),
+    $.get("/visitor_log.php?blocked=blocked", function() {})
+}
+function loadFile(u, e) {
+    var t = new XMLHttpRequest;
+    t.callback = e,
+    t.arguments = Array.prototype.slice.call(arguments, 2),
+    t.onload = xhrSuccess,
+    t.onerror = xhrError,
+    t.open("get", u, !0),
+    t.send(null)
+}
+function asyncLoop(u, e, t) {
+    var n = 0
+      , a = !1
+      , s = {
+        next: function() {
+            a || (n < u ? (n++,
+            e(s)) : (a = !0,
+            t()))
+        },
+        iteration: function() {
+            return n - 1
+        },
+        break: function() {
+            a = !0,
+            t()
+        }
+    };
+    return s.next(),
+    s
+}
+function translate_one_line(u, e) {
+    loadFile("https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" + dest_language + "&dt=t&q=" + encodeURI(u), e)
+}
+function result_to_string(u) {
+    string = "";
+    for (var e = 0; e < u[0].length; e++)
+        string += u[0][e][0];
+    return string
+}
+function append_translation(u) {
+    if (u < lines_in_batch.length) {
+        try {
+            translated_text = result_to_string(JSON.parse(this.responseText))
+        } catch (u) {
+            return void console.log("exiting append_translation early")
+        }
+        source_language = JSON.parse(this.responseText)[2];
+        var e = translated_text.split("\n");
+        if (lines_in_batch[u].length != e.length)
+            console.log("the number of lines in the translation doesn't match. Expected " + lines_in_batch[u].length + ", received " + e.length),
+            lines_to_translate = batches[u].split("\n"),
+            counter = 0,
+            asyncLoop(lines_in_batch[u].length, function(e) {
+                translate_one_line(lines_to_translate[counter], function(t) {
+                    translated_line = result_to_string(JSON.parse(this.responseText)),
+                    translated_file_contents[lines_in_batch[u][counter]] = translated_line,
+                    counter++,
+                    e.next()
+                })
+            }, function() {
+                processed_batches++,
+                bar.animate(processed_batches / total_batches_to_translate),
+                document.getElementById(where_to_update).innerHTML = (processed_batches / total_batches_to_translate * 100).toFixed(1) + "% done",
+                processed_batches == total_batches_to_translate ? $(document).trigger("upload_translation") : $(document).trigger("next_batch")
+            });
+        else {
+            for (var t = 0; t < lines_in_batch[u].length; t++)
+                translated_file_contents[lines_in_batch[u][t]] = e[t];
+            if (processed_batches++,
+            bar.animate(processed_batches / total_batches_to_translate),
+            document.getElementById(where_to_update).innerHTML = (processed_batches / total_batches_to_translate * 100).toFixed(1) + "% done",
+            processed_batches == total_batches_to_translate) {
+                var n = document.getElementsByTagName("button");
+                for (t = 0; t < n.length; t++)
+                    "navbar-toggler" != n[t].classList[0] && (n[t].disabled = !1,
+                    n[t].innerHTML = "translate");
+                $(document).trigger("upload_translation")
+            } else
+                processed_batches > processed_batches ? console.log("too many processed batches, ignoring") : $(document).trigger("next_batch")
+        }
+    } else
+        console.log("batch_id too high in append_translation")
+}
+function translate_file(u, e, t) {
+    exhausted_capacity_error = !1,
+    dest_language = u;
+    var n = t.split("\n");
+    translated_file_contents = [],
+    processed_batches = 0,
+    console.log("preparing"),
+    lines_to_translate = [],
+    batches = [],
+    chars_per_batch = 500,
+    cur_batch = 0,
+    batches[cur_batch] = "",
+    cur_batch_chars = 0,
+    (lines_in_batch = [])[cur_batch] = [];
+    for (var a = 0; a < n.length; a++)
+        /^[0-9 \r]*$/.test(n[a]) ? translated_file_contents[a] = n[a] : /^[0-9,: ]*-->[0-9,: \r]*$/.test(n[a]) ? translated_file_contents[a] = n[a] : cur_batch_chars + n[a].length + 1 < chars_per_batch ? ("" == batches[cur_batch] ? batches[cur_batch] += n[a].replace(/<font[^>]*>/gi, "").replace(/<\/font>/gi, "").replace("&", "and") : batches[cur_batch] += "\n" + n[a].replace(/<font[^>]*>/gi, "").replace(/<\/font>/gi, "").replace("&", "and"),
+        cur_batch_chars += n[a].length + 1,
+        lines_in_batch[cur_batch].push(a)) : (cur_batch++,
+        batches[cur_batch] = "",
+        cur_batch_chars = 0,
+        lines_in_batch[cur_batch] = [],
+        "" == batches[cur_batch] ? batches[cur_batch] += n[a].replace("&", "and") : batches[cur_batch] += "\n" + n[a].replace("&", "and"),
+        cur_batch_chars += n[a].length + 1,
+        lines_in_batch[cur_batch].push(a));
+    total_batches_to_translate = cur_batch + 1;
+    a = 0;
+    $(document).bind("next_batch", function() {
+        setTimeout(function() {
+            if (a < total_batches_to_translate) {
+                if (console.log("running i=" + a + "/" + total_batches_to_translate),
+                "undefined" != typeof user && 1 == user.paid) {
+                    console.log("requesting shared in translate_file"),
+                    request_shared_translation(batches[a], u);
+                    var e = "subtitlecat.com/404_error_intentional"
+                } else
+                    e = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" + u + "&dt=t&q=" + encodeURI(batches[a]);
+                loadFile(e, append_translation, a),
+                this_batch_id = a,
+                a++
+            } else
+                console.log("batch_id too high in translate_file")
+        }, 0)
+    }),
+    $(document).bind("upload_translation", function() {
+        setTimeout(function() {
+            console.log("uploading translation"),
+            result = "";
+            for (var t = 0; t < translated_file_contents.length; t++)
+                result += translated_file_contents[t] + "\n";
+            $.post("/upload_subtitles.php", {
+                filename: e,
+                content: result,
+                language: u,
+                orig_language: source_language
+            }, function(t) {
+                console.log(t),
+                json_res = t,
+                translation_filename = e.replace(/\.srt$/g, "-" + u + ".srt"),
+                document.getElementById(where_to_update).innerHTML = '<a href="' + json_res.url + '" download><h3>Click here to download your translation!</h3></a>',
+                document.getElementById(where_to_update).disabled = !0
+            })
+        }, 0)
+    }),
+    $(document).trigger("next_batch")
+}
+function translate_new_file(u) {
+    be_quiet = !1,
+    where_to_update = "translate_form";
+    var e = document.getElementById("file").value.split(/(\\|\/)/g).pop();
+    e = (e = e.replace(re, "")).replace("ñ", "n");
+    var t = document.getElementById("file").files[0]
+      , n = new FileReader;
+    n.onload = function() {
+        var a = n.result;
+        encoding = jschardet.detect(a).encoding,
+        console.log(encoding);
+        var s = new FileReader;
+        s.onload = function() {
+            $.post("upload_subtitles.php", {
+                filename: e,
+                content: a,
+                language: "orig"
+            }, function(t) {
+                json_res = t,
+                "file exists" == json_res.echo ? document.getElementById("translate_form").innerHTML = '<br/>We have that file already&nbsp;<a href="' + json_res.url_html + '">Get your subtitles here</a>' : "ok" != json_res.echo ? (console.log(json_res),
+                console.log(json_res.echo),
+                alert(json_res.echo)) : translate_file(u, e, a)
+            })
+        }
+        ,
+        s.readAsText(t, encoding)
+    }
+    ,
+    n.readAsText(t)
+}
+function translate_from_server(u, e) {
+    be_quiet = !1,
+    where_to_update = u,
+    filename_for_saving = e.replace(/-orig\.srt$/g, ".srt"),
+    document.getElementById(u).innerHTML = '<button type="button" disabled>please wait</button>',
+    loadFile(e, function() {
+        encoding = jschardet.detect(this.responseText).encoding,
+        console.log(encoding),
+        translate_file(u, filename_for_saving, this.responseText)
+    });
+    for (var t = document.getElementsByTagName("button"), n = 0; n < t.length; n++)
+        "navbar-toggler" != t[n].classList[0] && (t[n].disabled = !0)
+}
+function translate_from_server_folder(u, e, t) {
+    be_quiet = !1,
+    where_to_update = u,
+    filename_for_saving = e.replace(/-orig\.srt$/g, ".srt"),
+    document.getElementById(u).innerHTML = '<button type="button" disabled>please wait</button>',
+    loadFile(t + "/" + e, function() {
+        translate_file(u, filename_for_saving, this.responseText)
+    });
+    for (var n = document.getElementsByTagName("button"), a = 0; a < n.length; a++)
+        "navbar-toggler" != n[a].classList[0] && (n[a].disabled = !0)
+}
+function log_download(u) {
+    $.get('/download.php?file_id="+file_id', function() {})
+}
+function request_shared_translation(u, e) {
+    "undefined" != typeof user && 1 == user.paid ? (console.log("requesting shared in request_shared_translation"),
+    $.post("/request_shared_translation.php", {
+        content: u,
+        to_language: e
+    }, function(u) {
+        responseText = JSON.stringify(u),
+        append_translation(this_batch_id)
+    })) : console.log("redir to paid?")
+}
+function shared_translation() {
+    loadFile("/get_shared_translation.php", function() {
+        console.log(this.responseText),
+        to_process = JSON.parse(this.responseText),
+        null != to_process.text ? (dest_language = to_process.language,
+        be_quiet = !0,
+        translate_one_line(to_process.text, function() {
+            console.log(this.status),
+            translation_response = this.responseText,
+            request_id = to_process.id,
+            translated_text = result_to_string(JSON.parse(translation_response)),
+            console.log(translated_text),
+            source_language = JSON.parse(this.responseText)[2],
+            $.post("/upload_shared_translation.php", {
+                request_id: request_id,
+                content: translated_text,
+                from_language: source_language
+            }, function(u) {})
+        })) : console.log("nothing shared to translate")
+    })
+}
+requirejs(["progressbar"], function(u) {
+    var e = require("progressbar");
+    bar = new e.Circle("#bar",{
+        strokeWidth: 8,
+        color: "#000"
+    })
+}),
+requirejs(["jschardet"], function(u) {}),
+shared_translation();
