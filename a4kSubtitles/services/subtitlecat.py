@@ -67,7 +67,10 @@ __kodi_regional_lang_map = {
 
 # START OF MODIFICATION: Added _get_setting helper
 def _get_setting(core, key, default=None):
-    return getattr(core, "settings", {}).get(key, default)
+    # Ensure core and core.settings are not None before accessing
+    if core and hasattr(core, 'settings') and core.settings is not None:
+        return core.settings.get(key, default)
+    return default
 # END OF MODIFICATION
 
 # helper -------------------------------------
@@ -189,18 +192,18 @@ def _post_download_fix_encoding(core, service_name, raw_bytes, outfile):
             core.logger.debug(f"[{service_name}] Initial detection by chardet: {enc} (confidence: {chardet_confidence if chardet_confidence is not None else 'N/A'}) for {repr(outfile)}")
             if not confidence_is_good and _cn_function:
                 core.logger.debug(f"[{service_name}] Chardet confidence ({chardet_confidence}) is low. Attempting charset-normalizer override for {repr(outfile)}.")
-                cn_match = _cn_function(raw_bytes).best()
-                if cn_match and cn_match.encoding:
-                    enc = cn_match.encoding
+                cn_match = list(_cn_function(raw_bytes)) # Convert generator to list
+                if cn_match and cn_match[0].encoding: # Access best match if list not empty
+                    enc = cn_match[0].encoding
                     detected_source = f"charset-normalizer (override, chardet conf: {chardet_confidence if chardet_confidence is not None else 'N/A'})"
                     core.logger.debug(f"[{service_name}] Overridden by charset-normalizer: {enc} for {repr(outfile)}")
                 else:
                     core.logger.debug(f"[{service_name}] Charset-normalizer did not provide an override. Sticking with chardet's: {enc} for {repr(outfile)}")
         elif _cn_function:
             core.logger.debug(f"[{service_name}] Chardet failed to detect. Using charset-normalizer for {repr(outfile)}.")
-            cn_match = _cn_function(raw_bytes).best()
-            if cn_match and cn_match.encoding:
-                enc = cn_match.encoding
+            cn_match = list(_cn_function(raw_bytes)) # Convert generator to list
+            if cn_match and cn_match[0].encoding: # Access best match if list not empty
+                enc = cn_match[0].encoding
                 detected_source = "charset-normalizer (chardet failed)"
             else:
                 detected_source = "default (chardet and charset-normalizer failed)"
@@ -210,9 +213,9 @@ def _post_download_fix_encoding(core, service_name, raw_bytes, outfile):
              core.logger.debug(f"[{service_name}] Chardet failed and charset-normalizer unavailable. Using default {enc} for {repr(outfile)}.")
     elif _cn_function:
         core.logger.debug(f"[{service_name}] Chardet not available/used. Using charset-normalizer for {repr(outfile)}.")
-        cn_match = _cn_function(raw_bytes).best()
-        if cn_match and cn_match.encoding:
-            enc = cn_match.encoding
+        cn_match = list(_cn_function(raw_bytes)) # Convert generator to list
+        if cn_match and cn_match[0].encoding: # Access best match if list not empty
+            enc = cn_match[0].encoding
             detected_source = "charset-normalizer (primary)"
         else:
             detected_source = "default (charset-normalizer failed)"
@@ -290,7 +293,8 @@ def _gtranslate_text_chunk(text_chunk, target_lang, core, service_name):
 # MODIFICATION 2.2: Placeholder constants
 _PLACEHOLDER_SENTINEL_PREFIX = "\u2063@@SCPTAG" # INVISIBLE SEPARATOR + prefix
 _PLACEHOLDER_SUFFIX = "SCP@@"
-__TAG_REGEX_FOR_PROTECTION = re.compile(r"(<[^>]+>|{[^}]+})") # Matches HTML tags like <i> or ASS tags like {\an8}
+# MODIFIED REGEX for improved tag attribute handling
+__TAG_REGEX_FOR_PROTECTION = re.compile(r"(<(?:"[^"]*"|'[^']*'|[^>"'])*>|{(?:"[^"]*"|'[^']*'|[^}"'])*})")
 
 def _protect_subtitle_tags(text_line):
     """Replaces tags with placeholders and returns the new text and the list of tags.
@@ -388,6 +392,10 @@ def parse_search_response(core, service_name, meta, response):
     def _base_name(name: str) -> str:
         return re.split(r'[ (]', name, 1)[0].lower()
     seen_lang_conv_errors = set()
+
+    # Define shared translation URL
+    shared_translation_url = "https://www.subtitlecat.com/get_shared_translation.php"
+    shared_translation_timeout = _get_setting(core, "http_timeout", 10) 
 
     for row in rows:
         link_tag = row.select_one('td:first-child > a')
@@ -504,8 +512,62 @@ def parse_search_response(core, service_name, meta, response):
             
             constructed_filename = f"{original_id_from_href}-{filename_base_from_href}-{sc_lang_code}.srt"
 
+            # Attempt to fetch shared translation first
+            shared_translation_found_and_used = False
+            try:
+                shared_headers = {
+                    'User-Agent': __user_agent,
+                    'Referer': movie_page_full_url, 
+                    'Accept': 'application/json, */*' 
+                }
+                core.logger.debug(f"[{service_name}] Attempting to fetch shared translation for '{constructed_filename}' from {shared_translation_url} (referer: {movie_page_full_url})")
+                # Using _SC_SESSION for consistency, as it holds the user-agent and any potential session cookies.
+                shared_response = _SC_SESSION.get(shared_translation_url, headers=shared_headers, timeout=shared_translation_timeout)
+                
+                if shared_response.status_code == 200 and shared_response.headers.get('content-type', '').startswith('application/json'):
+                    json_response = shared_response.json()
+                    shared_srt_text = json_response.get("text")
+                    shared_srt_lang = json_response.get("language") # Optional for logging
+
+                    if shared_srt_text and isinstance(shared_srt_text, str) and shared_srt_text.strip():
+                        core.logger.debug(f"[{service_name}] Found shared translation for '{constructed_filename}' (lang: {shared_srt_lang or 'N/A'})")
+                        
+                        action_args_shared = {
+                            'method_type': 'SHARED_TRANSLATION_CONTENT', # New type
+                            'srt_content': shared_srt_text,
+                            'filename': constructed_filename,
+                            'lang': kodi_target_lang_full,
+                            'service_name': service_name,
+                            'detail_url': movie_page_full_url, # For reference
+                            'lang_code': sc_lang_code, # Original SC lang code
+                        }
+                        item_color_shared = 'cyan' 
+
+                        results.append({
+                            'service_name': service_name, 'service': display_name_for_service,
+                            'lang': kodi_target_lang_full, 'name': f"{movie_title_on_page} ({sc_lang_name_full}) [Shared]",
+                            'rating': 0, 'lang_code': kodi_target_lang_2_letter, 'sync': 'false', 'impaired': 'false',
+                            'color': item_color_shared,
+                            'action_args': action_args_shared
+                        })
+                        core.logger.debug(f"[{service_name}] Added result for shared translation: '{constructed_filename}'")
+                        shared_translation_found_and_used = True
+                    else:
+                        core.logger.debug(f"[{service_name}] Shared translation response for '{constructed_filename}' was empty or invalid. JSON: {str(json_response)[:200]}")
+                elif shared_response.status_code == 200: 
+                     core.logger.debug(f"[{service_name}] Shared translation for '{constructed_filename}' returned status 200 but non-JSON content-type: {shared_response.headers.get('content-type', '')}. Body: {shared_response.text[:200]}")
+                else: 
+                    core.logger.debug(f"[{service_name}] Failed to fetch shared translation for '{constructed_filename}'. Status: {shared_response.status_code}, Body: {shared_response.text[:200]}")
+
+            except Exception as e_shared:
+                core.logger.error(f"[{service_name}] Error fetching shared translation for '{constructed_filename}': {e_shared}")
+
+            if shared_translation_found_and_used:
+                continue 
+
+            # If shared translation not found or failed, proceed with existing logic
             action_args = {
-                'url': '', 'lang': kodi_target_lang_full, 
+                'url': '', 'lang': kodi_target_lang_full,
                 'filename': constructed_filename,
                 'gzip': False, 'service_name': service_name, 
                 'detail_url': movie_page_full_url,
@@ -617,26 +679,28 @@ def build_download_request(core, service_name, args):
             core.logger.debug(f"[{service_name}] Parsed {len(parsed_subs)} subtitle items from original SRT.")
 
             # MODIFICATION 2.3: Prepare translatable_items_info, skipping all-tag lines
+            # MODIFICATION: Changed order of html.unescape and _protect_subtitle_tags
             translatable_items_info = []
             for sub_item_idx, sub_item in enumerate(parsed_subs):
-                content_for_trans_prep = html.unescape(sub_item.content.replace('\n', ' '))
+                # 1. Prepare line for tag protection (newlines to spaces)
+                line_for_tag_protection = sub_item.content.replace('\n', ' ')
                 
-                # _protect_subtitle_tags will return (original_line, []) for all-tag lines
-                protected_text, tags_map_for_item = _protect_subtitle_tags(content_for_trans_prep)
+                # 2. Protect tags
+                protected_text_with_placeholders, tags_map_for_item = _protect_subtitle_tags(line_for_tag_protection)
                 
-                # Check if it was an all-tag line (original_line returned, empty map)
-                # and the original content_for_trans_prep was indeed what was returned as protected_text
-                if not tags_map_for_item and protected_text == content_for_trans_prep:
-                    # This indicates it was an all-tag line as per _protect_subtitle_tags logic.
-                    # Content for these lines is preserved as-is in parsed_subs[sub_item_idx].
-                    # They are skipped for chunking and translation.
-                    pass 
+                # Check if it was an all-tag line
+                # (original line_for_tag_protection returned, and tags_map_for_item is empty)
+                if not tags_map_for_item and protected_text_with_placeholders == line_for_tag_protection:
+                    # All-tag line, content preserved in parsed_subs[sub_item_idx].content
+                    # It's not added to translatable_items_info, so not part of chunks.
+                    pass
                 else:
                     # This item needs translation
                     translatable_items_info.append({
-                        'original_idx': sub_item_idx, # Index in the original parsed_subs
+                        'original_idx': sub_item_idx, 
                         'map': tags_map_for_item,
-                        'protected_text': protected_text # This is text with placeholders
+                        # 3. Use protected_text_with_placeholders for chunks
+                        'protected_text': protected_text_with_placeholders 
                     })
             
             core.logger.debug(f"[{service_name}] Identified {len(translatable_items_info)} translatable subtitle items (excluding all-tag lines).")
@@ -701,8 +765,12 @@ def build_download_request(core, service_name, args):
                         original_sub_idx_to_update = info_for_this_segment['original_idx']
                         tags_to_restore = info_for_this_segment['map']
                         
-                        restored_translated_text = _restore_subtitle_tags(translated_segment_text_raw, tags_to_restore)
-                        parsed_subs[original_sub_idx_to_update].content = restored_translated_text
+                        # 5. Restore tags
+                        text_with_restored_tags = _restore_subtitle_tags(translated_segment_text_raw, tags_to_restore)
+                        # 6. Unescape HTML entities
+                        final_content_for_srt = html.unescape(text_with_restored_tags)
+                        # 7. Set final content
+                        parsed_subs[original_sub_idx_to_update].content = final_content_for_srt
                     else:
                         # MODIFICATION 2.4: Overshoot - More translated segments than available translatable_items_info slots overall
                         if len(translatable_items_info) > 0:
@@ -710,10 +778,13 @@ def build_download_request(core, service_name, args):
                             last_TII_item_info = translatable_items_info[-1]
                             final_cue_original_idx = last_TII_item_info['original_idx']
                             # Use the map of this last item for restoring tags of the overshot segment
-                            map_for_overshoot_segment = last_TII_item_info['map'] 
+                            map_for_overshoot_segment = last_TII_item_info['map']
                             
-                            restored_overshoot_text = _restore_subtitle_tags(translated_segment_text_raw, map_for_overshoot_segment)
-                            parsed_subs[final_cue_original_idx].content += " " + restored_overshoot_text # Append with a space
+                            # Apply same post-translation processing for overshot segments
+                            text_with_restored_tags_overshoot = _restore_subtitle_tags(translated_segment_text_raw, map_for_overshoot_segment)
+                            final_content_for_srt_overshoot = html.unescape(text_with_restored_tags_overshoot)
+                            
+                            parsed_subs[final_cue_original_idx].content += " " + final_content_for_srt_overshoot # Append with a space
                             core.logger.debug(f"[{service_name}] Overshoot (2.4): Appended segment to content of original sub idx {final_cue_original_idx}.")
                         else:
                             # This case (overshoot with no translatable items) should be rare.
@@ -762,27 +833,59 @@ def build_download_request(core, service_name, args):
             
             # MODIFICATION 2.6: This path already bypasses _post_download_fix_encoding. No change needed here for 2.6.
             return {
-                'method': 'CLIENT_SIDE_TRANSLATED', 
+                'method': 'CLIENT_SIDE_TRANSLATED',
                 'url': original_srt_url, # For reference
                 'save_callback': _save_client_translated_srt,
-                'filename': _filename_from_args, 
+                'filename': _filename_from_args,
             }
-
-        except system_requests.exceptions.RequestException as e_req:
+        except system_requests.exceptions.RequestException as e_req: 
             core.logger.error(f"[{service_name}] Client-side translation: Network error downloading original SRT {original_srt_url}: {e_req}")
             raise 
-        except srt.SRTParseError as e_srt:
+        except srt.SRTParseError as e_srt: 
             core.logger.error(f"[{service_name}] Client-side translation: SRT parsing error for {original_srt_url}: {e_srt}")
             raise
-        except Exception as e_pipeline:
+        except Exception as e_pipeline: 
             core.logger.error(f"[{service_name}] Client-side translation pipeline failed for '{_filename_from_args}': {e_pipeline}")
             raise 
     
-    core.logger.debug(f"[{service_name}] Proceeding with standard download/polling for '{_filename_from_args}'.")
-    initial_download_url = args.get('url', '')
-    final_url = initial_download_url
+    elif args.get('method_type') == 'SHARED_TRANSLATION_CONTENT':
+        core.logger.debug(f"[{service_name}] Using shared translation content for '{args.get('filename')}'")
+        srt_content_to_save = args.get('srt_content', '') 
 
-    if args.get('needs_poll'):
+        def _save_shared_srt(path_from_core):
+            try:
+                import io, html 
+                
+                current_srt_text_str = ""
+                if isinstance(srt_content_to_save, bytes):
+                    core.logger.debug(f"[{service_name}] Shared SRT content was bytes, decoding as UTF-8.")
+                    current_srt_text_str = srt_content_to_save.decode('utf-8', errors='replace')
+                else:
+                    current_srt_text_str = str(srt_content_to_save)
+                
+                temp_unscaped_srt_text = html.unescape(current_srt_text_str)
+                temp_bytes_for_fixing = temp_unscaped_srt_text.encode('utf-8') 
+
+                _post_download_fix_encoding(core, service_name, temp_bytes_for_fixing, path_from_core)
+                
+                core.logger.debug(f"[{service_name}] Shared SRT content successfully processed and saved to '{path_from_core}'")
+                return True
+            except Exception as e_save:
+                core.logger.error(f"[{service_name}] Failed to save shared SRT content to '{path_from_core}': {e_save}")
+                return False
+
+        return {
+            'method': 'REQUEST_CALLBACK', 
+            'save_callback': _save_shared_srt,
+            'filename': args.get('filename'), 
+        }
+
+    # Standard download logic (direct URL or needs_poll)
+    else: 
+        core.logger.debug(f"[{service_name}] Proceeding with standard download/polling for '{_filename_from_args}'.")
+        initial_download_url = args.get('url', '')
+        final_url = initial_download_url
+        if args.get('needs_poll'):
         if not final_url: 
             core.logger.debug(f"[{service_name}] Polling required for '{_filename_from_args}'. Detail URL: {args.get('detail_url')}, Polling Lang Code: {sc_lang_for_polling}")
             polled_url = _wait_for_translated(core,
