@@ -35,7 +35,7 @@ else:  # pragma: no cover
     import xbmcgui
     import xbmcvfs
 
-addon = xbmcaddon.Addon('service.subtitles.polyglotsubs-kodi')
+addon = xbmcaddon.Addon()
 addon_id = addon.getAddonInfo('id')
 addon_name = addon.getAddonInfo('name')
 addon_version = addon.getAddonInfo('version')

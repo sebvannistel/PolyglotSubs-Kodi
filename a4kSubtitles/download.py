@@ -47,7 +47,7 @@ def __extract_zip(core, archivepath, filename, episodeid):
     except:
         using_libvfs = True
         archivepath_ = core.utils.quote_plus(archivepath)
-        (dirs, files) = core.kodi.xbmcvfs.listdir('archive://%s' % archivepath_)
+        (dirs, files) = core.kodi.xbmcvfs.listdir('zip://%s' % archivepath_)
         namelist = [file.decode(core.utils.default_encoding) if core.utils.py2 else file for file in files]
 
     subfile = core.utils.find_file_in_archive(core, namelist, sub_exts + sub_exts_secondary, episodeid)
@@ -76,7 +76,7 @@ def __extract_zip(core, archivepath, filename, episodeid):
         try: core.os.rename(src, dest)
         except: pass
     else:
-        src = 'archive://' + archivepath_ + '/' + subfile
+        src = 'zip://' + archivepath_ + '/' + subfile
         core.kodi.xbmcvfs.copy(src, dest)
 
     return dest
