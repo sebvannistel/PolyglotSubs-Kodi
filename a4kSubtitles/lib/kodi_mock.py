@@ -53,7 +53,7 @@ xbmcaddon = lambda: None
 __addon = lambda: None
 def __get_addon_info(name):
     if name == 'id':
-        return 'service.subtitles.a4ksubtitlecat'
+        return 'service.subtitles.polyglotsubs-kodi'
     elif name == 'name':
         return 'a4ksubtitles'
     elif name == 'version':

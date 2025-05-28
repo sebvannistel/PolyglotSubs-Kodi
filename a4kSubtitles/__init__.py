@@ -6,7 +6,7 @@ import os
 # --- Start of sys.path modification ---
 try:
     import xbmcaddon
-    ADDON_ID = 'service.subtitles.a4ksubtitlecat' # Your specific addon ID
+    ADDON_ID = 'service.subtitles.polyglotsubs-kodi' # Your specific addon ID
     ADDON = xbmcaddon.Addon(ADDON_ID)
     # getAddonInfo('path') returns the addon's root directory
     ADDON_PATH = ADDON.getAddonInfo('path')
