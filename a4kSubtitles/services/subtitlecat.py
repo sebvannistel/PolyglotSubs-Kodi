@@ -732,6 +732,8 @@ def build_download_request(core, service_name, args):
             block_size_chars = 1500
             original_segments_for_chunks_count = [] # Stores count of original segments from translatable_items_info per chunk
             
+            _CHUNK_SEP = "|||SGMNTBRK|||"
+
             current_chunk_buffer = ""
             current_chunk_segment_count = 0
             
@@ -739,102 +741,74 @@ def build_download_request(core, service_name, args):
             for item_data in translatable_items_info: # Iterate over translatable items only
                 segment_text_for_chunk = item_data['protected_text']
                 # Check URL encoding length if concerned, for now simple length check
-                if len(current_chunk_buffer) + len(segment_text_for_chunk) + 1 > block_size_chars and current_chunk_buffer:
+                if len(current_chunk_buffer) + len(segment_text_for_chunk) + len(_CHUNK_SEP) > block_size_chars and current_chunk_buffer:
                     chunks.append(current_chunk_buffer)
                     original_segments_for_chunks_count.append(current_chunk_segment_count)
                     current_chunk_buffer = ""
                     current_chunk_segment_count = 0
-                current_chunk_buffer += segment_text_for_chunk + "␟" # Use a rare separator
+                current_chunk_buffer += segment_text_for_chunk + _CHUNK_SEP
                 current_chunk_segment_count += 1
 
-            if current_chunk_buffer: 
+            if current_chunk_buffer:
+                # Remove trailing separator before appending the last chunk
+                if current_chunk_buffer.endswith(_CHUNK_SEP):
+                    current_chunk_buffer = current_chunk_buffer[:-len(_CHUNK_SEP)]
                 chunks.append(current_chunk_buffer)
                 original_segments_for_chunks_count.append(current_chunk_segment_count)
 
             core.logger.debug(f"[{service_name}] Split translatable items into {len(chunks)} chunks for translation.")
             
-            current_TII_pointer = 0 # Pointer into translatable_items_info (conceptual `translated_srt_item_pointer`)
+            current_TII_pointer = 0 # Pointer into translatable_items_info
             
             for i, text_chunk_to_translate in enumerate(chunks): # i is chunk index
                 core.logger.debug(f"[{service_name}] Translating chunk {i+1}/{len(chunks)}...")
-                # MODIFICATION 2.1: Rate limit between chunk posts
-                if i > 0: # No sleep before the first chunk request
+                if i > 0: 
                     time.sleep(0.4)
                 
                 translated_chunk_content = _gtranslate_text_chunk(text_chunk_to_translate, target_gtranslate_lang, core, service_name)
                 
-                translated_segments_in_chunk = translated_chunk_content.split("␟")
-                if translated_segments_in_chunk and translated_segments_in_chunk[-1] == "": # Remove potential trailing empty segment
-                    translated_segments_in_chunk = translated_segments_in_chunk[:-1]
+                translated_segments = translated_chunk_content.split(_CHUNK_SEP)
+                if translated_segments and translated_segments[-1] == "":
+                    translated_segments.pop()
 
-                # This is the number of original segments from translatable_items_info that formed this chunk
-                num_original_segments_this_chunk = original_segments_for_chunks_count[i] 
-                
-                # MODIFICATION: core.logger.warning -> core.logger.debug
-                if len(translated_segments_in_chunk) != num_original_segments_this_chunk:
-                    core.logger.debug(f"[{service_name}] Mismatch in segment count for translated chunk {i+1}. Expected {num_original_segments_this_chunk} original segments for this chunk, got {len(translated_segments_in_chunk)} translated segments. Translation quality may be affected.")
+                expected_segments_this_chunk = original_segments_for_chunks_count[i]
+                received_segments_this_chunk = len(translated_segments)
 
-                # Iterate over each segment returned by Google for this chunk
-                # k_zip is the index within the current translated_segments_in_chunk
-                for k_zip, translated_segment_text_raw in enumerate(translated_segments_in_chunk):
-                    # target_TII_idx is the effective destination slot in translatable_items_info
-                    # based on Fix #4's pointer logic (current_TII_pointer + k_zip)
-                    target_TII_idx = current_TII_pointer + k_zip 
+                if received_segments_this_chunk != expected_segments_this_chunk:
+                    core.logger.debug(f"[{service_name}] Segment count mismatch for chunk {i+1}. Expected {expected_segments_this_chunk}, got {received_segments_this_chunk}. Processing min of the two.")
 
-                    if target_TII_idx < len(translatable_items_info):
-                        # Normal case: This translated segment maps to a designated translatable item
-                        info_for_this_segment = translatable_items_info[target_TII_idx]
-                        original_sub_idx_to_update = info_for_this_segment['original_idx']
-                        tags_to_restore = info_for_this_segment['map']
-                        
-                        # 5. Restore tags
-                        text_with_restored_tags = _restore_subtitle_tags(translated_segment_text_raw, tags_to_restore)
-                        # 6. Unescape HTML entities
-                        final_content_for_srt = html.unescape(text_with_restored_tags)
-                        # 7. Set final content
-                        parsed_subs[original_sub_idx_to_update].content = final_content_for_srt
-                    else:
-                        # MODIFICATION 2.4: Overshoot - More translated segments than available translatable_items_info slots overall
-                        if len(translatable_items_info) > 0:
-                            # Append to the content of the *very last item in translatable_items_info*
-                            last_TII_item_info = translatable_items_info[-1]
-                            final_cue_original_idx = last_TII_item_info['original_idx']
-                            # Use the map of this last item for restoring tags of the overshot segment
-                            map_for_overshoot_segment = last_TII_item_info['map']
-                            
-                            # Apply same post-translation processing for overshot segments
-                            text_with_restored_tags_overshoot = _restore_subtitle_tags(translated_segment_text_raw, map_for_overshoot_segment)
-                            final_content_for_srt_overshoot = html.unescape(text_with_restored_tags_overshoot)
-                            
-                            parsed_subs[final_cue_original_idx].content += " " + final_content_for_srt_overshoot # Append with a space
-                            core.logger.debug(f"[{service_name}] Overshoot (2.4): Appended segment to content of original sub idx {final_cue_original_idx}.")
-                        else:
-                            # This case (overshoot with no translatable items) should be rare.
-                            # MODIFICATION: core.logger.warning -> core.logger.debug
-                            core.logger.debug(f"[{service_name}] Overshoot (2.4): No translatable items to append to. Discarding segment: {translated_segment_text_raw[:60]}")
+                segments_to_process_for_this_chunk = min(expected_segments_this_chunk, received_segments_this_chunk)
+
+                for k_segment_in_chunk in range(segments_to_process_for_this_chunk):
+                    target_tii_index = current_TII_pointer + k_segment_in_chunk
+                    
+                    if target_tii_index >= len(translatable_items_info):
+                        core.logger.error(f"[{service_name}] Error: target_tii_index ({target_tii_index}) out of bounds for translatable_items_info (len: {len(translatable_items_info)}) in chunk {i+1}. Skipping rest of this chunk.")
+                        break 
+
+                    info_for_this_segment = translatable_items_info[target_tii_index]
+                    raw_translated_text = translated_segments[k_segment_in_chunk]
+                    
+                    text_with_restored_tags = _restore_subtitle_tags(raw_translated_text, info_for_this_segment['map'])
+                    final_content_for_srt = html.unescape(text_with_restored_tags)
+                    parsed_subs[info_for_this_segment['original_idx']].content = final_content_for_srt
                 
-                # Advance current_TII_pointer by the number of segments Google returned for *this* chunk (Fix #4 behavior)
-                current_TII_pointer += len(translated_segments_in_chunk) 
-                
-                if current_TII_pointer >= len(translatable_items_info) and len(translatable_items_info) > 0 : # Check if all translatable items have been 'pointed to'
-                    if i < len(chunks) -1 : # If there were more chunks but we've notionally processed all translatable item slots
-                         # MODIFICATION: core.logger.warning -> core.logger.debug
-                         core.logger.debug(f"[{service_name}] All translatable item slots considered; subsequent chunks (if any) will primarily cause overshoot appends to the final cue.")
-                    # Continue processing remaining chunks, as they might still contain segments that need to be appended due to overshoot
-                    # The original break was: break # Break from the outer loop over chunks
-                    # Keeping the break, as Fix #4 original code also had a similar break condition logic.
-                    # This means if pointer exceeds items, remaining *chunks* are skipped. Overshoot for *current* chunk is handled above.
+                current_TII_pointer += expected_segments_this_chunk # Advance by expected segments
+
+                if received_segments_this_chunk > expected_segments_this_chunk:
+                    core.logger.debug(f"[{service_name}] Chunk {i+1}: Received {received_segments_this_chunk} segments, but only processed {expected_segments_this_chunk} based on original chunking. {received_segments_this_chunk - expected_segments_this_chunk} translated segments were discarded.")
+
+                if current_TII_pointer >= len(translatable_items_info) and len(translatable_items_info) > 0:
+                    if i < len(chunks) - 1 and len(translatable_items_info) > 0 : 
+                        core.logger.debug(f"[{service_name}] All translatable item slots processed based on original chunking ({current_TII_pointer}/{len(translatable_items_info)}); subsequent chunks (if any) will be skipped.")
                     break 
             
-            # Final logging for pointer state relative to translatable items
-            if len(chunks) > 0: # Only if translation attempt was made
+            if len(chunks) > 0: 
                 if current_TII_pointer < len(translatable_items_info):
-                     # MODIFICATION: core.logger.warning -> core.logger.debug
-                     core.logger.debug(f"[{service_name}] Final TII pointer ({current_TII_pointer}) is less than total translatable items ({len(translatable_items_info)}). Some items might not have received translations if Google returned fewer segments than expected overall.")
-                elif current_TII_pointer > len(translatable_items_info) and len(translatable_items_info) > 0:
-                     # MODIFICATION: core.logger.info -> core.logger.debug
-                     core.logger.debug(f"[{service_name}] Final TII pointer ({current_TII_pointer}) overshot total translatable items ({len(translatable_items_info)}). Overshoot logic (2.4) should have appended to the last item.")
-
+                    core.logger.debug(f"[{service_name}] Final TII pointer ({current_TII_pointer}) is less than total translatable items ({len(translatable_items_info)}). Some items might not have received translations if Google returned fewer segments than expected overall or per chunk.")
+                elif current_TII_pointer == len(translatable_items_info): 
+                    core.logger.debug(f"[{service_name}] Final TII pointer ({current_TII_pointer}) matches total translatable items ({len(translatable_items_info)}). All items processed/attempted.")
+                # No explicit logging for current_TII_pointer > len(translatable_items_info) as pointer is advanced by expected, not received.
 
             final_translated_srt_str = srt.compose(parsed_subs)
             core.logger.debug(f"[{service_name}] Successfully composed translated SRT string ({len(final_translated_srt_str)} chars).")
