@@ -310,14 +310,16 @@ _PLACEHOLDER_SUFFIX = "SCP@@"
 __TAG_REGEX_FOR_PROTECTION = re.compile(r'(<(?:"[^"]*"|\'[^\']*\'|[^>"\'])*>|{(?:"[^"]*"|\'[^\']*\'|[^}\'"])*})')
 
 def _protect_subtitle_tags(text_line):
-    """Replaces tags with placeholders and returns the new text and the list of tags.
+    """Replaces tags with placeholders and returns the new text, the list of tags,
+    and a boolean indicating if the line was purely tags.
     MODIFICATION 2.3: Handles all-tag lines."""
     # Check if the line is effectively all tags after stripping non-tag content
     stripped_line_no_tags = __TAG_REGEX_FOR_PROTECTION.sub('', text_line).strip()
     if not stripped_line_no_tags: # If empty after removing tags and stripping
-        # This is an all-tag line. Return it as is, with no placeholders/tags to restore.
-        return text_line, [] # Return original line, and empty list of tags
+        # This is an all-tag line.
+        return text_line, [], True # Return original line, empty tags list, and True for is_all_tag_line
     
+    # Line has non-tag content
     tags_found = []
     def _replacer(match):
         tag = match.group(1)
@@ -326,7 +328,7 @@ def _protect_subtitle_tags(text_line):
         return f"{_PLACEHOLDER_SENTINEL_PREFIX}{len(tags_found)-1}{_PLACEHOLDER_SUFFIX}"
     
     processed_text = __TAG_REGEX_FOR_PROTECTION.sub(_replacer, text_line)
-    return processed_text, tags_found
+    return processed_text, tags_found, False # Return processed text, tags list, and False for is_all_tag_line
 
 def _restore_subtitle_tags(text_line_with_placeholders, tags_list):
     """Replaces placeholders in the text with their original tag strings."""
@@ -707,17 +709,15 @@ def build_download_request(core, service_name, args):
                 # 1. Prepare line for tag protection (newlines to spaces)
                 line_for_tag_protection = sub_item.content.replace('\n', ' ')
                 
-                # 2. Protect tags
-                protected_text_with_placeholders, tags_map_for_item = _protect_subtitle_tags(line_for_tag_protection)
+                # 2. Protect tags and check if it was an all-tag line
+                protected_text_with_placeholders, tags_map_for_item, is_all_tag_line = _protect_subtitle_tags(line_for_tag_protection)
                 
-                # Check if it was an all-tag line
-                # (original line_for_tag_protection returned, and tags_map_for_item is empty)
-                if not tags_map_for_item and protected_text_with_placeholders == line_for_tag_protection:
+                if is_all_tag_line:
                     # All-tag line, content preserved in parsed_subs[sub_item_idx].content
                     # It's not added to translatable_items_info, so not part of chunks.
                     pass
                 else:
-                    # This item needs translation
+                    # This item needs translation (it has actual text, may or may not have tags)
                     translatable_items_info.append({
                         'original_idx': sub_item_idx, 
                         'map': tags_map_for_item,
