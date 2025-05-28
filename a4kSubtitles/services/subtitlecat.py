@@ -36,12 +36,37 @@ _TRANSLATED_CACHE = {}     # survives for the lifetime of the add-on
 #######################################################################
 # 1. helper ­- title similarity
 #######################################################################
-# ≥85 % token_set_ratio ≈ “same movie”, order unimportant
+# Relaxed fuzzy matching with punctuation & camel-case preprocessing
+_CLEAN_PUNC = re.compile(r"[._-]")
+_CLEAN_CAMEL = re.compile(r"(?<=[a-z])(?=[A-Z])")
+
 def _is_title_close(wanted: str, got: str) -> bool:
-    return fuzz.token_set_ratio(
-        (wanted or "").lower(),
-        (got or "").lower()
-    ) >= 78 # MODIFIED FROM 85 to 78 as per patch
+    # Raw input
+    w_raw = wanted or ""
+    g_raw = got or ""
+
+    # 1) Insert spaces at camel-case boundaries
+    w_tmp = _CLEAN_CAMEL.sub(" ", w_raw)
+    g_tmp = _CLEAN_CAMEL.sub(" ", g_raw)
+
+    # 2) Replace dots/underscores/hyphens with spaces
+    w_spaced = _CLEAN_PUNC.sub(" ", w_tmp)
+    g_spaced = _CLEAN_PUNC.sub(" ", g_tmp)
+
+    # 3) Lowercase and collapse whitespace
+    clean_w = " ".join(w_spaced.lower().split())
+    clean_g = " ".join(g_spaced.lower().split())
+
+    tokens_w = clean_w.split()
+    tokens_g = clean_g.split()
+
+    # 4) Short-title guard: allow at most one extra token for two-word titles
+    if len(tokens_w) < 3 and abs(len(tokens_w) - len(tokens_g)) > 1:
+        return False
+
+    # Final fuzzy check at 75% threshold
+    return fuzz.token_set_ratio(clean_w, clean_g) >= 70
+
 
 __subtitlecat_base_url = "https://www.subtitlecat.com"
 __user_agent = (

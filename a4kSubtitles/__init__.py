@@ -11,7 +11,7 @@ try:
     # getAddonInfo('path') returns the addon's root directory
     ADDON_PATH = ADDON.getAddonInfo('path')
     # On Windows, Kodi might return a path that needs decoding
-    if sys.platform == 'win32':
+    if sys.platform == 'win32' and isinstance(ADDON_PATH, bytes):
         ADDON_PATH = ADDON_PATH.decode('utf-8')
 except ImportError:
     # Fallback for environments where xbmcaddon is not available (e.g., local testing outside Kodi)
