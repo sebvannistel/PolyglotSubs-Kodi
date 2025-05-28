@@ -138,9 +138,12 @@ def _wait_for_translated(core, detail_url, lang_code, service_name,
             core.logger.debug(f"[{service_name}] Polling for '{lang_code}' "
                               f"- {attempt+1}/{tries}")
 
+        except system_requests.exceptions.RequestException as req_exc:
+            core.logger.debug(f"[{service_name}] Poll {attempt+1}/{tries} "
+                              f"RequestException: {req_exc}")
         except Exception as exc:
             core.logger.debug(f"[{service_name}] Poll {attempt+1}/{tries} "
-                              f"failed: {exc}")
+                              f"failed with unexpected error: {exc}")
 
     return ''
 # END OF REPLACEMENT: _wait_for_translated replaced with "Take-away code"
@@ -544,8 +547,12 @@ def parse_search_response(core, service_name, meta, response):
                 else: 
                     core.logger.debug(f"[{service_name}] Failed to fetch shared translation for '{constructed_filename}'. Status: {shared_response.status_code}, Body: {shared_response.text[:200]}")
 
+            except system_requests.exceptions.RequestException as req_exc_shared:
+                core.logger.error(f"[{service_name}] RequestException fetching shared translation for '{constructed_filename}': {req_exc_shared}")
+            except ValueError as val_err_shared: # For JSON decoding errors
+                core.logger.error(f"[{service_name}] ValueError (JSON decode) fetching shared translation for '{constructed_filename}': {val_err_shared}")
             except Exception as e_shared:
-                core.logger.error(f"[{service_name}] Error fetching shared translation for '{constructed_filename}': {e_shared}")
+                core.logger.error(f"[{service_name}] Unexpected error fetching shared translation for '{constructed_filename}': {e_shared}")
 
             if shared_translation_found_and_used:
                 continue 
