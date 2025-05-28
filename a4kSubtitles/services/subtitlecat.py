@@ -282,7 +282,7 @@ def _gtranslate_text_chunk(text_chunk, target_lang, core, service_name):
 _PLACEHOLDER_SENTINEL_PREFIX = "\u2063@@SCPTAG" # INVISIBLE SEPARATOR + prefix
 _PLACEHOLDER_SUFFIX = "SCP@@"
 # MODIFIED REGEX for improved tag attribute handling
-__TAG_REGEX_FOR_PROTECTION = re.compile(r'(<(?:"[^"]*"|'[^']*'|[^>"'])*>|{(?:"[^"]*"|'[^']*'|[^}"'])*})')
+__TAG_REGEX_FOR_PROTECTION = re.compile(r'(<(?:"[^"]*"|\'[^\']*\'|[^>"\'])*>|{(?:"[^"]*"|\'[^\']*\'|[^}\'"])*})')
 
 def _protect_subtitle_tags(text_line):
     """Replaces tags with placeholders and returns the new text and the list of tags.
