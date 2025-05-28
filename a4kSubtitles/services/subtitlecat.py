@@ -282,7 +282,7 @@ def _gtranslate_text_chunk(text_chunk, target_lang, core, service_name):
 _PLACEHOLDER_SENTINEL_PREFIX = "\u2063@@SCPTAG" # INVISIBLE SEPARATOR + prefix
 _PLACEHOLDER_SUFFIX = "SCP@@"
 # MODIFIED REGEX for improved tag attribute handling
-__TAG_REGEX_FOR_PROTECTION = re.compile(r"(<(?:"[^"]*"|'[^']*'|[^>"'])*>|{(?:"[^"]*"|'[^']*'|[^}"'])*})")
+__TAG_REGEX_FOR_PROTECTION = re.compile(r'(<(?:"[^"]*"|'[^']*'|[^>"'])*>|{(?:"[^"]*"|'[^']*'|[^}"'])*})')
 
 def _protect_subtitle_tags(text_line):
     """Replaces tags with placeholders and returns the new text and the list of tags.
@@ -883,22 +883,22 @@ def build_download_request(core, service_name, args):
         initial_download_url = args.get('url', '')
         final_url = initial_download_url
         if args.get('needs_poll'):
-        if not final_url: 
-            core.logger.debug(f"[{service_name}] Polling required for '{_filename_from_args}'. Detail URL: {args.get('detail_url')}, Polling Lang Code: {sc_lang_for_polling}")
-            polled_url = _wait_for_translated(core,
-                                              args['detail_url'],
-                                              sc_lang_for_polling, 
-                                              service_name)
-            if polled_url:
-                final_url = polled_url
-                args['url'] = final_url 
-                core.logger.debug(f"[{service_name}] Polling successful. Found URL for '{_filename_from_args}': {final_url}")
-            else:
-                error_msg = f"[{service_name}] Translation poll for '{_filename_from_args}' (lang for poll: {sc_lang_for_polling}) did not become available on {args.get('detail_url')} in time."
-                core.logger.error(error_msg)
-                raise Exception(error_msg) 
-        elif final_url:
-            core.logger.debug(f"[{service_name}] 'needs_poll' is true but URL '{final_url}' already present for '{_filename_from_args}'. Using existing URL without polling.")
+            if not final_url: 
+                core.logger.debug(f"[{service_name}] Polling required for '{_filename_from_args}'. Detail URL: {args.get('detail_url')}, Polling Lang Code: {sc_lang_for_polling}")
+                polled_url = _wait_for_translated(core,
+                                                  args['detail_url'],
+                                                  sc_lang_for_polling, 
+                                                  service_name)
+                if polled_url:
+                    final_url = polled_url
+                    args['url'] = final_url 
+                    core.logger.debug(f"[{service_name}] Polling successful. Found URL for '{_filename_from_args}': {final_url}")
+                else:
+                    error_msg = f"[{service_name}] Translation poll for '{_filename_from_args}' (lang for poll: {sc_lang_for_polling}) did not become available on {args.get('detail_url')} in time."
+                    core.logger.error(error_msg)
+                    raise Exception(error_msg) 
+            elif final_url: # This corresponds to the inner if not final_url
+                core.logger.debug(f"[{service_name}] 'needs_poll' is true but URL '{final_url}' already present for '{_filename_from_args}'. Using existing URL without polling.")
 
     if not final_url:
         error_msg = f"[{service_name}] Final URL for '{_filename_from_args}' is empty after processing. (Initial URL: '{initial_download_url}', NeedsPoll: {args.get('needs_poll')}). Cannot download."
