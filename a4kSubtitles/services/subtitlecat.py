@@ -28,6 +28,7 @@ import html # For unescaping HTML entities (used in translation preparation)
 # urllib.parse.quote_plus is used via urllib.parse.quote_plus
 # END OF ADDITIONS FOR CLIENT-SIDE TRANSLATION
 
+from collections import Counter # Added for determining overall detected source language
 # No 'log = logger.Logger.get_logger(__name__)' needed; use 'core.logger' directly.
 
 # light-weight cache (detail_url, lang_code) ➜ final .srt URL
@@ -116,7 +117,7 @@ def _wait_for_translated(core, detail_url, lang_code, service_name,
             page = _SC_SESSION.get(
                 detail_url,
                 timeout=10,
-                headers={'Cache-Control': 'no-cache'} # Point 2: HTML caching by Cloudflare
+                headers={'Cache-Control': 'no-cache', 'User-Agent': __user_agent} # Added User-Agent for consistency
             )
             page.raise_for_status()
             soup = BeautifulSoup(page.text, 'html.parser')
@@ -258,7 +259,7 @@ GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single"
 def _gtranslate_text_chunk(text_chunk, target_lang, core, service_name):
     if not text_chunk.strip():
         core.logger.debug(f"[{service_name}] gtranslate: Empty chunk provided, skipping translation.")
-        return ""
+        return "", "auto"
 
     payload = {
         'client': 'gtx',
@@ -272,34 +273,59 @@ def _gtranslate_text_chunk(text_chunk, target_lang, core, service_name):
     core.logger.debug(f"[{service_name}] gtranslate: Translating chunk to '{target_lang}'. Chunk preview: {text_chunk[:60]}...")
 
     try:
-        r = _SC_SESSION.post(GOOGLE_TRANSLATE_URL, data=payload, timeout=20)
-        r.raise_for_status() 
+        r = _SC_SESSION.post(GOOGLE_TRANSLATE_URL, data=payload, timeout=20) # Uses global _SC_SESSION
+        r.raise_for_status()
 
         response_json = r.json()
+        detected_source_lang = "auto"
 
-        if not response_json or not isinstance(response_json, list) or not response_json[0]:
-            core.logger.error(f"[{service_name}] gtranslate: Unexpected JSON response structure from Google Translate: {str(response_json)[:200]}")
-            return ""
+        if response_json and isinstance(response_json, list):
+            # Attempt to extract detected source language
+            if len(response_json) > 2:
+                lang_info = response_json[2]
+                if isinstance(lang_info, str):
+                    detected_source_lang = lang_info
+                elif isinstance(lang_info, list):
+                    if lang_info and isinstance(lang_info[0], list) and lang_info[0]:
+                        if isinstance(lang_info[0][0], str):
+                            detected_source_lang = lang_info[0][0]
+                    elif lang_info and isinstance(lang_info[0], str):
+                        detected_source_lang = lang_info[0]
+            
+            if not response_json[0]: # Check for empty translation part specifically
+                 core.logger.error(f"[{service_name}] gtranslate: Empty translation data in JSON response: {str(response_json)[:200]}")
+                 return "", detected_source_lang # Return detected lang even if translation is empty
 
-        translated_parts = []
-        for part_list in response_json[0]:
-            if part_list and isinstance(part_list, list) and part_list[0] is not None:
-                translated_parts.append(part_list[0])
-        
-        return "".join(translated_parts)
+            translated_parts = []
+            # Ensure response_json[0] is iterable and contains lists before processing
+            if isinstance(response_json[0], list):
+                for part_list in response_json[0]:
+                    if part_list and isinstance(part_list, list) and part_list[0] is not None:
+                        translated_parts.append(part_list[0])
+            else:
+                # Handle cases where response_json[0] might not be a list of lists, e.g. direct string (though less common for 'dt=t')
+                # This part of the logic might need adjustment based on actual observed non-list structures for response_json[0]
+                # For now, if it's not the expected list of lists, log and proceed with empty translated_parts.
+                core.logger.debug(f"[{service_name}] gtranslate: Unexpected structure for translation parts in response_json[0]: {str(response_json[0])[:200]}")
+
+            return "".join(translated_parts), detected_source_lang
+        else:
+            core.logger.error(f"[{service_name}] gtranslate: Unexpected or empty JSON response structure from Google Translate: {str(response_json)[:200]}")
+            return "", "auto"
+
 
     except system_requests.exceptions.Timeout:
         core.logger.error(f"[{service_name}] gtranslate: Timeout during translation request to {GOOGLE_TRANSLATE_URL}.")
-        return ""
+        return "", "auto"
     except system_requests.exceptions.RequestException as e:
         core.logger.error(f"[{service_name}] gtranslate: RequestException: {e} for URL {GOOGLE_TRANSLATE_URL}.")
-        return ""
+        return "", "auto"
     except ValueError as e_json: 
         core.logger.error(f"[{service_name}] gtranslate: JSONDecodeError: {e_json}. Response text: {r.text[:200] if 'r' in locals() else 'N/A'}")
-        return ""
+        return "", "auto"
     except Exception as e_unexp:
         core.logger.error(f"[{service_name}] gtranslate: Unexpected error: {e_unexp} for URL {GOOGLE_TRANSLATE_URL}.")
-        return ""
+        return "", "auto"
 # END OF DEFINITIONS FOR CLIENT-SIDE TRANSLATION
 
 # START OF IMAGE FIX #3: Helpers for tag protection (module-level)
@@ -339,6 +365,77 @@ def _restore_subtitle_tags(text_line_with_placeholders, tags_list):
         text_line_with_placeholders = text_line_with_placeholders.replace(placeholder, original_tag_content)
     return text_line_with_placeholders
 # END OF IMAGE FIX #3: Helpers
+
+# START OF FUNCTION _upload_translation_to_subtitlecat
+def _upload_translation_to_subtitlecat(core, service_name, translated_srt_content_str, target_sc_lang_code, original_filename_stem_from_sc, detected_source_language_code, movie_page_full_url):
+    upload_url = "https://www.subtitlecat.com/upload_subtitles.php"
+    
+    # Determine name_for_upload by replacing "-orig.srt" or "-orig" (if .srt is missing) with ".srt"
+    name_for_upload = original_filename_stem_from_sc # Default if no suffix found
+    if original_filename_stem_from_sc.endswith("-orig.srt"):
+        name_for_upload = original_filename_stem_from_sc[:-len("-orig.srt")] + ".srt"
+    elif original_filename_stem_from_sc.endswith("-orig"):
+        name_for_upload = original_filename_stem_from_sc[:-len("-orig")] + ".srt"
+    else:
+        # If "-orig" is not a suffix, it might be a direct filename or an unexpected format.
+        # For safety, ensure it ends with .srt; Subtitlecat adds language if needed.
+        if not original_filename_stem_from_sc.endswith(".srt"):
+            # This case should ideally not happen if original_filename_stem_from_sc
+            # is derived correctly from an "-orig.srt" URL.
+            name_for_upload = f"{original_filename_stem_from_sc}.srt"
+            core.logger.debug(f"[{service_name}] original_filename_stem_from_sc ('{original_filename_stem_from_sc}') did not end with -orig or -orig.srt. Appended .srt: '{name_for_upload}'")
+
+
+    payload = {
+        'filename': name_for_upload,
+        'content': translated_srt_content_str,
+        'language': target_sc_lang_code,
+        'orig_language': detected_source_language_code, # Can be "auto"
+    }
+
+    headers = {
+        'User-Agent': __user_agent, # Already on _SC_SESSION, but can be explicit
+        'Referer': movie_page_full_url or __subtitlecat_base_url, # Ensure referer is present
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 
+        'X-Requested-With': 'XMLHttpRequest', 
+    }
+
+    core.logger.debug(f"[{service_name}] Attempting to upload translated subtitle '{name_for_upload}' to {upload_url} for language '{target_sc_lang_code}', source lang '{detected_source_language_code}'. Referer: {headers['Referer']}")
+
+    try:
+        # Using _SC_SESSION which is system_requests.Session()
+        response = _SC_SESSION.post(upload_url, data=payload, headers=headers, timeout=30) # Increased timeout for upload
+        response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+
+        json_response = response.json()
+        core.logger.debug(f"[{service_name}] Upload response from Subtitlecat: {json_response}")
+
+        if json_response.get("echo") == "ok" and json_response.get("url"):
+            returned_path = json_response["url"]
+            if returned_path.startswith("/"): 
+                 new_srt_url_on_sc = urljoin(__subtitlecat_base_url, returned_path.lstrip('/'))
+            else: 
+                 new_srt_url_on_sc = urljoin(__subtitlecat_base_url, returned_path)
+
+            core.logger.debug(f"[{service_name}] Successfully uploaded translated subtitle. New URL: {new_srt_url_on_sc}")
+            return new_srt_url_on_sc
+        else:
+            core.logger.error(f"[{service_name}] Subtitlecat upload failed or returned unexpected response. Echo: {json_response.get('echo')}, URL: {json_response.get('url')}, Message: {json_response.get('message')}") # Added message
+            return None
+
+    except system_requests.exceptions.Timeout:
+        core.logger.error(f"[{service_name}] Timeout during subtitle upload to {upload_url}.")
+        return None
+    except system_requests.exceptions.RequestException as e:
+        core.logger.error(f"[{service_name}] RequestException during subtitle upload: {e}")
+        return None
+    except ValueError as e_json:  # Includes JSONDecodeError
+        core.logger.error(f"[{service_name}] JSONDecodeError parsing Subtitlecat upload response: {e_json}. Response text: {response.text[:200] if 'response' in locals() and hasattr(response, 'text') else 'N/A'}")
+        return None
+    except Exception as e_unexp:
+        core.logger.error(f"[{service_name}] Unexpected error during subtitle upload: {e_unexp}")
+        return None
+# END OF FUNCTION _upload_translation_to_subtitlecat
 
 
 # ---------------------------------------------------------------------------
@@ -536,25 +633,24 @@ def parse_search_response(core, service_name, meta, response):
                     'Accept': 'application/json, */*' 
                 }
                 core.logger.debug(f"[{service_name}] Attempting to fetch shared translation for '{constructed_filename}' from {shared_translation_url} (referer: {movie_page_full_url})")
-                # Using _SC_SESSION for consistency, as it holds the user-agent and any potential session cookies.
                 shared_response = _SC_SESSION.get(shared_translation_url, headers=shared_headers, timeout=shared_translation_timeout)
                 
                 if shared_response.status_code == 200 and shared_response.headers.get('content-type', '').startswith('application/json'):
                     json_response = shared_response.json()
                     shared_srt_text = json_response.get("text")
-                    shared_srt_lang = json_response.get("language") # Optional for logging
+                    shared_srt_lang = json_response.get("language") 
 
                     if shared_srt_text and isinstance(shared_srt_text, str) and shared_srt_text.strip():
                         core.logger.debug(f"[{service_name}] Found shared translation for '{constructed_filename}' (lang: {shared_srt_lang or 'N/A'})")
                         
                         action_args_shared = {
-                            'method_type': 'SHARED_TRANSLATION_CONTENT', # New type
+                            'method_type': 'SHARED_TRANSLATION_CONTENT', 
                             'srt_content': shared_srt_text,
                             'filename': constructed_filename,
                             'lang': kodi_target_lang_full,
                             'service_name': service_name,
-                            'detail_url': movie_page_full_url, # For reference
-                            'lang_code': sc_lang_code, # Original SC lang code
+                            'detail_url': movie_page_full_url, 
+                            'lang_code': sc_lang_code, 
                         }
                         item_color_shared = 'cyan' 
 
@@ -576,7 +672,7 @@ def parse_search_response(core, service_name, meta, response):
 
             except system_requests.exceptions.RequestException as req_exc_shared:
                 core.logger.error(f"[{service_name}] RequestException fetching shared translation for '{constructed_filename}': {req_exc_shared}")
-            except ValueError as val_err_shared: # For JSON decoding errors
+            except ValueError as val_err_shared: 
                 core.logger.error(f"[{service_name}] ValueError (JSON decode) fetching shared translation for '{constructed_filename}': {val_err_shared}")
             except Exception as e_shared:
                 core.logger.error(f"[{service_name}] Unexpected error fetching shared translation for '{constructed_filename}': {e_shared}")
@@ -584,15 +680,14 @@ def parse_search_response(core, service_name, meta, response):
             if shared_translation_found_and_used:
                 continue 
 
-            # If shared translation not found or failed, proceed with existing logic
             action_args = {
                 'url': '', 'lang': kodi_target_lang_full,
                 'filename': constructed_filename,
                 'gzip': False, 'service_name': service_name, 
                 'detail_url': movie_page_full_url,
                 'lang_code': sc_lang_code, 
-                'needs_poll': False, 
-                'needs_client_side_translation': False
+                'needs_poll': False, # Set to False, polling handled differently or not at all for SC's new flow
+                'needs_client_side_translation': False # Default to False
             }
             item_color = 'white' 
             
@@ -618,38 +713,32 @@ def parse_search_response(core, service_name, meta, response):
 
             if patch_determined_href: 
                 action_args['url'] = urljoin(__subtitlecat_base_url, patch_determined_href)
-            else:
+            else: # No direct download link, check for translate button
                 btn = entry_div.select_one('button.yellow-link[onclick*="translate_from_server_folder"]')
-                if not btn: # Fallback if the class changes or is missing
+                if not btn: 
                     btn = entry_div.select_one('button[onclick*="translate_from_server_folder"]')
+                
                 if btn:
                     _onclick_attr = btn.get('onclick')
                     if not _onclick_attr:
                         core.logger.debug(f"[{service_name}] Translate button for '{sc_lang_name_full}' has no onclick. Skipping.")
                         continue
                     
-                    # Parameters derived from already extracted page data
-                    # original_id_from_href and filename_base_from_href are from the main movie page URL.
-                    # sc_lang_code is from the alt attribute of the flag image for this language entry.
-                    target_translation_lang = sc_lang_code # This is what was passed as the first param to translate_from_server_folder
-
-                    derived_folder_path = "/subs/%s/" % original_id_from_href
-                    derived_orig_filename_stem = filename_base_from_href + "-orig" # Matches the typical pattern for source files
-                    
-                    # Construct the source URL for the original subtitle file
-                    source_srt_filename = derived_orig_filename_stem + '.srt'
+                    target_translation_lang = sc_lang_code # This is the target language for translation
+                    derived_folder_path = f"/subs/{original_id_from_href}/"
+                    # Filename stem for original: MovieTitle-orig (no .srt yet)
+                    derived_orig_filename_stem = f"{filename_base_from_href}-orig" 
+                    source_srt_filename = f"{derived_orig_filename_stem}.srt" # Actual filename of original
                     source_srt_url = urljoin(__subtitlecat_base_url, derived_folder_path + source_srt_filename)
                     
-                    core.logger.debug(f"[{service_name}] Derived for client translation: target_lang='{target_translation_lang}', source_url='{source_srt_url}'")
+                    core.logger.debug(f"[{service_name}] Client translation needed: target_lang='{target_translation_lang}', source_url='{source_srt_url}'")
 
                     action_args.update({
                         'needs_client_side_translation': True,
                         'original_srt_url': source_srt_url,
-                        'target_translation_lang': target_translation_lang, 
-                        'needs_poll': False, 
-                        'url': '', 
-                        # 'lang_code': sc_lang_code, # Already in action_args
-                        # 'filename': constructed_filename, # Already in action_args
+                        'target_translation_lang': target_translation_lang, # This is sc_lang_code
+                        # 'needs_poll': False, # Already False
+                        'url': '', # No direct download URL yet
                     })
                     item_color = 'yellow' 
                 else:
@@ -685,156 +774,164 @@ def build_download_request(core, service_name, args):
     _filename_from_args = args.get('filename', 'unknown_subtitle.srt')
     core.logger.debug(f"[{service_name}] Building download request for: {_filename_from_args}, Args: {args}")
 
+    # Define _save_from_subtitlecat_url here, parameterized, to be accessible by all paths
+    # It captures 'core', 'service_name', module globals like '_SC_SESSION', '__user_agent', etc.
+    def _save_from_subtitlecat_url(path_from_core, url_to_download):
+        _timeout = _get_setting(core, "http_timeout", 15)
+        resp_for_save = None
+        core.logger.debug(f"[{service_name}] _save_from_subtitlecat_url: Downloading from {url_to_download} to {repr(path_from_core)} with timeout {_timeout}s")
+        try:
+            # Use module-level _SC_SESSION and __user_agent
+            resp_for_save = _SC_SESSION.get(url_to_download, headers={'User-Agent': __user_agent}, timeout=_timeout, stream=True)
+            resp_for_save.raise_for_status()
+            raw_bytes = resp_for_save.content # For stream=True, this reads all data. OK for subtitles.
+            core.logger.debug(f"[{service_name}] _save_from_subtitlecat_url: Download successful, {len(raw_bytes)} bytes received.")
+
+            _post_download_fix_encoding(core, service_name, raw_bytes, path_from_core) 
+            core.logger.debug(f"[{service_name}] _save_from_subtitlecat_url: Processing complete for {repr(path_from_core)}")
+            return True
+        except system_requests.exceptions.Timeout:
+            core.logger.error(f"[{service_name}] _save_from_subtitlecat_url: Timeout during download from {url_to_download} for {repr(path_from_core)}")
+            return False
+        except system_requests.exceptions.RequestException as e_req:
+            core.logger.error(f"[{service_name}] _save_from_subtitlecat_url: RequestException for {url_to_download}: {e_req}")
+            return False
+        except Exception as e_proc: # Catch any other error during processing
+            core.logger.error(f"[{service_name}] _save_from_subtitle_url: Error processing {url_to_download}: {e_proc}") # Typo in log fixed
+            return False
+        finally:
+            if resp_for_save:
+                resp_for_save.close()
+
     if args.get('needs_client_side_translation'):
-        # MODIFICATION: core.logger.info -> core.logger.debug
         core.logger.debug(f"[{service_name}] Starting client-side translation for '{_filename_from_args}'")
         original_srt_url = args['original_srt_url']
-        target_gtranslate_lang = args['target_translation_lang'] 
+        target_gtranslate_lang = args['target_translation_lang'] # This is the sc_lang_code
         
         try:
             core.logger.debug(f"[{service_name}] Downloading original SRT from: {original_srt_url}")
             dl_timeout = _get_setting(core, "http_timeout", 20) 
             original_srt_response = _SC_SESSION.get(original_srt_url, timeout=dl_timeout)
             original_srt_response.raise_for_status()
-            original_srt_text = original_srt_response.text
+            original_srt_text = original_srt_response.text # Assuming UTF-8 from SC for original
             core.logger.debug(f"[{service_name}] Downloaded original SRT content ({len(original_srt_text)} chars).")
 
             parsed_subs = list(srt.parse(original_srt_text))
             core.logger.debug(f"[{service_name}] Parsed {len(parsed_subs)} subtitle items from original SRT.")
-
-            # MODIFICATION 2.3: Prepare translatable_items_info, skipping all-tag lines
-            # MODIFICATION: Changed order of html.unescape and _protect_subtitle_tags
+            
             translatable_items_info = []
             for sub_item_idx, sub_item in enumerate(parsed_subs):
-                # 1. Prepare line for tag protection (newlines to spaces)
                 line_for_tag_protection = sub_item.content.replace('\n', ' ')
-                
-                # 2. Protect tags and check if it was an all-tag line
                 protected_text_with_placeholders, tags_map_for_item, is_all_tag_line = _protect_subtitle_tags(line_for_tag_protection)
                 
                 if is_all_tag_line:
-                    # All-tag line, content preserved in parsed_subs[sub_item_idx].content
-                    # It's not added to translatable_items_info, so not part of chunks.
                     pass
                 else:
-                    # This item needs translation (it has actual text, may or may not have tags)
                     translatable_items_info.append({
                         'original_idx': sub_item_idx, 
                         'map': tags_map_for_item,
-                        # 3. Use protected_text_with_placeholders for chunks
                         'protected_text': protected_text_with_placeholders 
                     })
             
             core.logger.debug(f"[{service_name}] Identified {len(translatable_items_info)} translatable subtitle items (excluding all-tag lines).")
 
-            chunks = []
-            # MODIFICATION 2.1: Chunk size adjusted
-            block_size_chars = 1500
-            original_segments_for_chunks_count = [] # Stores count of original segments from translatable_items_info per chunk
-            
-            _CHUNK_SEP = "|||SGMNTBRK|||"
+            # MODIFICATION: Line-by-line translation
+            all_detected_source_langs = []
+            INTER_REQUEST_DELAY_SECONDS = 0.4 # As per previous setting
 
-            current_chunk_buffer = ""
-            current_chunk_segment_count = 0
-            
-            # Build chunks using protected_text from translatable_items_info
-            for item_data in translatable_items_info: # Iterate over translatable items only
-                segment_text_for_chunk = item_data['protected_text']
-                # Check URL encoding length if concerned, for now simple length check
-                if len(current_chunk_buffer) + len(segment_text_for_chunk) + len(_CHUNK_SEP) > block_size_chars and current_chunk_buffer:
-                    chunks.append(current_chunk_buffer)
-                    original_segments_for_chunks_count.append(current_chunk_segment_count)
-                    current_chunk_buffer = ""
-                    current_chunk_segment_count = 0
-                current_chunk_buffer += segment_text_for_chunk + _CHUNK_SEP
-                current_chunk_segment_count += 1
-
-            if current_chunk_buffer:
-                # Remove trailing separator before appending the last chunk
-                if current_chunk_buffer.endswith(_CHUNK_SEP):
-                    current_chunk_buffer = current_chunk_buffer[:-len(_CHUNK_SEP)]
-                chunks.append(current_chunk_buffer)
-                original_segments_for_chunks_count.append(current_chunk_segment_count)
-
-            core.logger.debug(f"[{service_name}] Split translatable items into {len(chunks)} chunks for translation.")
-            
-            current_TII_pointer = 0 # Pointer into translatable_items_info
-            
-            for i, text_chunk_to_translate in enumerate(chunks): # i is chunk index
-                core.logger.debug(f"[{service_name}] Translating chunk {i+1}/{len(chunks)}...")
-                if i > 0: 
-                    time.sleep(0.4)
+            for idx, item_info in enumerate(translatable_items_info):
+                if idx > 0: # Delay between requests to Google
+                    time.sleep(INTER_REQUEST_DELAY_SECONDS)
                 
-                translated_chunk_content = _gtranslate_text_chunk(text_chunk_to_translate, target_gtranslate_lang, core, service_name)
+                text_to_translate = item_info['protected_text']
+                core.logger.debug(f"[{service_name}] Translating item {idx+1}/{len(translatable_items_info)}...")
+                translated_text_segment, detected_lang_for_line = _gtranslate_text_chunk(text_to_translate, target_gtranslate_lang, core, service_name)
+                all_detected_source_langs.append(detected_lang_for_line)
                 
-                translated_segments = translated_chunk_content.split(_CHUNK_SEP)
-                if translated_segments and translated_segments[-1] == "":
-                    translated_segments.pop()
-
-                expected_segments_this_chunk = original_segments_for_chunks_count[i]
-                received_segments_this_chunk = len(translated_segments)
-
-                if received_segments_this_chunk != expected_segments_this_chunk:
-                    core.logger.debug(f"[{service_name}] Segment count mismatch for chunk {i+1}. Expected {expected_segments_this_chunk}, got {received_segments_this_chunk}. Processing min of the two.")
-
-                segments_to_process_for_this_chunk = min(expected_segments_this_chunk, received_segments_this_chunk)
-
-                for k_segment_in_chunk in range(segments_to_process_for_this_chunk):
-                    target_tii_index = current_TII_pointer + k_segment_in_chunk
-                    
-                    if target_tii_index >= len(translatable_items_info):
-                        core.logger.error(f"[{service_name}] Error: target_tii_index ({target_tii_index}) out of bounds for translatable_items_info (len: {len(translatable_items_info)}) in chunk {i+1}. Skipping rest of this chunk.")
-                        break 
-
-                    info_for_this_segment = translatable_items_info[target_tii_index]
-                    raw_translated_text = translated_segments[k_segment_in_chunk]
-                    
-                    text_with_restored_tags = _restore_subtitle_tags(raw_translated_text, info_for_this_segment['map'])
-                    final_content_for_srt = html.unescape(text_with_restored_tags)
-                    parsed_subs[info_for_this_segment['original_idx']].content = final_content_for_srt
-                
-                current_TII_pointer += expected_segments_this_chunk # Advance by expected segments
-
-                if received_segments_this_chunk > expected_segments_this_chunk:
-                    core.logger.debug(f"[{service_name}] Chunk {i+1}: Received {received_segments_this_chunk} segments, but only processed {expected_segments_this_chunk} based on original chunking. {received_segments_this_chunk - expected_segments_this_chunk} translated segments were discarded.")
-
-                if current_TII_pointer >= len(translatable_items_info) and len(translatable_items_info) > 0:
-                    if i < len(chunks) - 1 and len(translatable_items_info) > 0 : 
-                        core.logger.debug(f"[{service_name}] All translatable item slots processed based on original chunking ({current_TII_pointer}/{len(translatable_items_info)}); subsequent chunks (if any) will be skipped.")
-                    break 
+                text_with_restored_tags = _restore_subtitle_tags(translated_text_segment, item_info['map'])
+                final_content_for_srt = html.unescape(text_with_restored_tags) # Unescape after restoring tags
+                parsed_subs[item_info['original_idx']].content = final_content_for_srt
             
-            if len(chunks) > 0: 
-                if current_TII_pointer < len(translatable_items_info):
-                    core.logger.debug(f"[{service_name}] Final TII pointer ({current_TII_pointer}) is less than total translatable items ({len(translatable_items_info)}). Some items might not have received translations if Google returned fewer segments than expected overall or per chunk.")
-                elif current_TII_pointer == len(translatable_items_info): 
-                    core.logger.debug(f"[{service_name}] Final TII pointer ({current_TII_pointer}) matches total translatable items ({len(translatable_items_info)}). All items processed/attempted.")
-                # No explicit logging for current_TII_pointer > len(translatable_items_info) as pointer is advanced by expected, not received.
+            # Determine overall detected source language
+            overall_detected_source_lang = "auto"
+            if all_detected_source_langs:
+                counts = Counter(lang for lang in all_detected_source_langs if lang and lang != "auto") # Filter out None/empty
+                if counts:
+                    overall_detected_source_lang = counts.most_common(1)[0][0]
+            core.logger.debug(f"[{service_name}] Overall detected source language for translation: {overall_detected_source_lang}")
 
             final_translated_srt_str = srt.compose(parsed_subs)
             core.logger.debug(f"[{service_name}] Successfully composed translated SRT string ({len(final_translated_srt_str)} chars).")
 
-            def _save_client_translated_srt(path_from_core):
+            new_url_from_sc = None
+            if _get_setting(core, 'subtitlecat_upload_translations', False): # Default to False if not set
+                core.logger.debug(f"[{service_name}] Uploading client-translated subtitle is enabled.")
+                
+                sc_original_filename_stem = "unknown_stem"
                 try:
-                    import io 
-                    bom = _get_setting(core, 'force_bom', False)
-                    final_encoding = 'utf-8-sig' if bom else 'utf-8'
-                    with io.open(path_from_core, 'w', encoding=final_encoding) as f:
-                        f.write(final_translated_srt_str)
-                    # MODIFICATION: core.logger.info -> core.logger.debug
-                    core.logger.debug(f"[{service_name}] Client-translated SRT saved to '{path_from_core}' with encoding '{final_encoding}'.")
-                    return True
-                except Exception as e_save:
-                    core.logger.error(f"[{service_name}] Failed to save client-translated SRT to '{path_from_core}': {e_save}")
-                    return False
-            
-            # MODIFICATION 2.6: This path already bypasses _post_download_fix_encoding. No change needed here for 2.6.
-            return {
-                'method': 'CLIENT_SIDE_TRANSLATED',
-                'url': original_srt_url, # For reference
-                'save_callback': _save_client_translated_srt,
-                'filename': _filename_from_args,
-            }
-        except system_requests.exceptions.RequestException as e_req: 
+                    # original_srt_url: "https://www.subtitlecat.com/subs/123/MovieTitle-orig.srt"
+                    # We need "MovieTitle-orig.srt" or "MovieTitle-orig"
+                    sc_original_filename_stem = urllib.parse.unquote(original_srt_url.split('/')[-1])
+                    if not sc_original_filename_stem and '/' in original_srt_url: # Handle trailing slash if any
+                         sc_original_filename_stem = urllib.parse.unquote(original_srt_url.split('/')[-2])
+                    core.logger.debug(f"[{service_name}] Extracted sc_original_filename_stem for upload: {sc_original_filename_stem}")
+                except Exception as e_parse_stem:
+                    core.logger.error(f"[{service_name}] Error parsing original_srt_url for filename stem: {e_parse_stem}. Using default '{sc_original_filename_stem}'.")
+                
+                target_sc_lang_code_for_upload = args.get('lang_code') # This is the sc_lang_code (e.g. 'de', 'lb')
+                if not target_sc_lang_code_for_upload:
+                     core.logger.error(f"[{service_name}] Could not determine target Subtitlecat language code for upload. Aborting upload.")
+                else:
+                    # Pass overall_detected_source_lang. If it's "auto", Subtitlecat's JS would also send "auto".
+                    # If Subtitlecat's backend rejects "auto", this might need a fallback (e.g., "en").
+                    # For now, matching SC's JS behavior.
+                    overall_detected_source_lang_for_upload = overall_detected_source_lang
+                    if overall_detected_source_lang_for_upload == "auto":
+                        core.logger.debug(f"[{service_name}] overall_detected_source_lang is 'auto'. Subtitlecat might default or handle this. If upload fails with 'bad language code', consider a fixed fallback like 'en' here.")
+                    
+                    new_url_from_sc = _upload_translation_to_subtitlecat(
+                        core,
+                        service_name,
+                        final_translated_srt_str,
+                        target_sc_lang_code_for_upload, 
+                        sc_original_filename_stem,
+                        overall_detected_source_lang_for_upload, 
+                        args.get('detail_url') 
+                    )
+            else:
+                core.logger.debug(f"[{service_name}] Uploading client-translated subtitle is disabled by setting.")
+
+            if new_url_from_sc:
+                core.logger.debug(f"[{service_name}] Upload successful. Using new URL from Subtitlecat for download: {new_url_from_sc}")
+                return {
+                    'method': 'GET', # Indicates a direct download is now possible
+                    'url': new_url_from_sc, # For core reference, callback handles actual download
+                    'save_callback': lambda path: _save_from_subtitlecat_url(path, new_url_from_sc),
+                    'filename': _filename_from_args,
+                    # No 'headers' or 'stream' needed here if save_callback handles the GET fully.
+                }
+            else:
+                core.logger.debug(f"[{service_name}] Upload failed or disabled. Using locally translated SRT content.")
+                def _save_client_translated_srt(path_from_core):
+                    try:
+                        import io 
+                        bom = _get_setting(core, 'force_bom', False)
+                        final_encoding = 'utf-8-sig' if bom else 'utf-8'
+                        with io.open(path_from_core, 'w', encoding=final_encoding) as f:
+                            f.write(final_translated_srt_str)
+                        core.logger.debug(f"[{service_name}] Client-translated SRT saved to '{path_from_core}' with encoding '{final_encoding}'.")
+                        return True
+                    except Exception as e_save:
+                        core.logger.error(f"[{service_name}] Failed to save client-translated SRT to '{path_from_core}': {e_save}")
+                        return False
+                
+                return {
+                    'method': 'CLIENT_SIDE_TRANSLATED', # Custom method type
+                    'url': args['original_srt_url'], # For reference
+                    'save_callback': _save_client_translated_srt,
+                    'filename': _filename_from_args,
+                }
+        except system_requests.exceptions.RequestException as e_req:
             core.logger.error(f"[{service_name}] Client-side translation: Network error downloading original SRT {original_srt_url}: {e_req}")
             raise 
         except srt.SRTParseError as e_srt: 
@@ -850,7 +947,7 @@ def build_download_request(core, service_name, args):
 
         def _save_shared_srt(path_from_core):
             try:
-                import io, html 
+                import io, html # html already imported at module level, but local import is fine
                 
                 current_srt_text_str = ""
                 if isinstance(srt_content_to_save, bytes):
@@ -871,72 +968,47 @@ def build_download_request(core, service_name, args):
                 return False
 
         return {
-            'method': 'REQUEST_CALLBACK', 
+            'method': 'REQUEST_CALLBACK', # Indicates save_callback handles everything
             'save_callback': _save_shared_srt,
             'filename': args.get('filename'), 
         }
 
-    # Standard download logic (direct URL or needs_poll)
+    # Standard download logic (direct URL from parse_search_response, or potentially polled if needs_poll was set)
     else: 
         core.logger.debug(f"[{service_name}] Proceeding with standard download/polling for '{_filename_from_args}'.")
-        initial_download_url = args.get('url', '')
-        final_url = initial_download_url
+        final_url_for_direct_dl = args.get('url', '') # Renamed to avoid confusion with other 'final_url' scopes
+
+        # This polling logic is likely not hit for 'Translate' buttons from Subtitlecat
+        # if parse_search_response sets needs_poll=False for them.
+        # It remains for hypothetical cases or direct links that might appear after a server-side delay.
         if args.get('needs_poll'):
-            if not final_url: 
+            if not final_url_for_direct_dl: 
                 core.logger.debug(f"[{service_name}] Polling required for '{_filename_from_args}'. Detail URL: {args.get('detail_url')}, Polling Lang Code: {sc_lang_for_polling}")
                 polled_url = _wait_for_translated(core,
                                                   args['detail_url'],
                                                   sc_lang_for_polling, 
                                                   service_name)
                 if polled_url:
-                    final_url = polled_url
-                    args['url'] = final_url 
-                    core.logger.debug(f"[{service_name}] Polling successful. Found URL for '{_filename_from_args}': {final_url}")
+                    final_url_for_direct_dl = polled_url
+                    # args['url'] = final_url_for_direct_dl # Update args if core needs it post-build
+                    core.logger.debug(f"[{service_name}] Polling successful. Found URL for '{_filename_from_args}': {final_url_for_direct_dl}")
                 else:
                     error_msg = f"[{service_name}] Translation poll for '{_filename_from_args}' (lang for poll: {sc_lang_for_polling}) did not become available on {args.get('detail_url')} in time."
                     core.logger.error(error_msg)
                     raise Exception(error_msg) 
-            elif final_url: # This corresponds to the inner if not final_url
-                core.logger.debug(f"[{service_name}] 'needs_poll' is true but URL '{final_url}' already present for '{_filename_from_args}'. Using existing URL without polling.")
+            # else: URL was already present, no poll needed despite needs_poll=True (unlikely scenario from parse_search_response)
 
-    if not final_url:
-        error_msg = f"[{service_name}] Final URL for '{_filename_from_args}' is empty after processing. (Initial URL: '{initial_download_url}', NeedsPoll: {args.get('needs_poll')}). Cannot download."
-        core.logger.error(error_msg)
-        raise ValueError(error_msg)
+        if not final_url_for_direct_dl:
+            error_msg = f"[{service_name}] Final URL for '{_filename_from_args}' is empty after processing. (Initial URL: '{args.get('url', '')}', NeedsPoll: {args.get('needs_poll')}). Cannot download."
+            core.logger.error(error_msg)
+            raise ValueError(error_msg) # Or return a dict indicating failure
 
-    def _save_from_subtitlecat_url(path_from_core):
-        _timeout = _get_setting(core, "http_timeout", 15)
-        resp_for_save = None
-        core.logger.debug(f"[{service_name}] _save_from_subtitlecat_url: Downloading from {final_url} to {repr(path_from_core)} with timeout {_timeout}s")
-        try:
-            resp_for_save = _SC_SESSION.get(final_url, timeout=_timeout)
-            resp_for_save.raise_for_status()
-            raw_bytes = resp_for_save.content
-            core.logger.debug(f"[{service_name}] _save_from_subtitlecat_url: Download successful, {len(raw_bytes)} bytes received.")
-
-            _post_download_fix_encoding(core, service_name, raw_bytes, path_from_core) 
-            core.logger.debug(f"[{service_name}] _save_from_subtitlecat_url: Processing complete for {repr(path_from_core)}")
-            return True
-        except system_requests.exceptions.Timeout:
-            core.logger.error(f"[{service_name}] _save_from_subtitlecat_url: Timeout during download from {final_url} for {repr(path_from_core)}")
-            return False
-        except system_requests.exceptions.RequestException as e_req:
-            core.logger.error(f"[{service_name}] _save_from_subtitlecat_url: RequestException for {final_url}: {e_req}")
-            return False
-        except Exception as e_proc:
-            core.logger.error(f"[{service_name}] _save_from_subtitle_url: Error processing {final_url}: {e_proc}")
-            return False
-        finally:
-            if resp_for_save:
-                resp_for_save.close()
-
-    core.logger.debug(f"[{service_name}] Prepared direct download request for '{_filename_from_args}' from {final_url}.")
+    core.logger.debug(f"[{service_name}] Prepared direct download request for '{_filename_from_args}' from {final_url_for_direct_dl}.")
     return {
         'method': 'GET', 
-        'url': final_url,
-        'headers': {'User-Agent': __user_agent}, 
-        'stream': True, 
-        'save_callback': _save_from_subtitlecat_url,
+        'url': final_url_for_direct_dl, # For core reference
+        # 'headers' and 'stream' are not strictly needed by core if save_callback handles the full GET
+        'save_callback': lambda path: _save_from_subtitlecat_url(path, final_url_for_direct_dl),
         'filename': _filename_from_args, 
     }
 # END OF MODIFICATION
