@@ -14,10 +14,7 @@
     <extension point="xbmc.service" library="main_service.py" />
     <extension point="xbmc.addon.metadata">
         <summary lang="en">PolyglotSubs-Kodi</summary>
-        <description>
-Fork of a4kSubtitles with added support for Subtitlecat.com, providing original and AI-translated subtitles.
-Original Supports: OpenSubtitles, BSPlayer, Podnadpisi.NET, SubDL, Addic7ed
-        </description>
+        <description>Fork of a4kSubtitles, now supercharged with Subtitlecat.com for direct and AI-translated subtitles! Access a wide range of providers: OpenSubtitles, BSPlayer, Podnadpisi.NET, SubDL, Addic7ed, and SubSource.</description>
         <platform>all</platform>
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <license>MIT License</license>
