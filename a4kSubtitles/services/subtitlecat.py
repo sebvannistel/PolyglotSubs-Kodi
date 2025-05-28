@@ -360,7 +360,7 @@ def parse_search_response(core, service_name, meta, response):
     display_name_for_service = getattr(
         core.services.get(service_name), "display_name", service_name
     )
-    results_table_body = soup.select_one('table.table.sub-table tbody')
+    results_table_body = soup.select_one('div.subtitles table tbody')
     if not results_table_body:
         results_table_body = soup.find('tbody')
         if not results_table_body:
@@ -448,19 +448,19 @@ def parse_search_response(core, service_name, meta, response):
             filename_base_from_href = "subtitle"
             original_id_from_href = "id"
 
-        language_entries = detail_soup.select('div.sub-single')
+        language_entries = detail_soup.select('div.all-sub div.row > div[class*="col-"] > div.sub-single')
         if not language_entries:
-            core.logger.debug(f"[{service_name}] No language entries ('div.sub-single') found on detail page: {movie_page_full_url}")
+            core.logger.debug(f"[{service_name}] No language entries ('div.all-sub div.row > div[class*=\"col-\"] > div.sub-single') found on detail page: {movie_page_full_url}")
         for entry_div in language_entries:
-            img_tag = entry_div.select_one('img.flag')
+            img_tag = entry_div.select_one('span:first-child > img[alt]')
             if not img_tag:
-                core.logger.debug(f"[{service_name}] No img.flag in language entry. Skipping.")
+                core.logger.debug(f"[{service_name}] No 'span:first-child > img[alt]' in language entry. Skipping.")
                 continue
             sc_lang_code = img_tag.get('alt')
             if not sc_lang_code:
-                core.logger.debug(f"[{service_name}] img.flag found but no alt attribute. Skipping.")
+                core.logger.debug(f"[{service_name}] 'span:first-child > img[alt]' found but no alt attribute. Skipping.")
                 continue
-            lang_name_span = entry_div.select_one('span:nth-of-type(2)')
+            lang_name_span = entry_div.select_one('span:first-child + span')
             sc_lang_name_full = sc_lang_code
             if lang_name_span:
                 temp_name = lang_name_span.get_text(strip=True)
@@ -563,7 +563,9 @@ def parse_search_response(core, service_name, meta, response):
             item_color = 'white' 
             
             patch_determined_href = None
-            a_tag = entry_div.select_one(r'a[href$=".srt"], a[href*=".srt?download="]')
+            a_tag = entry_div.select_one('a.green-link[href*=".srt"]')
+            if not a_tag:
+                a_tag = entry_div.select_one(r'a[href$=".srt"], a[href*=".srt?download="]')
             if a_tag:
                 _raw_href = a_tag.get('href')
                 if _raw_href: patch_determined_href = _raw_href
@@ -583,7 +585,9 @@ def parse_search_response(core, service_name, meta, response):
             if patch_determined_href: 
                 action_args['url'] = urljoin(__subtitlecat_base_url, patch_determined_href)
             else:
-                btn = entry_div.select_one('button[onclick*="translate_from_server_folder"]')
+                btn = entry_div.select_one('button.yellow-link[onclick*="translate_from_server_folder"]')
+                if not btn: # Fallback if the class changes or is missing
+                    btn = entry_div.select_one('button[onclick*="translate_from_server_folder"]')
                 if btn:
                     _onclick_attr = btn.get('onclick')
                     if not _onclick_attr:
