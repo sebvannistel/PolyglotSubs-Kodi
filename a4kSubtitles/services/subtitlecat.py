@@ -23,7 +23,7 @@ from rapidfuzz import fuzz                    # ← fuzzy title match
 # chardet and charset_normalizer are also imported locally within that function.
 
 # START OF ADDITIONS FOR CLIENT-SIDE TRANSLATION
-import srt # For parsing/composing SRT files
+from a4kSubtitles.lib.third_party.srt import srt # For parsing/composing SRT files
 import html # For unescaping HTML entities (used in translation preparation)
 # urllib.parse.quote_plus is used via urllib.parse.quote_plus
 # END OF ADDITIONS FOR CLIENT-SIDE TRANSLATION
