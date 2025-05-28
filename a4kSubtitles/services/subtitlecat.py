@@ -138,9 +138,12 @@ def _wait_for_translated(core, detail_url, lang_code, service_name,
             core.logger.debug(f"[{service_name}] Polling for '{lang_code}' "
                               f"- {attempt+1}/{tries}")
 
+        except system_requests.exceptions.RequestException as req_exc:
+            core.logger.debug(f"[{service_name}] Poll {attempt+1}/{tries} "
+                              f"RequestException: {req_exc}")
         except Exception as exc:
             core.logger.debug(f"[{service_name}] Poll {attempt+1}/{tries} "
-                              f"failed: {exc}")
+                              f"failed with unexpected error: {exc}")
 
     return ''
 # END OF REPLACEMENT: _wait_for_translated replaced with "Take-away code"
@@ -279,7 +282,7 @@ def _gtranslate_text_chunk(text_chunk, target_lang, core, service_name):
 _PLACEHOLDER_SENTINEL_PREFIX = "\u2063@@SCPTAG" # INVISIBLE SEPARATOR + prefix
 _PLACEHOLDER_SUFFIX = "SCP@@"
 # MODIFIED REGEX for improved tag attribute handling
-__TAG_REGEX_FOR_PROTECTION = re.compile(r"(<(?:"[^"]*"|'[^']*'|[^>"'])*>|{(?:"[^"]*"|'[^']*'|[^}"'])*})")
+__TAG_REGEX_FOR_PROTECTION = re.compile(r'(<(?:"[^"]*"|'[^']*'|[^>"'])*>|{(?:"[^"]*"|'[^']*'|[^}"'])*})')
 
 def _protect_subtitle_tags(text_line):
     """Replaces tags with placeholders and returns the new text and the list of tags.
@@ -360,7 +363,7 @@ def parse_search_response(core, service_name, meta, response):
     display_name_for_service = getattr(
         core.services.get(service_name), "display_name", service_name
     )
-    results_table_body = soup.select_one('table.table.sub-table tbody')
+    results_table_body = soup.select_one('div.subtitles table tbody')
     if not results_table_body:
         results_table_body = soup.find('tbody')
         if not results_table_body:
@@ -448,19 +451,19 @@ def parse_search_response(core, service_name, meta, response):
             filename_base_from_href = "subtitle"
             original_id_from_href = "id"
 
-        language_entries = detail_soup.select('div.sub-single')
+        language_entries = detail_soup.select('div.all-sub div.row > div[class*="col-"] > div.sub-single')
         if not language_entries:
-            core.logger.debug(f"[{service_name}] No language entries ('div.sub-single') found on detail page: {movie_page_full_url}")
+            core.logger.debug(f"[{service_name}] No language entries ('div.all-sub div.row > div[class*=\"col-\"] > div.sub-single') found on detail page: {movie_page_full_url}")
         for entry_div in language_entries:
-            img_tag = entry_div.select_one('img.flag')
+            img_tag = entry_div.select_one('span:first-child > img[alt]')
             if not img_tag:
-                core.logger.debug(f"[{service_name}] No img.flag in language entry. Skipping.")
+                core.logger.debug(f"[{service_name}] No 'span:first-child > img[alt]' in language entry. Skipping.")
                 continue
             sc_lang_code = img_tag.get('alt')
             if not sc_lang_code:
-                core.logger.debug(f"[{service_name}] img.flag found but no alt attribute. Skipping.")
+                core.logger.debug(f"[{service_name}] 'span:first-child > img[alt]' found but no alt attribute. Skipping.")
                 continue
-            lang_name_span = entry_div.select_one('span:nth-of-type(2)')
+            lang_name_span = entry_div.select_one('span:first-child + span')
             sc_lang_name_full = sc_lang_code
             if lang_name_span:
                 temp_name = lang_name_span.get_text(strip=True)
@@ -544,8 +547,12 @@ def parse_search_response(core, service_name, meta, response):
                 else: 
                     core.logger.debug(f"[{service_name}] Failed to fetch shared translation for '{constructed_filename}'. Status: {shared_response.status_code}, Body: {shared_response.text[:200]}")
 
+            except system_requests.exceptions.RequestException as req_exc_shared:
+                core.logger.error(f"[{service_name}] RequestException fetching shared translation for '{constructed_filename}': {req_exc_shared}")
+            except ValueError as val_err_shared: # For JSON decoding errors
+                core.logger.error(f"[{service_name}] ValueError (JSON decode) fetching shared translation for '{constructed_filename}': {val_err_shared}")
             except Exception as e_shared:
-                core.logger.error(f"[{service_name}] Error fetching shared translation for '{constructed_filename}': {e_shared}")
+                core.logger.error(f"[{service_name}] Unexpected error fetching shared translation for '{constructed_filename}': {e_shared}")
 
             if shared_translation_found_and_used:
                 continue 
@@ -563,7 +570,9 @@ def parse_search_response(core, service_name, meta, response):
             item_color = 'white' 
             
             patch_determined_href = None
-            a_tag = entry_div.select_one(r'a[href$=".srt"], a[href*=".srt?download="]')
+            a_tag = entry_div.select_one('a.green-link[href*=".srt"]')
+            if not a_tag:
+                a_tag = entry_div.select_one(r'a[href$=".srt"], a[href*=".srt?download="]')
             if a_tag:
                 _raw_href = a_tag.get('href')
                 if _raw_href: patch_determined_href = _raw_href
@@ -583,7 +592,9 @@ def parse_search_response(core, service_name, meta, response):
             if patch_determined_href: 
                 action_args['url'] = urljoin(__subtitlecat_base_url, patch_determined_href)
             else:
-                btn = entry_div.select_one('button[onclick*="translate_from_server_folder"]')
+                btn = entry_div.select_one('button.yellow-link[onclick*="translate_from_server_folder"]')
+                if not btn: # Fallback if the class changes or is missing
+                    btn = entry_div.select_one('button[onclick*="translate_from_server_folder"]')
                 if btn:
                     _onclick_attr = btn.get('onclick')
                     if not _onclick_attr:
@@ -872,22 +883,22 @@ def build_download_request(core, service_name, args):
         initial_download_url = args.get('url', '')
         final_url = initial_download_url
         if args.get('needs_poll'):
-        if not final_url: 
-            core.logger.debug(f"[{service_name}] Polling required for '{_filename_from_args}'. Detail URL: {args.get('detail_url')}, Polling Lang Code: {sc_lang_for_polling}")
-            polled_url = _wait_for_translated(core,
-                                              args['detail_url'],
-                                              sc_lang_for_polling, 
-                                              service_name)
-            if polled_url:
-                final_url = polled_url
-                args['url'] = final_url 
-                core.logger.debug(f"[{service_name}] Polling successful. Found URL for '{_filename_from_args}': {final_url}")
-            else:
-                error_msg = f"[{service_name}] Translation poll for '{_filename_from_args}' (lang for poll: {sc_lang_for_polling}) did not become available on {args.get('detail_url')} in time."
-                core.logger.error(error_msg)
-                raise Exception(error_msg) 
-        elif final_url:
-            core.logger.debug(f"[{service_name}] 'needs_poll' is true but URL '{final_url}' already present for '{_filename_from_args}'. Using existing URL without polling.")
+            if not final_url: 
+                core.logger.debug(f"[{service_name}] Polling required for '{_filename_from_args}'. Detail URL: {args.get('detail_url')}, Polling Lang Code: {sc_lang_for_polling}")
+                polled_url = _wait_for_translated(core,
+                                                  args['detail_url'],
+                                                  sc_lang_for_polling, 
+                                                  service_name)
+                if polled_url:
+                    final_url = polled_url
+                    args['url'] = final_url 
+                    core.logger.debug(f"[{service_name}] Polling successful. Found URL for '{_filename_from_args}': {final_url}")
+                else:
+                    error_msg = f"[{service_name}] Translation poll for '{_filename_from_args}' (lang for poll: {sc_lang_for_polling}) did not become available on {args.get('detail_url')} in time."
+                    core.logger.error(error_msg)
+                    raise Exception(error_msg) 
+            elif final_url: # This corresponds to the inner if not final_url
+                core.logger.debug(f"[{service_name}] 'needs_poll' is true but URL '{final_url}' already present for '{_filename_from_args}'. Using existing URL without polling.")
 
     if not final_url:
         error_msg = f"[{service_name}] Final URL for '{_filename_from_args}' is empty after processing. (Initial URL: '{initial_download_url}', NeedsPoll: {args.get('needs_poll')}). Cannot download."
