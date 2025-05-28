@@ -160,7 +160,7 @@ def download(core, params):
     lang_code = core.utils.get_lang_id(actions_args['lang'], core.kodi.xbmc.ISO_639_2)
     filename = __insert_lang_code_in_filename(core, actions_args['filename'], lang_code)
     filename = core.utils.slugify_filename(filename)
-    archivepath = core.os.path.join(core.utils.temp_dir, 'sub.zip')
+    archivepath = core.os.path.join(core.utils.temp_dir, 'sub.zip') # Used if actual archive download
 
     service_name = params['service_name']
     service = core.services[service_name]
@@ -168,38 +168,30 @@ def download(core, params):
 
     # --- START OF MODIFIED SECTION ---
     _is_raw_download = actions_args.get('raw', False)
+    cb = request.pop('save_callback', None) # Pop it early to check its existence
 
-    if _is_raw_download:
-        # For raw downloads, `filepath` is the direct path to the subtitle file.
-        filepath = core.os.path.join(core.utils.temp_dir, filename)
-    else:
-        # For archive downloads, the initial download target is `archivepath`.
-        # The patch uses `filepath` as its argument, so we set `filepath` to `archivepath` here.
-        # After download (or callback), `filepath` will be updated if extraction occurs.
-        filepath = archivepath
-
-    # Apply the patch logic: use save_callback if available, otherwise use __download.
-    # `filepath` at this point is the target path for the download operation.
-    cb = request.pop('save_callback', None)
-    if cb:
-        if not cb(filepath): # Call provider's helper to save to `filepath`
+    if cb: # If there's a save_callback, it's responsible for saving the final SRT.
+        # The 'filename' from action_args (already processed with lang_code) is the target SRT filename.
+        filepath = core.os.path.join(core.utils.temp_dir, filename) # Target path for the final SRT
+        if not cb(filepath): # Call provider's helper to save to this srt filepath
             raise Exception('save_callback failed')
-    else:
-        __download(core, filepath, request) # Standard download to `filepath`
+        # After callback, filepath is the direct path to the SRT. No further extraction needed for these items.
+    elif _is_raw_download: # No callback, but it's a raw (non-archive) download
+        filepath = core.os.path.join(core.utils.temp_dir, filename) # Target path for the final SRT
+        __download(core, filepath, request) # Standard download to srt filepath
+    else: # No callback, not raw download, so it's an actual archive download
+        # 'filepath' will first hold the path to the downloaded archive.
+        # The initial download target is `archivepath`.
+        filepath = archivepath
+        __download(core, filepath, request) # Standard download to archivepath (filepath)
 
-    # If an archive was downloaded, `filepath` currently points to the archive.
-    # We need to extract the subtitle file from it and update `filepath` to the extracted file's path.
-    if not _is_raw_download: # This means an archive was downloaded (to the path stored in `filepath`)
-        # The source for extraction is the `filepath` variable (which holds the path to the downloaded archive).
-        # The `filename` variable is the base name for the extracted subtitle.
+        # Now extract from the downloaded archive (which is at 'filepath' currently)
+        # and update 'filepath' to the path of the extracted subtitle file.
         if actions_args.get('gzip', False):
-            # __extract_gzip will save the extracted file and return its path. This becomes the new `filepath`.
             filepath = __extract_gzip(core, filepath, filename)
         else:
             episodeid = actions_args.get('episodeid', '')
-            # __extract_zip will save the extracted file and return its path. This becomes the new `filepath`.
             filepath = __extract_zip(core, filepath, filename, episodeid)
-    # If it was a raw download, `filepath` is already correctly set to the path of the downloaded subtitle file.
     # --- END OF MODIFIED SECTION ---
 
     __postprocess(core, filepath, lang_code)
