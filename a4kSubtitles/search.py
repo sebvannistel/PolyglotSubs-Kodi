@@ -83,11 +83,35 @@ def __get_last_results(core, meta):
 
 def __sanitize_results(core, meta, results):
     temp_dict = {}
-
     for result in results:
-        temp_dict[result['action_args']['url']] = result
-        result['name'] = core.utils.unquote(result['name'])
+        # --- START OF MODIFIED SECTION FOR KEY GENERATION ---
+        key_url = result['action_args'].get('url', '')
 
+        unique_key_components = [
+            result['service_name'],
+            result['lang'],
+            result['action_args'].get('filename', result.get('name', '')) # Use filename from action_args or result name
+        ]
+
+        if not key_url and (result['action_args'].get('needs_client_side_translation') or                             result['action_args'].get('method_type') == 'SHARED_TRANSLATION_CONTENT' or                             result['action_args'].get('save_callback')):
+            # For items without a direct URL (callbacks, client-side translations)
+            # Add more specificity to the key based on available unique identifiers
+            if result['service_name'] == 'subtitlecat':
+                if result['action_args'].get('needs_client_side_translation'):
+                    unique_key_components.append(result['action_args'].get('original_srt_url'))
+                elif result['action_args'].get('method_type') == 'SHARED_TRANSLATION_CONTENT':
+                     unique_key_components.append(result['action_args'].get('detail_url')) # detail_url is more stable for shared
+            # Fallback: use a hash of non-URL action_args if very desperate, but above should cover subtitlecat
+            # For now, service_name + lang + filename + specific_provider_id should be good.
+            key = tuple(['NO_DIRECT_URL'] + unique_key_components)
+        else:
+            # For items with a direct URL
+            unique_key_components.insert(1, key_url) # Add URL to the components
+            key = tuple(unique_key_components)
+        # --- END OF MODIFIED SECTION FOR KEY GENERATION ---
+
+        temp_dict[key] = result
+        result['name'] = core.utils.unquote(result['name'])
     return list(temp_dict.values())
 
 def __apply_language_filter(meta, results):
