@@ -67,7 +67,7 @@ def _is_title_close(wanted: str, got: str) -> bool:
 
     # 1) Insert spaces at camel-case boundaries
     w_tmp = _CLEAN_CAMEL.sub(" ", w_raw)
-    g_tmp = _CLEAN_CAMEL.sub(" ", g_tmp)
+    g_tmp = _CLEAN_CAMEL.sub(" ", g_raw)
 
     # 2) Replace dots/underscores/hyphens with spaces
     w_spaced = _CLEAN_PUNC.sub(" ", w_tmp)
