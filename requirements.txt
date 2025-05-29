@@ -2,3 +2,4 @@ requests
 pytest
 flake8
 coverage
+attrs>=23.2.0
