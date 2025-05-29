@@ -803,27 +803,73 @@ def build_download_request(core, service_name, args):
                     if potential_new_size > CHARS_PER_BATCH and current_batch_texts:
                         core.logger.debug(f"[{service_name}] Processing batch of {len(current_batch_texts)} items, {accumulated_chars_in_batch} chars.")
                         batch_to_translate_str = BATCH_DELIMITER.join(current_batch_texts)
-                        translated_batch_str, detected_lang = _gtranslate_text_chunk(batch_to_translate_str, target_gtranslate_lang, core, service_name)
-                        all_detected_source_langs.append(detected_lang)
-                        translated_segments = translated_batch_str.split(BATCH_DELIMITER)
+                        
+                        translated_batch_str, detected_lang_batch = _gtranslate_text_chunk(batch_to_translate_str, target_gtranslate_lang, core, service_name)
+                        # NOTE: detected_lang_batch is added to all_detected_source_langs conditionally below (Change 4)
 
-                        if len(translated_segments) != len(current_batch_texts):
-                            core.logger.error(f"[{service_name}] Mismatch in translated segments count for batch. Expected {len(current_batch_texts)}, got {len(translated_segments)}. Falling back to original text for this batch.")
-                            for k_item_idx, item_info_in_batch in enumerate(current_batch_item_infos):
-                                original_text_segment = current_batch_texts[k_item_idx]
-                                restored_text = _restore_subtitle_tags(original_text_segment, item_info_in_batch['map'])
-                                final_content = html.unescape(restored_text)
-                                final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
-                                parsed_subs[item_info_in_batch['original_idx']].content = final_content
-                        else:
+                        primary_split_segments = translated_batch_str.split(BATCH_DELIMITER)
+                        translated_segments = [] # Will hold the final segments for this batch
+
+                        if len(primary_split_segments) == len(current_batch_texts):
+                            core.logger.debug(f"[{service_name}] Batch segment split with BATCH_DELIMITER successful.")
+                            translated_segments = primary_split_segments
+                            all_detected_source_langs.append(detected_lang_batch) # Change 4
                             for j, segment_text in enumerate(translated_segments):
                                 info_for_segment = current_batch_item_infos[j]
                                 restored_text = _restore_subtitle_tags(segment_text, info_for_segment['map'])
                                 final_content = html.unescape(restored_text)
                                 final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
                                 parsed_subs[info_for_segment['original_idx']].content = final_content
-
-                        time.sleep(batch_delay_seconds)
+                            if batch_delay_seconds > 0: time.sleep(batch_delay_seconds) # Change 1
+                        else:
+                            core.logger.debug(f"[{service_name}] BATCH_DELIMITER split failed. Expected {len(current_batch_texts)}, got {len(primary_split_segments)}. Trying newline split.")
+                            alt_segments = translated_batch_str.splitlines() # Change 5.1
+                            if len(alt_segments) == len(current_batch_texts):
+                                core.logger.debug(f"[{service_name}] Newline split succeeded. Using newline-split segments.")
+                                translated_segments = alt_segments
+                                all_detected_source_langs.append(detected_lang_batch) # Change 4
+                                for j, segment_text in enumerate(translated_segments):
+                                    info_for_segment = current_batch_item_infos[j]
+                                    restored_text = _restore_subtitle_tags(segment_text, info_for_segment['map'])
+                                    final_content = html.unescape(restored_text)
+                                    final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
+                                    parsed_subs[info_for_segment['original_idx']].content = final_content
+                                if batch_delay_seconds > 0: time.sleep(batch_delay_seconds) # Change 1
+                            else:
+                                core.logger.debug(f"[{service_name}] Newline split also failed. Expected {len(current_batch_texts)}, got {len(alt_segments)}. Falling back to individual line translation.")
+                                # DO NOT add detected_lang_batch (Change 4)
+                                individual_translated_segments = []
+                                for idx_single, single_text_to_translate in enumerate(current_batch_texts):
+                                    seg, single_detected_lang = _gtranslate_text_chunk(single_text_to_translate, target_gtranslate_lang, core, service_name)
+                                    # Change 3: Defensive translation for per-line
+                                    if not seg or seg == single_text_to_translate:
+                                        core.logger.debug(f"[{service_name}] Per-line translation for '{single_text_to_translate[:30]}' failed or returned original. Using original text for this segment.")
+                                        seg = single_text_to_translate
+                                    individual_translated_segments.append(seg)
+                                    all_detected_source_langs.append(single_detected_lang)
+                                    if batch_delay_seconds > 0: time.sleep(batch_delay_seconds) # Change 1 (sleep per call)
+                                
+                                if len(individual_translated_segments) == len(current_batch_texts):
+                                    translated_segments = individual_translated_segments
+                                    for j, segment_text in enumerate(translated_segments):
+                                        info_for_segment = current_batch_item_infos[j]
+                                        restored_text = _restore_subtitle_tags(segment_text, info_for_segment['map'])
+                                        final_content = html.unescape(restored_text)
+                                        final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
+                                        parsed_subs[info_for_segment['original_idx']].content = final_content
+                                else:
+                                    # Catastrophic failure after all fallbacks for this in-loop batch
+                                    core.logger.error(f"[{service_name}] Mismatch in translated segments count for batch (even after per-line fallback). Expected {len(current_batch_texts)}, got {len(individual_translated_segments)}. Falling back to original text for this batch.")
+                                    for k_item_idx, item_info_in_batch in enumerate(current_batch_item_infos):
+                                        original_text_segment = current_batch_texts[k_item_idx]
+                                        restored_text = _restore_subtitle_tags(original_text_segment, item_info_in_batch['map'])
+                                        final_content = html.unescape(restored_text)
+                                        final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
+                                        parsed_subs[item_info_in_batch['original_idx']].content = final_content
+                        
+                        # This block is executed after the outer 'if potential_new_size > CHARS_PER_BATCH'
+                        # The time.sleep was here in the original code, it's now moved into specific paths.
+                        # The reset logic below is crucial and correctly placed. (Addresses Change 2 implicitly)
                         current_batch_texts = []
                         current_batch_item_infos = []
                         accumulated_chars_in_batch = 0
@@ -833,30 +879,75 @@ def build_download_request(core, service_name, args):
                     accumulated_chars_in_batch += len(protected_text_to_add) + \
                                                   (len(BATCH_DELIMITER) if len(current_batch_texts) > 1 else 0)
 
-                if current_batch_texts:
+                if current_batch_texts: # Final batch processing
                     core.logger.debug(f"[{service_name}] Processing final batch of {len(current_batch_texts)} items, {accumulated_chars_in_batch} chars.")
                     batch_to_translate_str = BATCH_DELIMITER.join(current_batch_texts)
-                    translated_batch_str, detected_lang = _gtranslate_text_chunk(batch_to_translate_str, target_gtranslate_lang, core, service_name)
-                    all_detected_source_langs.append(detected_lang)
-                    translated_segments = translated_batch_str.split(BATCH_DELIMITER)
 
-                    if len(translated_segments) != len(current_batch_texts):
-                        core.logger.error(f"[{service_name}] Mismatch in translated segments count for final batch. Expected {len(current_batch_texts)}, got {len(translated_segments)}. Falling back to original text for this batch.")
-                        for k_item_idx, item_info_in_batch in enumerate(current_batch_item_infos):
-                            original_text_segment = current_batch_texts[k_item_idx]
-                            restored_text = _restore_subtitle_tags(original_text_segment, item_info_in_batch['map'])
-                            final_content = html.unescape(restored_text)
-                            final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
-                            parsed_subs[item_info_in_batch['original_idx']].content = final_content
-                        # MODIFICATION: Point 3 - Reset list after final-batch mismatch
-                        current_batch_item_infos.clear()
-                    else:
+                    translated_batch_str, detected_lang_batch = _gtranslate_text_chunk(batch_to_translate_str, target_gtranslate_lang, core, service_name)
+                    # NOTE: detected_lang_batch is added to all_detected_source_langs conditionally below (Change 4)
+
+                    primary_split_segments = translated_batch_str.split(BATCH_DELIMITER)
+                    translated_segments = [] # Will hold the final segments for this batch
+                    
+                    if len(primary_split_segments) == len(current_batch_texts):
+                        core.logger.debug(f"[{service_name}] Final batch segment split with BATCH_DELIMITER successful.")
+                        translated_segments = primary_split_segments
+                        all_detected_source_langs.append(detected_lang_batch) # Change 4
                         for j, segment_text in enumerate(translated_segments):
                             info_for_segment = current_batch_item_infos[j]
                             restored_text = _restore_subtitle_tags(segment_text, info_for_segment['map'])
                             final_content = html.unescape(restored_text)
                             final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
                             parsed_subs[info_for_segment['original_idx']].content = final_content
+                        if batch_delay_seconds > 0: time.sleep(batch_delay_seconds) # Change 1
+                    else:
+                        core.logger.debug(f"[{service_name}] Final batch BATCH_DELIMITER split failed. Expected {len(current_batch_texts)}, got {len(primary_split_segments)}. Trying newline split.")
+                        alt_segments = translated_batch_str.splitlines() # Change 5.1
+                        if len(alt_segments) == len(current_batch_texts):
+                            core.logger.debug(f"[{service_name}] Final batch newline split succeeded. Using newline-split segments.")
+                            translated_segments = alt_segments
+                            all_detected_source_langs.append(detected_lang_batch) # Change 4
+                            for j, segment_text in enumerate(translated_segments):
+                                info_for_segment = current_batch_item_infos[j]
+                                restored_text = _restore_subtitle_tags(segment_text, info_for_segment['map'])
+                                final_content = html.unescape(restored_text)
+                                final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
+                                parsed_subs[info_for_segment['original_idx']].content = final_content
+                            if batch_delay_seconds > 0: time.sleep(batch_delay_seconds) # Change 1
+                        else:
+                            core.logger.debug(f"[{service_name}] Final batch newline split also failed. Expected {len(current_batch_texts)}, got {len(alt_segments)}. Falling back to individual line translation.")
+                            # DO NOT add detected_lang_batch (Change 4)
+                            individual_translated_segments = []
+                            for idx_single, single_text_to_translate in enumerate(current_batch_texts):
+                                seg, single_detected_lang = _gtranslate_text_chunk(single_text_to_translate, target_gtranslate_lang, core, service_name)
+                                # Change 3: Defensive translation for per-line
+                                if not seg or seg == single_text_to_translate:
+                                    core.logger.debug(f"[{service_name}] Per-line translation for '{single_text_to_translate[:30]}' (final batch) failed or returned original. Using original.")
+                                    seg = single_text_to_translate
+                                individual_translated_segments.append(seg)
+                                all_detected_source_langs.append(single_detected_lang)
+                                if batch_delay_seconds > 0: time.sleep(batch_delay_seconds) # Change 1 (sleep per call)
+                            
+                            if len(individual_translated_segments) == len(current_batch_texts):
+                                translated_segments = individual_translated_segments
+                                for j, segment_text in enumerate(translated_segments):
+                                    info_for_segment = current_batch_item_infos[j]
+                                    restored_text = _restore_subtitle_tags(segment_text, info_for_segment['map'])
+                                    final_content = html.unescape(restored_text)
+                                    final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
+                                    parsed_subs[info_for_segment['original_idx']].content = final_content
+                            else:
+                                # Catastrophic failure after all fallbacks for the final batch
+                                core.logger.error(f"[{service_name}] Mismatch in translated segments count for final batch (even after per-line fallback). Expected {len(current_batch_texts)}, got {len(individual_translated_segments)}. Falling back to original text for this batch.")
+                                for k_item_idx, item_info_in_batch in enumerate(current_batch_item_infos):
+                                    original_text_segment = current_batch_texts[k_item_idx]
+                                    restored_text = _restore_subtitle_tags(original_text_segment, item_info_in_batch['map'])
+                                    final_content = html.unescape(restored_text)
+                                    final_content = final_content.replace(_SC_NEWLINE_MARKER_, '\n')
+                                    parsed_subs[item_info_in_batch['original_idx']].content = final_content
+                                # MODIFICATION: Point 3 - Reset list after final-batch mismatch (from previous user diff, ensuring it's kept)
+                                if current_batch_item_infos: # Check if list exists and has items
+                                    current_batch_item_infos.clear()
 
             overall_detected_source_lang = "auto"
             if all_detected_source_langs:
