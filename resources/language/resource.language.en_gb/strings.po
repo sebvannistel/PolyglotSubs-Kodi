@@ -93,3 +93,7 @@ msgstr ""
 msgctxt "#33303"
 msgid "API Key"
 msgstr ""
+
+msgctxt "#33209"
+msgid "Automatically upload translated subtitles to Subtitlecat"
+msgstr ""
