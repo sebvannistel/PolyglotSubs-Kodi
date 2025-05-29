@@ -187,233 +187,333 @@ def _post_download_fix_encoding(core, service_name, raw_bytes, outfile):
 
 # START OF DEFINITIONS FOR CLIENT-SIDE TRANSLATION
 GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single"
-# MODIFICATION: Added comment for CHARS_PER_BATCH
-CHARS_PER_BATCH = 5000 # Character budget for batching texts before sending to _gtranslate_text_chunk.
-                       # _gtranslate_text_chunk itself uses MAX_LINES_PER_API_CALL for API requests.
-# MODIFICATION: Point 2 - Harden the delimiter (RETIRED - Now using newline as per latest spec)
-# BATCH_DELIMITER = "@@\u2063\u2063@@"
-# INTER_REQUEST_DELAY_SECONDS is already defined globally in the script,
-# will be used within build_download_request
+# Constants for client-side translation batching by build_download_request
+GOOGLE_API_Q_PARAM_CHAR_LIMIT = 500  # MODIFIED: Max char length for all 'q' params combined (was 480)
+MAX_LINES_PER_API_CALL_CONFIG = 20   # MODIFIED: Max number of logical lines per API call (was 40)
+DEFAULT_BATCH_DELAY_SECONDS = 0.25   # Default delay between API calls made by build_download_request
+MAX_PARTIAL_RETRIES = 2              # Max depth for recursive calls in _gtranslate_text_chunk if it were to implement batch splitting itself.
+                                     # Note: Current per-line retry is a degradation, not recursive batch splitting.
+DEFAULT_TRANSLATION_FAILED_PLACEHOLDER = "[TRANSLATION UNAVAILABLE]" # ADDED: Default placeholder
 
 # START OF REPLACEMENT _gtranslate_text_chunk
-def _gtranslate_text_chunk(text_chunk_concatenated_with_newlines, target_lang, core, service_name):
-    # text_chunk_concatenated_with_newlines is like "line1\nline2\nline3"
-    individual_lines = text_chunk_concatenated_with_newlines.split('\n')
+def _gtranslate_text_chunk(lines_to_translate, target_lang, core, service_name, recursion_depth=0):
+    # lines_to_translate is a list of strings (logical lines from SRT, already tag-protected)
+    # This function processes the entire received `lines_to_translate` list.
+    # If it's a batch, it makes one API call. If that call is partial, it retries tail segments one-by-one.
+    # If called with a single line, it processes that single line.
 
-    if not any(line.strip() for line in individual_lines): # Check if all lines are effectively empty
-        core.logger.debug(f"[{service_name}] gtranslate: All lines in chunk are empty, skipping translation.")
-        return ["" for _ in individual_lines], "auto" # Return list of empty strings
+    if not lines_to_translate: # Handle empty list first
+        return [], "auto"
 
-    all_translated_segments = []
-    all_detected_source_langs_from_sub_batches = []
+    placeholder_str = _get_setting(core, "subtitlecat_translation_failed_placeholder", DEFAULT_TRANSLATION_FAILED_PLACEHOLDER)
 
-    MAX_LINES_PER_API_CALL = 128  # Google Translate API limit for 'q' parameters in a single request
-    MAX_URL_LENGTH_FOR_GET = 1900 # Threshold to switch from GET to POST
+    # +++ START OF RECURSION GUARD +++
+    if recursion_depth >= MAX_PARTIAL_RETRIES:
+        log_prefix_guard = f"(Depth {recursion_depth}, MAX_RETRIES_EXCEEDED) "
+        # Ensure lines_to_translate is not empty before accessing lines_to_translate[0]
+        first_line_preview_msg = f"'{str(lines_to_translate[0])[:50]}...'" # Safe, lines_to_translate is not empty here
 
-    for i in range(0, len(individual_lines), MAX_LINES_PER_API_CALL):
-        sub_batch_lines = individual_lines[i:i + MAX_LINES_PER_API_CALL]
-        if not sub_batch_lines: # Should not happen with correct loop logic
-            continue
+        core.logger.error(f"[{service_name}] gtranslate: {log_prefix_guard}Max recursion depth ({MAX_PARTIAL_RETRIES}) reached. "
+                         f"Using placeholders for {len(lines_to_translate)} line(s). First line preview: {first_line_preview_msg}")
+        return [placeholder_str if line.strip() else "" for line in lines_to_translate], "auto"
+    # +++ END OF RECURSION GUARD +++
 
-        params_list_sub_batch = [
-            ('client', 'gtx'),
-            ('sl', 'auto'),
-            ('tl', target_lang),
-            ('dt', 't'), # We only need text translation
-            ('format', 'text') # Ensure text format for simpler parsing
-        ]
-        for line in sub_batch_lines:
-            # Send a single space for empty/whitespace-only lines to maintain segment count
-            params_list_sub_batch.append(('q', line if line.strip() else " "))
+    # Handle all-empty lines upfront (this check is after the recursion guard)
+    if not any(line.strip() for line in lines_to_translate):
+        # core.logger.debug(f"[{service_name}] gtranslate: All lines in chunk are empty, skipping translation.")
+        return ["" for _ in lines_to_translate], "auto" # Return list of empty strings matching input length
 
-        MAX_RETRIES = 3
-        RETRY_DELAY_BASE_SECONDS = 2
-        sub_batch_translated_segments_for_this_attempt = None
-        detected_lang_for_sub_batch = "auto" # Default for this sub_batch
+    params_list_for_api_call = [
+        ('client', 'gtx'),
+        ('sl', 'auto'),
+        ('tl', target_lang),
+        ('dt', 't'),
+        ('format', 'text') # Added to help preserve explicit line breaks if any are part of 'q'
+    ]
+    for line in lines_to_translate:
+        # Send a space if line is empty or whitespace only, as Google might ignore empty 'q'
+        params_list_for_api_call.append(('q', line if line.strip() else " "))
 
-        for attempt in range(MAX_RETRIES + 1):
-            r = None
+    MAX_RETRIES_HTTP = 3
+    RETRY_DELAY_BASE_SECONDS = 2
+    MAX_URL_LENGTH_FOR_GET = 1900
+    API_TIMEOUT_SECONDS = 30 # MODIFIED: was 20
+
+    translated_segments_for_this_call_final = None # Will hold the final list of translated/placeholder segments
+    detected_lang_for_this_call = "auto"
+
+    for attempt in range(MAX_RETRIES_HTTP + 1):
+        r = None
+        use_post = False
+        log_prefix = f"(Depth {recursion_depth}, Attempt {attempt+1}/{MAX_RETRIES_HTTP+1}) "
+        current_call_is_single_line = (len(lines_to_translate) == 1)
+
+        try:
+            # URL length check for GET vs POST
+            query_string_for_check = urllib.parse.urlencode(params_list_for_api_call)
+            potential_url_len = len(GOOGLE_TRANSLATE_URL) + 1 + len(query_string_for_check)
+            if potential_url_len > MAX_URL_LENGTH_FOR_GET:
+                use_post = True
+        except Exception as e_url_len_check:
+            core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Error during URL length check: {e_url_len_check}. Defaulting to GET.")
             use_post = False
+        
+        if _get_setting(core, "debug", False) and attempt == 0 : # Log only on first attempt of a batch/line
+            first_q_preview = lines_to_translate[0][:60] if lines_to_translate else "N/A"
+            method_used = "POST" if use_post else "GET"
+            line_count_desc = f"{len(lines_to_translate)} segment(s)" if not current_call_is_single_line else "single segment"
+            core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Translating {line_count_desc} to '{target_lang}' via {method_used}. First q: {first_q_preview}...")
 
-            try:
-                # Check if GET URL would be too long
-                query_string_for_check = urllib.parse.urlencode(params_list_sub_batch)
-                potential_url_len = len(GOOGLE_TRANSLATE_URL) + 1 + len(query_string_for_check) # +1 for '?'
-                if potential_url_len > MAX_URL_LENGTH_FOR_GET:
-                    use_post = True
-            except Exception as e_url_len_check: # Should be rare
-                core.logger.debug(f"[{service_name}] gtranslate: Error during URL length check: {e_url_len_check}. Defaulting to GET.")
-                use_post = False # Or True, if safer for potential large payloads
+        try:
+            if use_post:
+                post_data = urllib.parse.urlencode(params_list_for_api_call).encode('utf-8')
+                headers_for_post = _SC_SESSION.headers.copy()
+                headers_for_post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8'
+                r = _SC_SESSION.post(GOOGLE_TRANSLATE_URL, data=post_data, headers=headers_for_post, timeout=API_TIMEOUT_SECONDS)
+            else:
+                r = _SC_SESSION.get(GOOGLE_TRANSLATE_URL, params=params_list_for_api_call, timeout=API_TIMEOUT_SECONDS)
+            
+            r.raise_for_status()
+            response_json = r.json()
 
-            try:
-                if attempt == 0 and _get_setting(core, "debug", False):
-                    first_q_preview = sub_batch_lines[0][:60] if sub_batch_lines else "N/A"
-                    method_used = "POST" if use_post else "GET"
-                    core.logger.debug(f"[{service_name}] gtranslate: Translating {len(sub_batch_lines)} segments in sub-batch to '{target_lang}' via {method_used}. First q: {first_q_preview}...")
+            if not isinstance(response_json, list):
+                raise ValueError(f"gtranslate: Expected list response, got {type(response_json)}. Preview: {str(response_json)[:200]}")
 
-                if use_post:
-                    post_data = urllib.parse.urlencode(params_list_sub_batch).encode('utf-8') # Encode to bytes for POST
-                    # Prepare headers for POST, preserving session headers and setting Content-Type
-                    headers_for_post = _SC_SESSION.headers.copy()
-                    headers_for_post['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8'
-                    r = _SC_SESSION.post(GOOGLE_TRANSLATE_URL, data=post_data, headers=headers_for_post, timeout=20)
-                else:
-                    r = _SC_SESSION.get(GOOGLE_TRANSLATE_URL, params=params_list_sub_batch, timeout=20)
+            # --- Start: Parsing logic ---
+            parsed_segments_from_api_response = []
+            parsed_successfully_this_api_call_count = 0
 
-                r.raise_for_status()
-                response_json = r.json()
+            # response_json[j] contains data for lines_to_translate[j]
+            # Each response_json[j] should be like: [ [["Translated text", "Original text", ...]], null, "src_lang_code", ... ]
+            for j in range(len(lines_to_translate)): # Iterate up to the number of lines we sent
+                translated_text_for_segment = None
+                original_line_text = lines_to_translate[j]
 
-                if not isinstance(response_json, list):
-                    raise ValueError(f"gtranslate: Expected list response, got {type(response_json)}. Preview: {str(response_json)[:200]}")
-
-                num_translation_blocks_expected = len(sub_batch_lines)
-
-                if len(response_json) < num_translation_blocks_expected:
-                    core.logger.error(f"[{service_name}] gtranslate: Response has fewer translation blocks ({len(response_json)}) than expected ({num_translation_blocks_expected}). Full response preview: {str(response_json)[:200]}")
-                    sub_batch_translated_segments_for_this_attempt = [line for line in sub_batch_lines]
-                    break 
-
-                current_sub_batch_translations_list = []
-                parsed_successfully_count = 0
-                for j in range(num_translation_blocks_expected):
+                if j < len(response_json) and response_json[j] is not None:
                     segment_data_array = response_json[j]
-                    
-                    translated_text_for_segment = None
                     if (segment_data_array and isinstance(segment_data_array, list) and
                         segment_data_array[0] and isinstance(segment_data_array[0], list) and
                         len(segment_data_array[0]) > 0 and segment_data_array[0][0] is not None):
-                        # Segment Trimming note: The prompt's "Segment trimming" quick fix refers to handling of
-                        # originals that are empty. The logic below for `original_line_was_effectively_empty`
-                        # correctly uses `translated_text_for_segment.strip()` in its condition
-                        # `translated_text_is_effectively_empty` and ensures `""` is appended.
-                        # No general strip is applied here to translated_text_for_segment itself unless
-                        # that was a broader interpretation not tied to the "empty originals" fix.
                         translated_text_for_segment = str(segment_data_array[0][0])
-                        parsed_successfully_count += 1
+                        parsed_successfully_this_api_call_count += 1
+                    else: # Malformed segment data for this specific line
+                        if _get_setting(core, "debug", False):
+                            core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Malformed segment data for line '{original_line_text[:30]}...': {str(segment_data_array)[:100]}.")
+                        # This segment is considered failed for this API call. Handled by mismatch logic below.
+                        pass
+                else: # Google's response was shorter than expected number of 'q' params
+                    if _get_setting(core, "debug", False) and j < len(response_json) and response_json[j] is None: # Explicit null for a segment
+                         core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Response was null for segment {j+1}/{len(lines_to_translate)}. Original: '{original_line_text[:30]}...'.")
+                    # This (and subsequent ones) are missing. Handled by mismatch logic.
+                    pass
+                
+                # Append what we got, even if it's None (placeholder for now)
+                parsed_segments_from_api_response.append(translated_text_for_segment)
+
+
+            # --- Language Detection for this call ---
+            # Try to find language code: often after all translation blocks if all were successful.
+            # Or sometimes at a fixed index like response_json[2] or response_json[8][0][0] in older formats.
+            temp_detected_lang = "auto"
+            expected_lang_code_idx = parsed_successfully_this_api_call_count # Index after actual translation blocks if all were parsed
+            if parsed_successfully_this_api_call_count == len(lines_to_translate): # All segments might have been returned
+                if len(response_json) > expected_lang_code_idx and isinstance(response_json[expected_lang_code_idx], str) and response_json[expected_lang_code_idx]:
+                    candidate_lang = response_json[expected_lang_code_idx]
+                    if 2 <= len(candidate_lang) <= 7 and (candidate_lang.isalnum() or '-' in candidate_lang) and candidate_lang != "auto":
+                        temp_detected_lang = candidate_lang
+            
+            if temp_detected_lang == "auto": # Fallbacks
+                if len(response_json) > 2 and isinstance(response_json[2], str) and response_json[2]:
+                    temp_detected_lang = response_json[2]
+                elif len(response_json) > 8 and isinstance(response_json[8], list) and response_json[8] and \
+                     isinstance(response_json[8][0], list) and response_json[8][0] and \
+                     isinstance(response_json[8][0][0], str) and response_json[8][0][0]:
+                    temp_detected_lang = response_json[8][0][0]
+            
+            if temp_detected_lang != "auto":
+                detected_lang_for_this_call = temp_detected_lang
+            # --- End Language Detection ---
+
+            # --- Handle Mismatches / Per-Line Retry ---
+            if parsed_successfully_this_api_call_count == len(lines_to_translate):
+                # Perfect match for this batch/single call. Ensure empty strings for originally empty lines.
+                final_batch_results = []
+                for i, translated_text in enumerate(parsed_segments_from_api_response):
+                    if not lines_to_translate[i].strip(): # Original was empty/whitespace
+                        final_batch_results.append("")
                     else:
-                        core.logger.debug(f"[{service_name}] gtranslate: Malformed segment data for line '{sub_batch_lines[j][:30]}...': {str(segment_data_array)[:100]}. Using original.")
-                        current_sub_batch_translations_list.append(sub_batch_lines[j])
-                        continue 
+                        final_batch_results.append(translated_text if translated_text is not None else placeholder_str) # Should not be None here
+                translated_segments_for_this_call_final = final_batch_results
+                break # Successful HTTP call and all segments processed/accounted for.
 
-                    original_line_was_effectively_empty = not sub_batch_lines[j].strip()
-                    translated_text_is_effectively_empty = not translated_text_for_segment.strip()
+            elif parsed_successfully_this_api_call_count < len(lines_to_translate) and not current_call_is_single_line:
+                # MISMATCH on a BATCH call: API returned fewer segments than 'q' params sent, or some were malformed.
+                # We have `parsed_segments_from_api_response` which contains `None` for failed/missing segments.
+                core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Batch API call returned {parsed_successfully_this_api_call_count} valid segments, expected {len(lines_to_translate)}. Attempting per-line retry for failed/missing segments.")
+                
+                results_after_per_line_retry = []
+                num_failed_in_per_line_retry = 0
 
-                    if original_line_was_effectively_empty:
-                        if translated_text_is_effectively_empty: 
-                            current_sub_batch_translations_list.append("")
-                        else: 
-                            core.logger.debug(f"[{service_name}] gtranslate: Empty input line got non-empty translation '{translated_text_for_segment}'. Using empty string.")
-                            current_sub_batch_translations_list.append("")
-                    else: 
-                        current_sub_batch_translations_list.append(translated_text_for_segment)
-                
-                if parsed_successfully_count != num_translation_blocks_expected:
-                    core.logger.debug(f"[{service_name}] gtranslate: Parsed {parsed_successfully_count}/{num_translation_blocks_expected} segments successfully in sub-batch. Others used original text.")
-                
-                sub_batch_translated_segments_for_this_attempt = current_sub_batch_translations_list
-
-                # MODIFICATION: Updated source language detection logic
-                # Attempt to detect source language
-                # detected_lang_for_sub_batch is already defaulted to "auto"
-                lang_code_index = num_translation_blocks_expected
-                
-                # Primary check with plausibility
-                if len(response_json) > lang_code_index and \
-                   isinstance(response_json[lang_code_index], str) and \
-                   response_json[lang_code_index]:
-                    candidate_lang = response_json[lang_code_index]
-                    # START OF PATCH from "6 · Two small edge-cases"
-                    # Allow A-Za-z and hyphen, length 2 to 7 (e.g., pt-BR, es-419)
-                    if 2 <= len(candidate_lang) <= 7 and all(c.isalnum() or c == '-' for c in candidate_lang) and candidate_lang != "auto":
-                    # END OF PATCH
-                        detected_lang_for_sub_batch = candidate_lang
+                for i, original_line_text in enumerate(lines_to_translate):
+                    if i < len(parsed_segments_from_api_response) and parsed_segments_from_api_response[i] is not None:
+                        # This segment was successfully translated in the batch
+                        if not original_line_text.strip(): # Original was empty
+                             results_after_per_line_retry.append("")
+                        else:
+                             results_after_per_line_retry.append(parsed_segments_from_api_response[i])
+                    else:
+                        # This segment failed in the batch or was missing; retry it singly.
+                        if _get_setting(core, "debug", False):
+                            core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Retrying failed/missing segment {i+1} individually: '{original_line_text[:30]}...'")
+                        if i > 0 and (parsed_segments_from_api_response[i-1] is None or i >= parsed_successfully_this_api_call_count):
+                            time.sleep(0.1) # Small polite delay if previous was also a retry or we are in the tail
                         
-                # Fallbacks if primary check (with plausibility) didn't yield a valid language
-                # or wasn't applicable and detected_lang_for_sub_batch is still "auto".
-                if detected_lang_for_sub_batch == "auto":
-                    # Fallback 1 (original position from prior code structure)
-                    if len(response_json) > 2 and isinstance(response_json[2], str) and response_json[2]:
-                        # No explicit plausibility check was here before, so keeping it simple.
-                        # If strictness is desired, add: and 2 <= len(response_json[2]) <= 7 and all(c.isalnum() or c == '-' for c in response_json[2])
-                        detected_lang_for_sub_batch = response_json[2]
-                    # Fallback 2 (original position from prior code structure)
-                    elif len(response_json) > 8 and isinstance(response_json[8], list) and response_json[8] and \
-                         isinstance(response_json[8][0], list) and response_json[8][0] and \
-                         isinstance(response_json[8][0][0], str) and response_json[8][0][0]:
-                        # No explicit plausibility check was here before.
-                        detected_lang_for_sub_batch = response_json[8][0][0]
+                        # Call _gtranslate_text_chunk for this single line.
+                        # recursion_depth+1 to ensure MAX_PARTIAL_RETRIES is respected for overall problem depth.
+                        single_line_translated_list, single_line_lang = _gtranslate_text_chunk(
+                            [original_line_text], target_lang, core, service_name, recursion_depth + 1
+                        )
+                        
+                        if single_line_translated_list and len(single_line_translated_list) == 1:
+                            single_result = single_line_translated_list[0]
+                            results_after_per_line_retry.append(single_result)
+                            if single_result == placeholder_str:
+                                num_failed_in_per_line_retry += 1
+                            # Update overall detected language if this single line provided a non-auto one and current is auto
+                            if single_line_lang and single_line_lang != "auto" and detected_lang_for_this_call == "auto":
+                                detected_lang_for_this_call = single_line_lang
+                        else: # Should not happen if single-line call returns placeholder on failure
+                            core.logger.error(f"[{service_name}] gtranslate: {log_prefix}Per-line retry for '{original_line_text[:30]}...' unexpectedly did not return one segment. Using placeholder.") # MODIFIED TO .error
+                            results_after_per_line_retry.append(placeholder_str)
+                            num_failed_in_per_line_retry += 1
                 
-                break 
+                if num_failed_in_per_line_retry > 0 and _get_setting(core, "debug", False):
+                     core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Per-line retry phase completed. {num_failed_in_per_line_retry} segment(s) still failed and used placeholder.")
+                
+                translated_segments_for_this_call_final = results_after_per_line_retry
+                break # Processed the batch, with per-line degradation for tail. Exit HTTP retry loop.
+            
+            elif current_call_is_single_line and parsed_successfully_this_api_call_count < 1:
+                # Single line call failed to get a translation from API response.
+                # This means the API returned something like [null] or [[]] for the single 'q'.
+                core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Single line translation API response did not yield text for '{lines_to_translate[0][:30]}...'. This attempt will use placeholder.")
+                # Fallback to placeholder will happen after loop if all HTTP attempts fail.
+                # No break here, let HTTP retries try again for this single line.
+                # If this *was* the last HTTP attempt, the except block will handle it.
+                # We need to make sure `translated_segments_for_this_call_final` gets set to placeholder if all attempts fail.
+                pass # Let the HTTP retry loop continue for this single line if attempts remain.
 
-            except system_requests.exceptions.HTTPError as http_err:
-                first_q_preview = sub_batch_lines[0][:30] if sub_batch_lines else "N/A"
-                if http_err.response.status_code == 429 and attempt < MAX_RETRIES: 
-                    delay = RETRY_DELAY_BASE_SECONDS * (2 ** attempt)
-                    core.logger.debug(f"[{service_name}] gtranslate: HTTPError 429 (Rate Limit) on sub-batch attempt {attempt+1}/{MAX_RETRIES+1}. Retrying in {delay}s... (First q: {first_q_preview})")
-                    time.sleep(delay)
-                    continue
-                core.logger.error(f"[{service_name}] gtranslate: HTTPError {http_err.response.status_code}: {http_err} after {attempt+1} attempts for sub-batch. (First q: {first_q_preview})")
-                sub_batch_translated_segments_for_this_attempt = [line for line in sub_batch_lines] 
-                break 
-
-            except system_requests.exceptions.Timeout as e_timeout: 
-                first_q_preview = sub_batch_lines[0][:30] if sub_batch_lines else "N/A"
-                core.logger.error(f"[{service_name}] gtranslate: Timeout: {e_timeout} on sub-batch attempt {attempt+1}. (First q: {first_q_preview})")
-                if attempt < MAX_RETRIES:
-                    delay = RETRY_DELAY_BASE_SECONDS * (2 ** attempt) 
-                    core.logger.debug(f"[{service_name}] gtranslate: Retrying sub-batch after Timeout in {delay}s...")
-                    time.sleep(delay)
-                    continue
-                core.logger.error(f"[{service_name}] gtranslate: Max retries reached for sub-batch after Timeout. (First q: {first_q_preview})")
-                sub_batch_translated_segments_for_this_attempt = [line for line in sub_batch_lines]
-                break 
-
-            except ValueError as e_json_or_parse: 
-                first_q_preview = sub_batch_lines[0][:30] if sub_batch_lines else "N/A"
-                response_text_preview = r.text[:200] if r and hasattr(r, 'text') else "N/A"
-                core.logger.error(f"[{service_name}] gtranslate: ValueError (JSON/Parse error): {e_json_or_parse} on sub-batch attempt {attempt+1}. Response text: {response_text_preview}. (First q: {first_q_preview})")
-                sub_batch_translated_segments_for_this_attempt = [line for line in sub_batch_lines]
-                break 
-
-            except Exception as e_unexp: 
-                first_q_preview = sub_batch_lines[0][:30] if sub_batch_lines else "N/A"
-                core.logger.error(f"[{service_name}] gtranslate: Exception: {type(e_unexp).__name__} ('{e_unexp}') on sub-batch attempt {attempt+1}. (First q: {first_q_preview})")
-                if attempt < MAX_RETRIES:
-                    delay = RETRY_DELAY_BASE_SECONDS * (2 ** attempt)
-                    core.logger.debug(f"[{service_name}] gtranslate: Retrying sub-batch after {type(e_unexp).__name__} in {delay}s...")
-                    time.sleep(delay)
-                    continue
-                core.logger.error(f"[{service_name}] gtranslate: Max retries reached for sub-batch after {type(e_unexp).__name__}. (First q: {first_q_preview})")
-                sub_batch_translated_segments_for_this_attempt = [line for line in sub_batch_lines]
+            elif parsed_successfully_this_api_call_count > len(lines_to_translate): # Should not happen
+                core.logger.error(f"[{service_name}] gtranslate: {log_prefix}Got MORE segments ({parsed_successfully_this_api_call_count}) than expected ({len(lines_to_translate)}). Truncating.")
+                # Ensure empty strings for originally empty lines.
+                final_batch_results = []
+                for i, translated_text in enumerate(parsed_segments_from_api_response[:len(lines_to_translate)]):
+                    if not lines_to_translate[i].strip(): # Original was empty/whitespace
+                        final_batch_results.append("")
+                    else:
+                        final_batch_results.append(translated_text if translated_text is not None else placeholder_str)
+                translated_segments_for_this_call_final = final_batch_results
                 break
-        
-        if sub_batch_translated_segments_for_this_attempt is None:
-            core.logger.error(f"[{service_name}] gtranslate: Sub-batch translation attempt failed entirely, segments variable not set. Using originals for this sub-batch.")
-            sub_batch_translated_segments_for_this_attempt = [line for line in sub_batch_lines]
-        
-        all_translated_segments.extend(sub_batch_translated_segments_for_this_attempt)
-        if detected_lang_for_sub_batch and detected_lang_for_sub_batch != "auto": # "auto" already filtered here for appending
-            all_detected_source_langs_from_sub_batches.append(detected_lang_for_sub_batch)
+            
+            # If we are here, it means it was a single line call that DID get a translation,
+            # or some other state. If translated_segments_for_this_call_final is set, we break.
+            # This path should ideally be covered by the `parsed_successfully_this_api_call_count == len(lines_to_translate)`
+            # for single line calls too.
 
-    final_detected_lang_for_chunk = "auto"
-    # MODIFICATION: Use Counter for majority vote on detected language
-    # START OF PATCH from "6 · Two small edge-cases"
-    # Filter out "auto" if any sneaked in (though the append logic above should prevent it)
-    # The primary change is that all_detected_source_langs_from_sub_batches now *only* contains non-"auto" langs.
-    # So, no explicit filtering like `[l for l in ... if l != 'auto']` is needed right before Counter.
-    if all_detected_source_langs_from_sub_batches:
-        lang_counts = Counter(all_detected_source_langs_from_sub_batches) # `all_detected_source_langs_from_sub_batches` is already filtered.
-    # END OF PATCH
-        if lang_counts: # Ensure lang_counts is not empty (e.g. if all were "auto" or list was empty)
-            final_detected_lang_for_chunk = lang_counts.most_common(1)[0][0]
-        # If lang_counts is empty (e.g., all_detected_source_langs_from_sub_batches was empty),
-        # final_detected_lang_for_chunk remains "auto".
+            # This means the API call itself (HTTP) was successful, but parsing yielded an issue not yet fully resolved
+            # (e.g. single line call, parsed_successfully_this_api_call_count = 0, but not last HTTP attempt).
+            # Let the HTTP retry loop proceed if attempts remain.
+            if attempt < MAX_RETRIES_HTTP:
+                core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}API call attempt {attempt+1} had issues but not fatal HTTP error. Will retry if attempts left.")
+                # Delay before retrying this problematic batch/line
+                delay = RETRY_DELAY_BASE_SECONDS * (2 ** attempt)
+                time.sleep(delay)
+                continue
+            else: # Last HTTP attempt, and still not resolved (e.g. single line returned null content)
+                core.logger.error(f"[{service_name}] gtranslate: {log_prefix}All HTTP attempts for this chunk failed to yield full translation. Using placeholders for failed segments.")
+                # This state means even after HTTP retries, we couldn't get proper translation for all lines.
+                # `parsed_segments_from_api_response` might have some `None`s.
+                final_results_on_exhaustion = []
+                for i, original_line in enumerate(lines_to_translate):
+                    if i < len(parsed_segments_from_api_response) and parsed_segments_from_api_response[i] is not None:
+                        if not original_line.strip(): final_results_on_exhaustion.append("")
+                        else: final_results_on_exhaustion.append(parsed_segments_from_api_response[i])
+                    else:
+                        if not original_line.strip(): final_results_on_exhaustion.append("") # Empty remains empty
+                        else: final_results_on_exhaustion.append(placeholder_str)
+                translated_segments_for_this_call_final = final_results_on_exhaustion
+                break # Exit HTTP retry loop.
 
-    if len(all_translated_segments) != len(individual_lines):
-        core.logger.error(f"[{service_name}] gtranslate: CRITICAL - Final segment count ({len(all_translated_segments)}) does not match input line count ({len(individual_lines)}). Returning originals to prevent crash.")
-        return [line for line in individual_lines], "auto"
+        except system_requests.exceptions.HTTPError as http_err:
+            status_code = http_err.response.status_code if http_err.response else "Unknown"
+            response_text_preview = ""
+            if http_err.response is not None and hasattr(http_err.response, 'text'):
+                response_text_preview = http_err.response.text[:200]
+            
+            core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}HTTPError {status_code} for chunk. Response: {response_text_preview}")
+            if status_code == 413: # Payload too large
+                 core.logger.error(f"[{service_name}] gtranslate: {log_prefix}HTTPError 413 (Payload Too Large). This should be prevented by caller. Using placeholders.")
+                 translated_segments_for_this_call_final = [placeholder_str if line.strip() else "" for line in lines_to_translate]
+                 break
+            if status_code == 429 and attempt < MAX_RETRIES_HTTP: # Rate Limit
+                delay = RETRY_DELAY_BASE_SECONDS * (2 ** attempt)
+                core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}HTTPError 429 (Rate Limit). Retrying in {delay}s...")
+                time.sleep(delay)
+                continue
+            # Other HTTP errors, or 429 on last attempt
+            if attempt < MAX_RETRIES_HTTP :
+                delay = RETRY_DELAY_BASE_SECONDS * (2 ** attempt)
+                time.sleep(delay)
+                continue # Retry non-fatal HTTP errors
+            else: # Last attempt
+                core.logger.error(f"[{service_name}] gtranslate: {log_prefix}HTTPError {status_code}: {http_err} after {MAX_RETRIES_HTTP+1} attempts. Using placeholders.")
+                translated_segments_for_this_call_final = [placeholder_str if line.strip() else "" for line in lines_to_translate]
+                break
+        except system_requests.exceptions.Timeout as e_timeout:
+            core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Timeout: {e_timeout}")
+            if attempt < MAX_RETRIES_HTTP:
+                delay = RETRY_DELAY_BASE_SECONDS * (2**attempt)
+                time.sleep(delay)
+                continue
+            core.logger.error(f"[{service_name}] gtranslate: {log_prefix}Timeout after {MAX_RETRIES_HTTP+1} attempts. Using placeholders.")
+            translated_segments_for_this_call_final = [placeholder_str if line.strip() else "" for line in lines_to_translate]
+            break
+        except ValueError as e_json_or_parse: # Includes JSONDecodeError
+            response_text_preview = r.text[:200] if r and hasattr(r, 'text') else "N/A"
+            core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}ValueError (e.g. JSONDecodeError): {e_json_or_parse}. Response: {response_text_preview}")
+            if attempt < MAX_RETRIES_HTTP:
+                delay = RETRY_DELAY_BASE_SECONDS * (2**attempt)
+                time.sleep(delay)
+                continue
+            core.logger.error(f"[{service_name}] gtranslate: {log_prefix}ValueError after {MAX_RETRIES_HTTP+1} attempts. Using placeholders.")
+            translated_segments_for_this_call_final = [placeholder_str if line.strip() else "" for line in lines_to_translate]
+            break
+        except Exception as e_unexp:
+            response_text_preview = r.text[:200] if r and hasattr(r, 'text') else "N/A"
+            core.logger.debug(f"[{service_name}] gtranslate: {log_prefix}Unexpected error: {e_unexp}. Response: {response_text_preview}")
+            if attempt < MAX_RETRIES_HTTP:
+                delay = RETRY_DELAY_BASE_SECONDS * (2**attempt)
+                time.sleep(delay)
+                continue
+            core.logger.error(f"[{service_name}] gtranslate: {log_prefix}Unexpected error after {MAX_RETRIES_HTTP+1} attempts. Using placeholders.")
+            translated_segments_for_this_call_final = [placeholder_str if line.strip() else "" for line in lines_to_translate]
+            break
+            
+    if translated_segments_for_this_call_final is None:
+        core.logger.error(f"[{service_name}] gtranslate: {log_prefix}Translation attempt loop completed without setting final segments. Critical logic error. Using placeholders.")
+        translated_segments_for_this_call_final = [placeholder_str if line.strip() else "" for line in lines_to_translate]
 
-    return all_translated_segments, final_detected_lang_for_chunk
+    # Ensure the returned list has the same number of elements as the input
+    if len(translated_segments_for_this_call_final) != len(lines_to_translate):
+        core.logger.error(f"[{service_name}] gtranslate: {log_prefix}CRITICAL MISMATCH: Final segment count ({len(translated_segments_for_this_call_final)}) != input count ({len(lines_to_translate)}). Padding/truncating.")
+        # This should ideally not happen with the new logic.
+        if len(translated_segments_for_this_call_final) < len(lines_to_translate):
+            padding = [placeholder_str if lines_to_translate[i].strip() else "" for i in range(len(translated_segments_for_this_call_final), len(lines_to_translate))]
+            translated_segments_for_this_call_final.extend(padding)
+        else:
+            translated_segments_for_this_call_final = translated_segments_for_this_call_final[:len(lines_to_translate)]
+            
+    return translated_segments_for_this_call_final, detected_lang_for_this_call
 # END OF REPLACEMENT _gtranslate_text_chunk
 # END OF DEFINITIONS FOR CLIENT-SIDE TRANSLATION
 
@@ -515,7 +615,7 @@ def _upload_translation_to_subtitlecat(core, service_name, translated_srt_conten
     except system_requests.exceptions.RequestException as e:
         core.logger.error(f"[{service_name}] RequestException during subtitle upload: {e}")
         return None
-    except ValueError as e_json:
+    except ValueError as e_json: # Catches JSONDecodeError
         response_text_preview = response.text[:200] if 'response' in locals() and hasattr(response, 'text') else 'N/A'
         core.logger.error(f"[{service_name}] JSONDecodeError parsing Subtitlecat upload response: {e_json}. Response text: {response_text_preview}")
         return None
@@ -755,7 +855,7 @@ def parse_search_response(core, service_name, meta, response):
 
             except system_requests.exceptions.RequestException as req_exc_shared:
                 core.logger.error(f"[{service_name}] RequestException fetching shared translation for '{constructed_filename}': {req_exc_shared}")
-            except ValueError as val_err_shared:
+            except ValueError as val_err_shared: # Catches JSONDecodeError
                 core.logger.error(f"[{service_name}] ValueError (JSON decode) fetching shared translation for '{constructed_filename}': {val_err_shared}")
             except Exception as e_shared:
                 core.logger.error(f"[{service_name}] Unexpected error fetching shared translation for '{constructed_filename}': {e_shared}")
@@ -818,8 +918,8 @@ def parse_search_response(core, service_name, meta, response):
                     action_args.update({
                         'needs_client_side_translation': True,
                         'original_srt_url': source_srt_url,
-                        'target_translation_lang': target_translation_lang,
-                        'url': '',
+                        'target_translation_lang': target_translation_lang, # This is SC lang code (e.g. 'en', 'pt-br')
+                        'url': '', # No direct download URL yet
                     })
                     item_color = 'yellow'
                 else:
@@ -844,6 +944,9 @@ def parse_search_response(core, service_name, meta, response):
 def build_download_request(core, service_name, args):
     _filename_from_args = args.get('filename', 'unknown_subtitle.srt')
     core.logger.debug(f"[{service_name}] Building download request for: {_filename_from_args}, Args: {str(args)[:500]}")
+    
+    placeholder_str = _get_setting(core, "subtitlecat_translation_failed_placeholder", DEFAULT_TRANSLATION_FAILED_PLACEHOLDER)
+
 
     def _save_from_subtitlecat_url(path_from_core, url_to_download):
         _timeout = _get_setting(core, "http_timeout", 15)
@@ -874,133 +977,170 @@ def build_download_request(core, service_name, args):
     if args.get('needs_client_side_translation'):
         core.logger.debug(f"[{service_name}] Starting client-side translation for '{_filename_from_args}'")
         original_srt_url = args['original_srt_url']
-        target_gtranslate_lang = args['target_translation_lang'] # This is the SC lang code, e.g., 'en', 'es', 'pt-br'
+        target_gtranslate_lang = args['target_translation_lang']
+        original_srt_text_content = "" # To store original srt text for error reporting
 
         try:
             core.logger.debug(f"[{service_name}] Downloading original SRT from: {original_srt_url}")
             dl_timeout = _get_setting(core, "http_timeout", 20)
             original_srt_response = _SC_SESSION.get(original_srt_url, timeout=dl_timeout)
             original_srt_response.raise_for_status()
-            original_srt_text = original_srt_response.text # Assuming UTF-8 from Subtitlecat for original
-            core.logger.debug(f"[{service_name}] Downloaded original SRT content ({len(original_srt_text)} chars).")
+            original_srt_text_content = original_srt_response.text # Assuming UTF-8 from Subtitlecat
+            core.logger.debug(f"[{service_name}] Downloaded original SRT content ({len(original_srt_text_content)} chars).")
 
-            parsed_subs = list(srt.parse(original_srt_text))
+            parsed_subs = list(srt.parse(original_srt_text_content))
             core.logger.debug(f"[{service_name}] Parsed {len(parsed_subs)} subtitle items from original SRT.")
+            
+            contains_any_tags_globally = False
 
-            translatable_items_info = [] # Stores {'original_idx': ..., 'map': ..., 'protected_text': ...}
-            for sub_item_idx, sub_item in enumerate(parsed_subs):
-                # Preserve internal newlines within a single subtitle line using a marker
-                content_with_newline_placeholders = sub_item.content.replace('\n', _SC_NEWLINE_MARKER_)
-                # Protect HTML-like tags
-                protected_text_with_placeholders, tags_map_for_item, is_all_tag_line = _protect_subtitle_tags(content_with_newline_placeholders)
+            all_logical_lines_original_protected = []
+            logical_line_metadata = [] 
 
-                if is_all_tag_line: 
-                    # If line is only tags, no need to translate. Content will remain original.
-                    pass
-                else:
-                    translatable_items_info.append({
-                        'original_idx': sub_item_idx,      # Index in parsed_subs
-                        'map': tags_map_for_item,           # Tags for this item
-                        'protected_text': protected_text_with_placeholders # Text to translate
+            for srt_idx, srt_item in enumerate(parsed_subs):
+                original_logical_lines_for_srt_item = srt_item.content.split('\n')
+                for logical_line_idx, logical_line_content in enumerate(original_logical_lines_for_srt_item):
+                    protected_text, tags_map, is_all_tag_line = _protect_subtitle_tags(logical_line_content)
+                    if tags_map:
+                        contains_any_tags_globally = True
+                    all_logical_lines_original_protected.append(protected_text)
+                    logical_line_metadata.append({
+                        'original_srt_item_idx': srt_idx,
+                        'original_logical_line_idx_within_srt_item': logical_line_idx,
+                        'tags_map_for_this_logical_line': tags_map,
+                        'is_all_tag_logical_line': is_all_tag_line
                     })
+            core.logger.debug(f"[{service_name}] Prepared {len(all_logical_lines_original_protected)} logical lines for translation processing.")
 
-            core.logger.debug(f"[{service_name}] Identified {len(translatable_items_info)} translatable subtitle items (excluding all-tag lines).")
+            texts_to_translate_for_api = []
+            source_indices_map_for_api_texts = [] 
 
-            all_detected_source_langs_overall = [] # Collect detected source langs from all translation calls
-            batch_delay_seconds = _get_setting(core, "subtitlecat_translation_batch_delay", 0.0) # Delay between API calls
+            for original_idx, line_content in enumerate(all_logical_lines_original_protected):
+                if not logical_line_metadata[original_idx]['is_all_tag_logical_line']:
+                    texts_to_translate_for_api.append(line_content)
+                    source_indices_map_for_api_texts.append(original_idx)
+            
+            core.logger.debug(f"[{service_name}] Found {len(texts_to_translate_for_api)} actual text lines requiring translation API calls.")
 
-            if not translatable_items_info:
-                core.logger.debug(f"[{service_name}] No translatable items found after parsing. Skipping translation API calls.")
+            all_translated_pure_text_lines_from_google = [] # This will store results from _gtranslate_text_chunk
+            all_detected_source_langs_overall = []
+
+            current_api_batch_lines_for_google = []
+            current_api_batch_char_count = 0
+            
+            api_char_limit = GOOGLE_API_Q_PARAM_CHAR_LIMIT
+            api_line_limit = MAX_LINES_PER_API_CALL_CONFIG
+            batch_delay_setting = _get_setting(core, "subtitlecat_translation_batch_delay", DEFAULT_BATCH_DELAY_SECONDS)
+
+            if not texts_to_translate_for_api:
+                 core.logger.debug(f"[{service_name}] No text lines to translate after filtering all-tag lines. Skipping API calls.")
             else:
-                current_char_batch_protected_texts = [] # List of protected texts for the current character-limited batch
-                current_char_batch_item_infos = []    # Corresponding item_info objects
-                accumulated_chars_in_char_batch = 0
+                for i, protected_text_line_for_google in enumerate(texts_to_translate_for_api):
+                    line_char_count = len(protected_text_line_for_google)
+                    potential_new_char_count = current_api_batch_char_count + line_char_count + (1 if current_api_batch_lines_for_google else 0)
 
-                for i, item_info in enumerate(translatable_items_info):
-                    protected_text_to_add = item_info['protected_text']
-                    
-                    # Calculate potential size if this item is added to the current character batch
-                    # Add 1 for the newline delimiter used when joining texts for _gtranslate_text_chunk
-                    potential_new_size = accumulated_chars_in_char_batch + len(protected_text_to_add) + \
-                                         (1 if current_char_batch_protected_texts else 0)
-
-                    # If this item makes the character batch too large, process the current batch first
-                    if potential_new_size > CHARS_PER_BATCH and current_char_batch_protected_texts:
-                        core.logger.debug(f"[{service_name}] Processing character-batch of {len(current_char_batch_protected_texts)} items, {accumulated_chars_in_char_batch} chars, for translation.")
+                    if current_api_batch_lines_for_google and \
+                    (potential_new_char_count > api_char_limit or len(current_api_batch_lines_for_google) >= api_line_limit):
+                        core.logger.debug(f"[{service_name}] Processing API batch of {len(current_api_batch_lines_for_google)} lines, {current_api_batch_char_count} chars.")
                         
-                        batch_to_translate_str = "\n".join(current_char_batch_protected_texts)
-                        
-                        translated_segments_list, detected_lang_from_chunk = _gtranslate_text_chunk(
-                            batch_to_translate_str, target_gtranslate_lang, core, service_name
+                        translated_segments, detected_lang_from_chunk = _gtranslate_text_chunk(
+                            current_api_batch_lines_for_google, target_gtranslate_lang, core, service_name
                         )
                         
-                        if len(translated_segments_list) == len(current_char_batch_protected_texts):
-                            core.logger.debug(f"[{service_name}] Translation chunk processed. Received {len(translated_segments_list)} segments. Detected lang: {detected_lang_from_chunk}")
-                            if detected_lang_from_chunk and detected_lang_from_chunk != "auto":
-                                all_detected_source_langs_overall.append(detected_lang_from_chunk)
-                            
-                            for j, translated_segment_text in enumerate(translated_segments_list):
-                                info_for_segment = current_char_batch_item_infos[j]
-                                restored_text_with_tags = _restore_subtitle_tags(translated_segment_text, info_for_segment['map'])
-                                final_content_unescaped = html.unescape(restored_text_with_tags)
-                                final_content_with_newlines = final_content_unescaped.replace(_SC_NEWLINE_MARKER_, '\n')
-                                parsed_subs[info_for_segment['original_idx']].content = final_content_with_newlines
-                            
-                            if batch_delay_seconds > 0 and i < len(translatable_items_info) -1 : 
-                                time.sleep(batch_delay_seconds)
+                        # _gtranslate_text_chunk should now always return a list of the same length
+                        if len(translated_segments) != len(current_api_batch_lines_for_google):
+                            core.logger.error(f"[{service_name}] CRITICAL MISMATCH: _gtranslate_text_chunk returned {len(translated_segments)}, expected {len(current_api_batch_lines_for_google)}. This indicates an issue in _gtranslate_text_chunk's padding/error handling.")
+                            # Attempt to self-correct length for safety, though _gtranslate_text_chunk should prevent this
+                            corrected_segments = [placeholder_str if line.strip() else "" for line in current_api_batch_lines_for_google] # Default to all placeholders
+                            for k_idx in range(min(len(translated_segments), len(corrected_segments))):
+                                corrected_segments[k_idx] = translated_segments[k_idx]
+                            all_translated_pure_text_lines_from_google.extend(corrected_segments)
                         else:
-                            core.logger.error(f"[{service_name}] Mismatch from _gtranslate_text_chunk: Expected {len(current_char_batch_protected_texts)}, got {len(translated_segments_list)}. Using original texts for this batch.")
-                            for j, item_info_in_failed_batch in enumerate(current_char_batch_item_infos):
-                                original_protected_text = item_info_in_failed_batch['protected_text']
-                                restored_text = _restore_subtitle_tags(original_protected_text, item_info_in_failed_batch['map'])
-                                final_content = html.unescape(restored_text).replace(_SC_NEWLINE_MARKER_, '\n')
-                                parsed_subs[item_info_in_failed_batch['original_idx']].content = final_content
+                            all_translated_pure_text_lines_from_google.extend(translated_segments)
                         
-                        current_char_batch_protected_texts = []
-                        current_char_batch_item_infos = []
-                        accumulated_chars_in_char_batch = 0
-
-                    current_char_batch_protected_texts.append(protected_text_to_add)
-                    current_char_batch_item_infos.append(item_info)
-                    accumulated_chars_in_char_batch += len(protected_text_to_add) + \
-                                                       (1 if len(current_char_batch_protected_texts) > 1 else 0)
-
-                if current_char_batch_protected_texts:
-                    core.logger.debug(f"[{service_name}] Processing final character-batch of {len(current_char_batch_protected_texts)} items, {accumulated_chars_in_char_batch} chars.")
-                    batch_to_translate_str = "\n".join(current_char_batch_protected_texts)
-                    
-                    translated_segments_list, detected_lang_from_chunk = _gtranslate_text_chunk(
-                        batch_to_translate_str, target_gtranslate_lang, core, service_name
-                    )
-
-                    if len(translated_segments_list) == len(current_char_batch_protected_texts):
-                        core.logger.debug(f"[{service_name}] Final translation chunk processed. Received {len(translated_segments_list)} segments. Detected lang: {detected_lang_from_chunk}")
                         if detected_lang_from_chunk and detected_lang_from_chunk != "auto":
                             all_detected_source_langs_overall.append(detected_lang_from_chunk)
                         
-                        for j, translated_segment_text in enumerate(translated_segments_list):
-                            info_for_segment = current_char_batch_item_infos[j]
-                            restored_text_with_tags = _restore_subtitle_tags(translated_segment_text, info_for_segment['map'])
-                            final_content_unescaped = html.unescape(restored_text_with_tags)
-                            final_content_with_newlines = final_content_unescaped.replace(_SC_NEWLINE_MARKER_, '\n')
-                            parsed_subs[info_for_segment['original_idx']].content = final_content_with_newlines
+                        current_api_batch_lines_for_google = []
+                        current_api_batch_char_count = 0
+                        
+                        if batch_delay_setting > 0 and i < len(texts_to_translate_for_api):
+                            time.sleep(batch_delay_setting)
+
+                    current_api_batch_lines_for_google.append(protected_text_line_for_google)
+                    current_api_batch_char_count += line_char_count
+                    if len(current_api_batch_lines_for_google) > 1:
+                        current_api_batch_char_count += 1
+                
+                if current_api_batch_lines_for_google:
+                    core.logger.debug(f"[{service_name}] Processing final API batch of {len(current_api_batch_lines_for_google)} lines, {current_api_batch_char_count} chars.")
+                    translated_segments, detected_lang_from_chunk = _gtranslate_text_chunk(
+                        current_api_batch_lines_for_google, target_gtranslate_lang, core, service_name
+                    )
+
+                    if len(translated_segments) != len(current_api_batch_lines_for_google):
+                        core.logger.error(f"[{service_name}] CRITICAL MISMATCH (final batch): _gtranslate_text_chunk returned {len(translated_segments)}, expected {len(current_api_batch_lines_for_google)}. This indicates an issue in _gtranslate_text_chunk's padding/error handling.")
+                        corrected_segments = [placeholder_str if line.strip() else "" for line in current_api_batch_lines_for_google]
+                        for k_idx in range(min(len(translated_segments), len(corrected_segments))):
+                                corrected_segments[k_idx] = translated_segments[k_idx]
+                        all_translated_pure_text_lines_from_google.extend(corrected_segments)
                     else:
-                        core.logger.error(f"[{service_name}] Mismatch from _gtranslate_text_chunk for final batch: Expected {len(current_char_batch_protected_texts)}, got {len(translated_segments_list)}. Using original texts.")
-                        for j, item_info_in_failed_batch in enumerate(current_char_batch_item_infos):
-                            original_protected_text = item_info_in_failed_batch['protected_text']
-                            restored_text = _restore_subtitle_tags(original_protected_text, item_info_in_failed_batch['map'])
-                            final_content = html.unescape(restored_text).replace(_SC_NEWLINE_MARKER_, '\n')
-                            parsed_subs[item_info_in_failed_batch['original_idx']].content = final_content
-                    
-                    current_char_batch_protected_texts.clear()
-                    current_char_batch_item_infos.clear()
+                        all_translated_pure_text_lines_from_google.extend(translated_segments)
+
+                    if detected_lang_from_chunk and detected_lang_from_chunk != "auto":
+                        all_detected_source_langs_overall.append(detected_lang_from_chunk)
+            
+            final_flat_processed_logical_lines = [""] * len(all_logical_lines_original_protected)
+            current_translated_text_idx = 0
+
+            for original_idx, original_protected_line_val in enumerate(all_logical_lines_original_protected):
+                meta_for_line = logical_line_metadata[original_idx]
+                if meta_for_line['is_all_tag_logical_line']:
+                    final_flat_processed_logical_lines[original_idx] = original_protected_line_val
+                else:
+                    if current_translated_text_idx < len(all_translated_pure_text_lines_from_google):
+                        translated_line_from_google = all_translated_pure_text_lines_from_google[current_translated_text_idx]
+                        
+                        # If the line is a placeholder, don't restore tags or unescape
+                        if translated_line_from_google == placeholder_str:
+                            final_flat_processed_logical_lines[original_idx] = placeholder_str
+                        else:
+                            restored_line = translated_line_from_google
+                            if contains_any_tags_globally and meta_for_line['tags_map_for_this_logical_line']:
+                                restored_line = _restore_subtitle_tags(translated_line_from_google, meta_for_line['tags_map_for_this_logical_line'])
+                            final_flat_processed_logical_lines[original_idx] = html.unescape(restored_line)
+                        current_translated_text_idx += 1
+                    else:
+                        core.logger.error(f"[{service_name}] Mismatch during final reconstruction. Expected translated text for original_idx {original_idx} but ran out. Using placeholder.")
+                        final_flat_processed_logical_lines[original_idx] = placeholder_str if all_logical_lines_original_protected[original_idx].strip() else ""
+            
+            if current_translated_text_idx != len(all_translated_pure_text_lines_from_google):
+                 core.logger.error(f"[{service_name}] Mismatch: Processed {current_translated_text_idx} translated lines, but API processing yielded {len(all_translated_pure_text_lines_from_google)}. Some translations might be unused or placeholders inserted incorrectly.")
+
+            flat_line_cursor = 0
+            for srt_idx_rebuild, srt_item_rebuild in enumerate(parsed_subs):
+                num_logical_lines_in_this_srt_item = srt_item_rebuild.content.count('\n') + 1
+                end_slice = min(flat_line_cursor + num_logical_lines_in_this_srt_item, len(final_flat_processed_logical_lines))
+                new_content_lines_for_srt_item = final_flat_processed_logical_lines[flat_line_cursor : end_slice]
+                
+                if len(new_content_lines_for_srt_item) != num_logical_lines_in_this_srt_item:
+                    core.logger.error(f"[{service_name}] Mismatch during SRT item reconstruction for srt_idx {srt_idx_rebuild}. Expected {num_logical_lines_in_this_srt_item} lines, got {len(new_content_lines_for_srt_item)}. Padding with empty strings.")
+                    # Pad with empty strings to maintain structure
+                    padding_count = num_logical_lines_in_this_srt_item - len(new_content_lines_for_srt_item)
+                    if padding_count > 0:
+                        new_content_lines_for_srt_item.extend([""] * padding_count)
+
+                parsed_subs[srt_idx_rebuild].content = "\n".join(new_content_lines_for_srt_item)
+                flat_line_cursor += num_logical_lines_in_this_srt_item
+            
+            if flat_line_cursor != len(final_flat_processed_logical_lines):
+                 core.logger.error(f"[{service_name}] Mismatch: Processed {flat_line_cursor} flat lines for SRT reconstruction, but had {len(final_flat_processed_logical_lines)} total. SRT structure might be incorrect.")
 
             overall_detected_source_lang = "auto"
-            if all_detected_source_langs_overall: # This list is already filtered for non-"auto" values
+            if all_detected_source_langs_overall:
                 counts = Counter(all_detected_source_langs_overall)
                 if counts:
                     overall_detected_source_lang = counts.most_common(1)[0][0]
-            core.logger.debug(f"[{service_name}] Overall detected source language for translation: {overall_detected_source_lang}")
+            core.logger.debug(f"[{service_name}] Overall detected source language from API calls: {overall_detected_source_lang}")
 
             final_translated_srt_str = srt.compose(parsed_subs)
             core.logger.debug(f"[{service_name}] Successfully composed translated SRT string ({len(final_translated_srt_str)} chars).")
@@ -1008,12 +1148,11 @@ def build_download_request(core, service_name, args):
             new_url_from_sc = None
             if _get_setting(core, 'subtitlecat_upload_translations', False):
                 core.logger.debug(f"[{service_name}] Uploading client-translated subtitle is enabled.")
-
                 sc_original_filename_stem = "unknown_stem"
                 try:
                     parsed_url_path = urllib.parse.urlparse(original_srt_url).path
                     sc_original_filename_stem = urllib.parse.unquote(parsed_url_path.split('/')[-1])
-                    if not sc_original_filename_stem and '/' in parsed_url_path: 
+                    if not sc_original_filename_stem and '/' in parsed_url_path:
                          sc_original_filename_stem = urllib.parse.unquote(parsed_url_path.split('/')[-2])
                     if sc_original_filename_stem.lower().endswith(".srt"):
                         sc_original_filename_stem = sc_original_filename_stem[:-4]
@@ -1021,7 +1160,7 @@ def build_download_request(core, service_name, args):
                 except Exception as e_parse_stem:
                     core.logger.error(f"[{service_name}] Error parsing original_srt_url for filename stem: {e_parse_stem}. Using default '{sc_original_filename_stem}'.")
 
-                target_sc_lang_code_for_upload = args.get('lang_code') 
+                target_sc_lang_code_for_upload = args.get('lang_code')
                 if not target_sc_lang_code_for_upload:
                      core.logger.error(f"[{service_name}] Could not determine target Subtitlecat language code for upload (args['lang_code'] missing). Aborting upload.")
                 else:
@@ -1031,13 +1170,9 @@ def build_download_request(core, service_name, args):
                         overall_detected_source_lang_for_upload = "en" 
 
                     new_url_from_sc = _upload_translation_to_subtitlecat(
-                        core,
-                        service_name,
-                        final_translated_srt_str,
-                        target_sc_lang_code_for_upload, 
-                        sc_original_filename_stem,      
-                        overall_detected_source_lang_for_upload, 
-                        args.get('detail_url')          
+                        core, service_name, final_translated_srt_str,
+                        target_sc_lang_code_for_upload, sc_original_filename_stem,      
+                        overall_detected_source_lang_for_upload, args.get('detail_url')          
                     )
             else:
                 core.logger.debug(f"[{service_name}] Uploading client-translated subtitle is disabled by setting.")
@@ -1047,17 +1182,16 @@ def build_download_request(core, service_name, args):
                 cache_key_lang = args.get('lang_code', target_gtranslate_lang).lower()
                 _TRANSLATED_CACHE[(args.get('detail_url'), cache_key_lang)] = new_url_from_sc
                 core.logger.debug(f"[{service_name}] Stored translated URL in _TRANSLATED_CACHE for key ({args.get('detail_url')}, {cache_key_lang})")
-
                 return {
                     'method': 'REQUEST_CALLBACK',
                     'save_callback': lambda path: _save_from_subtitlecat_url(path, new_url_from_sc),
-                    'filename': _filename_from_args, 
+                    'filename': _filename_from_args,
                 }
             else:
                 core.logger.debug(f"[{service_name}] Upload failed or disabled. Using locally translated SRT content directly.")
                 def _save_client_translated_srt(path_from_core):
                     try:
-                        import io 
+                        import io
                         bom = _get_setting(core, 'force_bom', False)
                         final_encoding = 'utf-8-sig' if bom else 'utf-8'
                         with io.open(path_from_core, 'w', encoding=final_encoding) as f:
@@ -1067,18 +1201,17 @@ def build_download_request(core, service_name, args):
                     except Exception as e_save:
                         core.logger.error(f"[{service_name}] Failed to save client-translated SRT to '{path_from_core}': {e_save}")
                         return False
-
                 return {
-                    'method': 'CLIENT_SIDE_TRANSLATED', 
-                    'url': args['original_srt_url'],    
+                    'method': 'CLIENT_SIDE_TRANSLATED',
+                    'url': args['original_srt_url'],
                     'save_callback': _save_client_translated_srt,
                     'filename': _filename_from_args,
                 }
         except system_requests.exceptions.RequestException as e_req:
             core.logger.error(f"[{service_name}] Client-side translation: Network error downloading original SRT {original_srt_url}: {e_req}")
-            raise 
+            raise
         except srt.SRTParseError as e_srt:
-            core.logger.error(f"[{service_name}] Client-side translation: SRT parsing error for {original_srt_url}: {e_srt}. Content preview: {original_srt_text[:200]}")
+            core.logger.error(f"[{service_name}] Client-side translation: SRT parsing error for {original_srt_url}: {e_srt}. Content preview: {original_srt_text_content[:200] if isinstance(original_srt_text_content, str) else 'N/A'}")
             raise
         except Exception as e_pipeline:
             core.logger.error(f"[{service_name}] Client-side translation pipeline failed for '{_filename_from_args}': {e_pipeline}")
@@ -1092,8 +1225,6 @@ def build_download_request(core, service_name, args):
 
         def _save_shared_srt(path_from_core):
             try:
-                import io
-                
                 current_srt_text_str = ""
                 if isinstance(srt_content_to_save, bytes):
                     core.logger.debug(f"[{service_name}] Shared SRT content was bytes, decoding as UTF-8.")
@@ -1113,23 +1244,23 @@ def build_download_request(core, service_name, args):
                 return False
 
         return {
-            'method': 'REQUEST_CALLBACK', 
+            'method': 'REQUEST_CALLBACK',
             'save_callback': _save_shared_srt,
             'filename': args.get('filename'),
         }
 
-    else: 
+    else:
         core.logger.debug(f"[{service_name}] Proceeding with standard download for '{_filename_from_args}'.")
         final_url_for_direct_dl = args.get('url', '')
 
         if not final_url_for_direct_dl:
-            error_msg = f"[{service_name}] Final URL for '{_filename_from_args}' is empty. (Args: {args}). Cannot download."
+            error_msg = f"[{service_name}] Final URL for '{_filename_from_args}' is empty. (Args: {str(args)[:200]}). Cannot download."
             core.logger.error(error_msg)
             raise ValueError(error_msg) 
 
         core.logger.debug(f"[{service_name}] Prepared direct download request for '{_filename_from_args}' from {final_url_for_direct_dl}.")
         return {
-            'method': 'REQUEST_CALLBACK', 
+            'method': 'REQUEST_CALLBACK',
             'save_callback': lambda path: _save_from_subtitlecat_url(path, final_url_for_direct_dl),
             'filename': _filename_from_args,
         }
