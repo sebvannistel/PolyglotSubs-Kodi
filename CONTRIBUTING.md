@@ -1,6 +1,7 @@
 # Contributing to PolyglotSubs-Kodi
 
 First off, thank you for considering contributing to PolyglotSubs-Kodi! Your help is appreciated.
+Please note that this project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
 ## How Can I Contribute?
 
@@ -27,24 +28,21 @@ We welcome pull requests for bug fixes and improvements.
     python -m venv .venv
     source .venv/bin/activate  # On Windows use `source .venv\Scripts\activate`
     ```
-4.  **Dependencies for Linting/Testing (if any):**
-    If there's a `requirements-dev.txt` or similar, install those:
+4.  **Dependencies for Linting/Testing:**
+    Install development dependencies (linters, test runners):
     ```bash
-    # pip install -r requirements-dev.txt 
-    # (Note: Check if such a file exists or if standard library/Kodi environment is assumed for most dev tasks)
+    pip install -r requirements-dev.txt 
     ```
-    The project uses `.flake8` for linting. You can install it locally:
-    ```bash
-    pip install flake8
-    ```
+    The project uses `.flake8` for linting.
 
-#### Running Tests
-*   The repository contains a `tests/` directory. Explore this directory for existing tests.
-*   To run tests, you might need to set up a Kodi development environment or use a mock environment if provided. (Further details on running tests would ideally be added here if specific test runners or setups are standard for this project).
-*   For now, ensure your changes pass linting:
+#### Running Linters and Tests
+*   **Linting:** Ensure your changes pass linting before submitting:
     ```bash
     flake8 .
     ```
+*   **Tests:** The repository may contain a `tests/` directory.
+    *   (Placeholder: Add specific instructions here if you have a test suite, e.g., `pytest`)
+    *   For Kodi addon development, testing can sometimes involve mocking Kodi's environment or running within a Kodi development setup. Please describe any specific test procedures if applicable.
 
 #### Coding Standards
 *   Please follow the existing code style.
@@ -64,7 +62,7 @@ We welcome pull requests for bug fixes and improvements.
 4.  Open a pull request from your fork to the main `PolyglotSubs-Kodi` repository.
 5.  Provide a clear description of the changes in your pull request. Explain the problem you're solving or the feature you're adding.
 
-## Code of Conduct
-While this project does not have a formal Code of Conduct, please be respectful and constructive in all interactions.
+### Considering Upstream Contributions
+While this is a fork with specific modifications (like Subtitlecat.com integration), if you develop a general improvement or bug fix that could benefit the original [a4kSubtitles](https://github.com/a4k-openproject/a4kSubtitles) project, please consider opening an issue or pull request there as well. Collaborative efforts benefit the entire community.
 
 Thank you!
