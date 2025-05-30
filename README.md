@@ -152,26 +152,13 @@ To install this specific version of a4kSubtitles:
 
 This section explains common user actions. The general process of searching and selecting subtitles is also visually demonstrated in the "Preview" section below.
 
-### Manual Subtitle Search
+### Subtitle Search
 
 1.  **Access Player Controls:** While your video is playing, access the video player controls. This might vary by Kodi skin, but often involves pressing 'Enter', 'OK', or a menu button on your remote.
 2.  **Open Subtitles Menu:** Navigate to the Subtitles icon/button (often looks like a speech bubble or 'cc' icon) within the player controls.
 3.  **Search Process:** PolyglotSubs-Kodi will then search for subtitles using your enabled providers. If multiple services are active, this might take a few moments.
 4.  **Select and Download:** You'll be presented with a list of found subtitles. Results are typically sorted by relevance or language. Select a subtitle from the list to download and display it on your video. If "subtitlecat.com" is shown in yellow colour it means that the subtitles have not been translated yet. Therefore when you select it you need to give it around 2-3min time to translate. After it finished it will download automatically.
 
-### Setting Preferred Languages
-
-Setting your preferred languages helps the addon find the most relevant subtitles for you.
-
-1.  **Navigate to Addon Settings:**
-    *   Go to KODI's main menu: **Settings** (gear icon).
-    *   Then navigate to **Add-ons**.
-    *   Select **My add-ons** -> **Subtitle add-ons**.
-    *   Find and select **PolyglotSubs-Kodi** from the list.
-    *   Click on **Configure** (or **Settings**).
-2.  **Set Languages:**
-    *   In the addon settings, look for language options. You can typically select a "Primary Language", "Secondary Language", and sometimes a "Tertiary Language".
-    *   The addon will prioritize search results in these languages.
 
 ### Subtitlecat.com Integration
 
