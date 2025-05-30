@@ -133,3 +133,6 @@ tmp
 .idea
 pyrightconfig.json
 .vim
+
+# Local utility scripts or developer tools
+gitpush.bat
