@@ -111,6 +111,10 @@ _TRANSLATED_CACHE = SimpleLRUCache(maxsize=64) # survives for the lifetime of th
 # Key: (original_srt_url, target_gtranslate_lang_code), Value: {'srt_content': '...', 'detected_source_lang': '...'}
 _CLIENT_TRANSLATED_CONTENT_CACHE = SimpleLRUCache(maxsize=128)
 
+# ADDED: Custom exception for user cancellation
+class UserCancelledTranslation(Exception):
+    """Custom exception raised when the user cancels the translation process."""
+    pass
 
 #######################################################################
 # 1. helper ­- title similarity
@@ -1173,6 +1177,14 @@ def build_download_request(core, service_name, args):
     
     placeholder_str = _get_setting(core, "subtitlecat_translation_failed_placeholder", DEFAULT_TRANSLATION_FAILED_PLACEHOLDER)
 
+    # Ensure core.kodi is available for get_progress_dialog
+    if not hasattr(core, 'kodi') or not core.kodi:
+        # This is a fallback or error logging, as progress dialog cannot be used.
+        # The core logic should ideally ensure kodi context is available when needed.
+        core.logger.error(f"[{service_name}] core.kodi not available. Progress dialog cannot be used for client-side translation.")
+        # Depending on strictness, could raise an error or proceed without progress.
+        # For now, let it proceed, and the subsequent progress_dialog calls will fail if not handled.
+
     if args.get('needs_client_side_translation') and _get_setting(core, "debug", False):
         source_lang_override_setting = _get_setting(core, "subtitlecat_source_lang_override", "auto").strip().lower()
         if source_lang_override_setting and source_lang_override_setting != "auto":
@@ -1242,7 +1254,8 @@ def build_download_request(core, service_name, args):
         cache_key_content = (original_srt_url, target_gtranslate_lang)
         cached_content_data = _CLIENT_TRANSLATED_CONTENT_CACHE.get(cache_key_content)
         
-        try: # This try block no longer needs a finally for loop cleanup
+        progress_dialog = None
+        try: # This try block now includes progress dialog management
             if cached_content_data:
                 core.logger.debug(f"[{service_name}] Using cached client-translated SRT content for {original_srt_url} to {target_gtranslate_lang}.")
                 final_translated_srt_str = cached_content_data['srt_content']
@@ -1301,6 +1314,22 @@ def build_download_request(core, service_name, args):
                 if not texts_to_translate_for_api:
                      core.logger.debug(f"[{service_name}] No text lines to translate after filtering. Skipping API calls.")
                 else:
+                    # Initialize progress dialog here, only if there are lines to translate
+                    # and not using cached content.
+                    if hasattr(core, 'kodi') and core.kodi and hasattr(core, 'addon'): # Check for core.addon as well
+                        progress_dialog = core.kodi.get_progress_dialog()
+                        # Use new language string IDs
+                        title = core.addon.getLocalizedString(33401) # Translating Subtitles
+                        initial_message = core.addon.getLocalizedString(33403) # Initializing translation...
+                        # Use display_name for the service as title, and localized initial_message
+                        progress_dialog.create(core.services.get(service_name).display_name, initial_message)
+                    else:
+                        core.logger.warning(f"[{service_name}] core.kodi, core.addon, or get_progress_dialog not available when translation starts. No progress will be shown.")
+                        progress_dialog = None # Ensure it's None if creation failed
+
+                    total_lines_to_translate_api = len(texts_to_translate_for_api)
+                    processed_lines_for_api_count = 0
+
                     for i, protected_text_line_for_google in enumerate(texts_to_translate_for_api):
                         line_char_count = len(protected_text_line_for_google)
                         potential_new_char_count = current_api_batch_char_count + line_char_count + (1 if current_api_batch_lines_for_google else 0)
@@ -1309,10 +1338,24 @@ def build_download_request(core, service_name, args):
                         (potential_new_char_count > api_char_limit or len(current_api_batch_lines_for_google) >= api_line_limit):
                             core.logger.debug(f"[{service_name}] Processing API batch of {len(current_api_batch_lines_for_google)} lines, {current_api_batch_char_count} chars.")
                             
+                            if progress_dialog:
+                                if progress_dialog.iscanceled():
+                                    core.logger.debug(f"[{service_name}] User cancelled translation via progress dialog.")
+                                    raise UserCancelledTranslation("User cancelled subtitle translation.")
+                                # Update progress before sending the batch
+                                percent = int((processed_lines_for_api_count / total_lines_to_translate_api) * 100) if total_lines_to_translate_api > 0 else 0
+                                # Use new language string ID for progress update
+                                progress_message_format = core.addon.getLocalizedString(33402) # Processed %s of %s lines...
+                                progress_message = progress_message_format % (processed_lines_for_api_count, total_lines_to_translate_api)
+                                progress_dialog.update(percent, progress_message)
+
+
                             translated_segments, detected_lang_from_chunk = _gtranslate_text_chunk(
                                 current_api_batch_lines_for_google, target_gtranslate_lang, core, service_name, 0
                             )
                             
+                            processed_lines_for_api_count += len(current_api_batch_lines_for_google)
+
                             if len(translated_segments) != len(current_api_batch_lines_for_google):
                                 core.logger.error(f"[{service_name}] CRITICAL MISMATCH: _gtranslate_text_chunk returned {len(translated_segments)}, expected {len(current_api_batch_lines_for_google)}. Correcting.")
                                 corrected_segments = [placeholder_str if line.strip() else "" for line in current_api_batch_lines_for_google]
@@ -1338,9 +1381,32 @@ def build_download_request(core, service_name, args):
                     
                     if current_api_batch_lines_for_google:
                         core.logger.debug(f"[{service_name}] Processing final API batch of {len(current_api_batch_lines_for_google)} lines, {current_api_batch_char_count} chars.")
+                        
+                        if progress_dialog:
+                            if progress_dialog.iscanceled():
+                                core.logger.debug(f"[{service_name}] User cancelled translation via progress dialog (before final batch).")
+                                raise UserCancelledTranslation("User cancelled subtitle translation.")
+                            # Update progress before sending the final batch
+                            percent = int((processed_lines_for_api_count / total_lines_to_translate_api) * 100) if total_lines_to_translate_api > 0 else 0
+                            # Use new language string ID for progress update
+                            progress_message_format = core.addon.getLocalizedString(33402) # Processed %s of %s lines...
+                            progress_message = progress_message_format % (processed_lines_for_api_count, total_lines_to_translate_api)
+                            progress_dialog.update(percent, progress_message)
+
                         translated_segments, detected_lang_from_chunk = _gtranslate_text_chunk(
                             current_api_batch_lines_for_google, target_gtranslate_lang, core, service_name, 0
                         )
+                        
+                        processed_lines_for_api_count += len(current_api_batch_lines_for_google)
+                        
+                        # After final batch, update with a finalizing message
+                        if progress_dialog and hasattr(core, 'addon'):
+                            final_percent = int((processed_lines_for_api_count / total_lines_to_translate_api) * 100) if total_lines_to_translate_api > 0 else 0
+                            # Show "Processed X of X lines... Finalizing translation..."
+                            processed_message_format = core.addon.getLocalizedString(33402)
+                            processed_message = processed_message_format % (processed_lines_for_api_count, total_lines_to_translate_api)
+                            finalizing_bit = core.addon.getLocalizedString(33405) # Finalizing translation...
+                            progress_dialog.update(final_percent, f"{processed_message} {finalizing_bit}")
 
                         if len(translated_segments) != len(current_api_batch_lines_for_google):
                             core.logger.error(f"[{service_name}] CRITICAL MISMATCH (final batch): _gtranslate_text_chunk returned {len(translated_segments)}, expected {len(current_api_batch_lines_for_google)}. Correcting.")
@@ -1478,6 +1544,12 @@ def build_download_request(core, service_name, args):
                     'filename': _filename_from_args,
                 }
 
+        except UserCancelledTranslation: # Specific catch for UserCancelledTranslation
+            core.logger.info(f"[{service_name}] Client-side translation cancelled by user for '{_filename_from_args}'.")
+            # Message for cancellation (ID 33404) is primarily for logging or toast, dialog closes quickly.
+            # Kodi itself usually handles a "cancelled" notification if an operation raises an exception.
+            raise # Re-raise to be handled by Kodi or higher-level logic
+
         except system_requests.exceptions.RequestException as e_req:
             core.logger.error(f"[{service_name}] Client-side translation: Network error downloading original SRT {original_srt_url}: {e_req}")
             raise
@@ -1489,7 +1561,10 @@ def build_download_request(core, service_name, args):
             import traceback
             core.logger.error(traceback.format_exc())
             raise
-        # REMOVED: finally block that was cleaning up event_loop_for_this_job
+        finally:
+            if progress_dialog:
+                progress_dialog.close()
+                core.logger.debug(f"[{service_name}] Closed progress dialog for client-side translation.")
 
 
     elif args.get('method_type') == 'SHARED_TRANSLATION_CONTENT':

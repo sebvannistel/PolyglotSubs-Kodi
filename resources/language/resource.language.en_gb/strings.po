@@ -97,3 +97,24 @@ msgstr ""
 msgctxt "#33209"
 msgid "Automatically upload translated subtitles to Subtitlecat"
 msgstr ""
+
+# Added for Subtitlecat client-side translation progress
+msgctxt "#33401"
+msgid "Translating Subtitles"
+msgstr ""
+
+msgctxt "#33402"
+msgid "Processed %s of %s lines..."
+msgstr ""
+
+msgctxt "#33403"
+msgid "Initializing translation..."
+msgstr ""
+
+msgctxt "#33404"
+msgid "Translation cancelled by user."
+msgstr ""
+
+msgctxt "#33405"
+msgid "Finalizing translation..."
+msgstr ""
