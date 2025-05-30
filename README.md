@@ -52,7 +52,7 @@ You can customize PolyglotSubs-Kodi to your preferences through the addon settin
 6.  Find and select **PolyglotSubs-Kodi** (it might be listed as a4kSubtitles or a similar name).
 7.  Click on **Configure**.
 
-*(The existing configuration GIF can be kept here if it still provides a good general overview of navigating the settings panel.)*
+*(The existing configuration GIF from the original project that provides a good general overview of navigating the settings panel.)*
 ![configuration](https://media.giphy.com/media/kewuE4BgfOnFin0vEC/source.gif)
 
 Below is a description of the available settings, generally following the structure you'll find in the configuration dialog:
