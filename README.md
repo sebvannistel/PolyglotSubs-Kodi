@@ -121,7 +121,7 @@ Remember to set your preferred languages in Kodi's main settings. PolyglotSubs-K
 
 ## Installation of this Fork (PolyglotSubs-Kodi)
 
-To install this specific version of a4kSubtitles with the SubtitlecatMod:
+To install this specific version of a4kSubtitles:
 
 **Important First Step:** To prevent potential conflicts or issues, it is **highly recommended to uninstall any previous versions of `a4kSubtitles` or other conflicting subtitle addons** before installing this fork.
 
@@ -167,7 +167,7 @@ Setting your preferred languages helps the addon find the most relevant subtitle
     *   Go to KODI's main menu: **Settings** (gear icon).
     *   Then navigate to **Add-ons**.
     *   Select **My add-ons** -> **Subtitle add-ons**.
-    *   Find and select **PolyglotSubs-Kodi** (or the name it appears under, e.g., a4kSubtitles) from the list.
+    *   Find and select **PolyglotSubs-Kodi** from the list.
     *   Click on **Configure** (or **Settings**).
 2.  **Set Languages:**
     *   In the addon settings, look for language options. You can typically select a "Primary Language", "Secondary Language", and sometimes a "Tertiary Language".
