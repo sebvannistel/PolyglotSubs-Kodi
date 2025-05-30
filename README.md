@@ -7,7 +7,7 @@
 
 
 [![Kodi version](https://img.shields.io/badge/kodi%20versions-20--21-blue)](https://kodi.tv/)
-[![View Releases](https://img.shields.io/badge/releases-on%20GitHub-blue)](https://github.com/sevannistel/a4kSubtitles/releases)
+[![View Releases](https://img.shields.io/badge/releases-on%20GitHub-blue)](https://https://github.com/sebvannistel/PolyglotSubs-Kodi/releases)
 
 This is a fork of the original [a4kSubtitles](https://github.com/a4k-openproject/a4kSubtitles) addon, modified to include **Subtitlecat.com** as an additional subtitle provider.
 
