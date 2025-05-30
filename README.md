@@ -187,7 +187,7 @@ The general usage for searching and selecting subtitles remains consistent with 
 
 *   **Primary Change:** This fork's main purpose is to add **Subtitlecat.com** as a provider, including its unique translation-on-demand feature.
 *   **Source:** This version is maintained by [sebvannistel](https://github.com/sebvannistel), not the original `a4k-openproject` team.
-*   **Release Method:** Releases for this fork are provided as direct ZIP files on the [sebvannistel/PolyglotSubs-Kodi releases page]((https://github.com/sebvannistel/PolyglotSubs-Kodi/releases)).
+*   **Release Method:** Releases for this fork are provided as direct ZIP files on the [sebvannistel/PolyglotSubs-Kodi releases page](https://github.com/sebvannistel/PolyglotSubs-Kodi/releases).
 
 ## License
 
