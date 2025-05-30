@@ -32,7 +32,7 @@ a4kSubtitles is a subtitle addon for KODI. This version retains the features and
 
 ## What's New in this Fork?
 
-This fork introduces the `SubtitlecatMod`, which integrates [Subtitlecat.com](https://www.subtitlecat.com) as a subtitle service. The main changes are within the `a4kSubtitles/services/subtitlecat.py` file, enabling:
+This fork integrates [Subtitlecat.com](https://www.subtitlecat.com) as a subtitle service. The main changes are within the `a4kSubtitles/services/subtitlecat.py` file, enabling:
 *   Direct searching and downloading of subtitles from Subtitlecat.
 *   Automated requests for server-side translation of subtitles if a direct match for your language isn't immediately available. The addon will then wait for the translation to complete and download the subtitle.
 *   Robust URL handling and parsing tailored for Subtitlecat.
