@@ -126,7 +126,7 @@ To install this specific version of a4kSubtitles:
 **Important First Step:** To prevent potential conflicts or issues, it is **highly recommended to uninstall any previous versions of `a4kSubtitles` or other conflicting subtitle addons** before installing this fork.
 
 1.  **Download the Addon:**
-    *   Go to the releases page for this fork: [(https://github.com/sebvannistel/PolyglotSubs-Kodi/releases)]((https://github.com/sebvannistel/PolyglotSubs-Kodi/releases))
+    *   Go to the releases page for this fork: (https://github.com/sebvannistel/PolyglotSubs-Kodi/releases)
     *   Download the latest `service.subtitles.polyglotsubs-kodi-X.X.X.sc.X.zip` file (e.g., `service.subtitles.polyglotsubs-kodi-3.20.0.sc.9.zip`).
 
 2.  **Enable Unknown Sources in KODI (If Not Already Done):**
