@@ -126,8 +126,8 @@ To install this specific version of a4kSubtitles with the SubtitlecatMod:
 **Important First Step:** To prevent potential conflicts or issues, it is **highly recommended to uninstall any previous versions of `a4kSubtitles` or other conflicting subtitle addons** before installing this fork.
 
 1.  **Download the Addon:**
-    *   Go to the releases page for this fork: [https://github.com/sevannistel/a4kSubtitles/releases](https://github.com/sevannistel/a4kSubtitles/releases)
-    *   Download the latest `service.subtitles.a4ksubtitlecat-X.X.X.sc.X.zip` file (e.g., `service.subtitles.a4ksubtitlecat-3.20.0.sc.9.zip`).
+    *   Go to the releases page for this fork: [(https://github.com/sebvannistel/PolyglotSubs-Kodi/releases)]((https://github.com/sebvannistel/PolyglotSubs-Kodi/releases))
+    *   Download the latest `service.subtitles.polyglotsubs-kodi-X.X.X.sc.X.zip` file (e.g., `service.subtitles.polyglotsubs-kodi-3.20.0.sc.9.zip`).
 
 2.  **Enable Unknown Sources in KODI (If Not Already Done):**
     *   Before you can install from a zip file, you might need to enable "Unknown Sources".
@@ -143,7 +143,7 @@ To install this specific version of a4kSubtitles with the SubtitlecatMod:
     *   Wait for the "Add-on installed" notification.
 
 4.  **Configure (Recommended):**
-    *   After installation, find "PolyglotSubs-Kodi" (or its listed name, e.g., a4kSubtitles) in your Program or Subtitle add-ons.
+    *   After installation, find "PolyglotSubs-Kodi" in your Subtitle add-ons.
     *   Open its settings. **Subtitlecat.com is enabled by default.** You can review other provider settings and also configure your preferred languages here, though main language preferences are typically set globally in Kodi's Player settings (see Configuration section).
 
 **Note:** This installation method installs the addon directly. It differs from the original a4kSubtitles installation that typically uses a repository.
@@ -156,9 +156,8 @@ This section explains common user actions. The general process of searching and 
 
 1.  **Access Player Controls:** While your video is playing, access the video player controls. This might vary by Kodi skin, but often involves pressing 'Enter', 'OK', or a menu button on your remote.
 2.  **Open Subtitles Menu:** Navigate to the Subtitles icon/button (often looks like a speech bubble or 'cc' icon) within the player controls.
-3.  **Download Subtitles:** Select 'Download Subtitles...' (the exact wording might vary slightly, e.g., "Download", "Search for subtitles").
-4.  **Search Process:** PolyglotSubs-Kodi will then search for subtitles using your enabled providers. If multiple services are active, this might take a few moments.
-5.  **Select and Download:** You'll be presented with a list of found subtitles. Results are typically sorted by relevance or language. Select a subtitle from the list to download and display it on your video.
+3.  **Search Process:** PolyglotSubs-Kodi will then search for subtitles using your enabled providers. If multiple services are active, this might take a few moments.
+4.  **Select and Download:** You'll be presented with a list of found subtitles. Results are typically sorted by relevance or language. Select a subtitle from the list to download and display it on your video. If "subtitlecat.com" is shown in yellow colour it means that the subtitles have not been translated yet. Therefore when you select it you need to give it around 2-3min time to translate. After it finished it will download automatically.
 
 ### Setting Preferred Languages
 
