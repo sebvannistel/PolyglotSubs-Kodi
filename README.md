@@ -166,10 +166,10 @@ PolyglotSubs-Kodi automatically leverages Subtitlecat.com if Subtitlecat is enab
 
 *   **Direct Matches:** If a subtitle in your preferred language is found directly on Subtitlecat, it will be listed in your search results like any other provider.
 *   **On-Demand Translation:** This is a key feature of the Subtitlecat integration.
-    *   If a direct subtitle match isn't found in your preferred language, but Subtitlecat has a version it can translate (e.g., an English subtitle that can be translated to your Spanish preferred language), the addon will automatically request this translation from Subtitlecat's servers. The listing will have "subtitlecat.com" written in yellow.
-    *   This process happens in the background. You might see a notification about the translation being initiated.
-    *   The translated subtitle will typically appear in the search results list after a short delay (usually a minute or two, depending on Subtitlecat's server load and the length of the subtitle).
-    *   No extra steps are usually needed from your side other than waiting briefly for these translated options to appear in the list. Select them as you would any other subtitle.
+    *   If a direct subtitle match isn't found in your preferred language, but Subtitlecat has a version it can translate (e.g., an English subtitle that can be translated to your Spanish preferred language), the addon will automatically request this translation from Subtitlecat's servers.
+    *   The listing will have "subtitlecat.com" written in yellow. 
+    *   Once you select it, the translation process happens in the background. You might see a notification about the translation being initiated..
+    *   No extra steps are usually needed from your side other than waiting (usually 2-3min, depending on the server load and the length of the subtitle) for the translation to finish and then it will be automatically downloaded.
 
 ### Automatic & Other Features
 
