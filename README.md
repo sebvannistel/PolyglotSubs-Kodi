@@ -119,7 +119,7 @@ Some subtitle services require you to have an account (and sometimes API keys) t
 **Note on Languages and Providers:**
 Remember to set your preferred languages in Kodi's main settings. PolyglotSubs-Kodi uses these preferences to search across all enabled providers. The availability and quality of subtitles can vary greatly between providers and languages. If you're not finding subtitles for specific content, try enabling more providers or checking their individual websites.
 
-## Installation of this Fork (SubtitlecatMod)
+## Installation of this Fork (PolyglotSubs-Kodi)
 
 To install this specific version of a4kSubtitles with the SubtitlecatMod:
 
