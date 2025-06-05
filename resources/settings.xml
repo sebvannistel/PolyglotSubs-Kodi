@@ -11,6 +11,7 @@
         <setting id="general.prefer_sdh"     label="33107" type="bool"   default="false" enable="eq(-1,true)" />
         <setting id="general.prefer_forced"  label="33108" type="bool"   default="true"  enable="eq(-1,false)+eq(-2,true)" />
         <setting id="subtitlecat_upload_translations" label="33209" type="bool" default="true"/>
+        <setting id="subtitlecat_notify_upload" label="33210" type="bool" default="true"/>
     </category>
     <!-- Services -->
     <category label="33002">

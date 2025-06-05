@@ -97,3 +97,7 @@ msgstr ""
 msgctxt "#33209"
 msgid "Automatically upload translated subtitles to Subtitlecat"
 msgstr ""
+
+msgctxt "#33210"
+msgid "Notify when uploaded translation is available on Subtitlecat"
+msgstr ""
