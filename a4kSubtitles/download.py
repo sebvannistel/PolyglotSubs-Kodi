@@ -94,10 +94,7 @@ def __insert_lang_code_in_filename(core, filename, lang_code):
 
 def __postprocess(core, filepath, lang_code):
     try:
-        # Read the subtitle bytes in binary mode. The file's encoding will be
-        # detected or assumed later when decoding ``text_bytes`` so we avoid
-        # passing an ``encoding`` parameter here.
-        with open(filepath, 'rb') as f:
+        with open(filepath, 'rb', encoding=core.utils.default_encoding) as f:
             text_bytes = f.read()
 
         if core.kodi.get_bool_setting('general.use_chardet'):
@@ -167,18 +164,7 @@ def download(core, params):
 
     service_name = params['service_name']
     service = core.services[service_name]
-
-    progress_dialog = None
-    if service_name == 'subtitlecat' and actions_args.get('needs_client_side_translation'):
-        progress_dialog = core.kodi.get_progress_dialog()
-        progress_dialog.open()
-        progress_dialog.update(0, 'Translating...')
-
-    try:
-        request = service.build_download_request(core, service_name, actions_args)
-    finally:
-        if progress_dialog:
-            progress_dialog.close()
+    request = service.build_download_request(core, service_name, actions_args)
 
     # --- START OF MODIFIED SECTION ---
     _is_raw_download = actions_args.get('raw', False)
