@@ -1033,58 +1033,86 @@ def parse_search_response(core, service_name, meta, response):
             constructed_filename = f"{original_id_from_href}-{filename_base_from_href}-{sc_lang_code}.srt"
 
             shared_translation_found_and_used = False
-            try:
-                shared_headers = {
-                    'User-Agent': __user_agent, # This is fine
-                    'Referer': movie_page_full_url,
-                    'Accept': 'application/json, */*'
-                }
-                core.logger.debug(f"[{service_name}] Attempting to fetch shared translation for '{constructed_filename}' from {shared_translation_url} (referer: {movie_page_full_url})")
-                # MODIFICATION: Use thread-local session and remove lock
-                # with _SC_SESSION_LOCK: # ADDED LOCK
-                shared_response = _get_session().get(shared_translation_url, headers=shared_headers, timeout=shared_translation_timeout)
+            if _get_setting(core, "subtitlecat_include_shared", True):
+                try:
+                    shared_headers = {
+                        'User-Agent': __user_agent,  # This is fine
+                        'Referer': movie_page_full_url,
+                        'Accept': 'application/json, */*'
+                    }
+                    core.logger.debug(
+                        f"[{service_name}] Attempting to fetch shared translation for '{constructed_filename}' from {shared_translation_url} (referer: {movie_page_full_url})"
+                    )
+                    # MODIFICATION: Use thread-local session and remove lock
+                    # with _SC_SESSION_LOCK: # ADDED LOCK
+                    shared_response = _get_session().get(
+                        shared_translation_url,
+                        headers=shared_headers,
+                        timeout=shared_translation_timeout
+                    )
 
-                if shared_response.status_code == 200 and shared_response.headers.get('content-type', '').startswith('application/json'):
-                    json_response = shared_response.json()
-                    shared_srt_text = json_response.get("text")
-                    shared_srt_lang = json_response.get("language")
+                    if shared_response.status_code == 200 and shared_response.headers.get('content-type', '').startswith('application/json'):
+                        json_response = shared_response.json()
+                        shared_srt_text = json_response.get("text")
+                        shared_srt_lang = json_response.get("language")
 
-                    if shared_srt_text and isinstance(shared_srt_text, str) and shared_srt_text.strip():
-                        core.logger.debug(f"[{service_name}] Found shared translation for '{constructed_filename}' (lang: {shared_srt_lang or 'N/A'})")
+                        if shared_srt_text and isinstance(shared_srt_text, str) and shared_srt_text.strip():
+                            core.logger.debug(
+                                f"[{service_name}] Found shared translation for '{constructed_filename}' (lang: {shared_srt_lang or 'N/A'})"
+                            )
 
-                        action_args_shared = {
-                            'method_type': 'SHARED_TRANSLATION_CONTENT',
-                            'srt_content': shared_srt_text,
-                            'filename': constructed_filename,
-                            'lang': kodi_target_lang_full,
-                            'service_name': service_name,
-                            'detail_url': movie_page_full_url,
-                            'lang_code': sc_lang_code,
-                        }
-                        item_color_shared = 'cyan'
+                            action_args_shared = {
+                                'method_type': 'SHARED_TRANSLATION_CONTENT',
+                                'srt_content': shared_srt_text,
+                                'filename': constructed_filename,
+                                'lang': kodi_target_lang_full,
+                                'service_name': service_name,
+                                'detail_url': movie_page_full_url,
+                                'lang_code': sc_lang_code,
+                            }
+                            item_color_shared = 'cyan'
 
-                        results.append({
-                            'service_name': service_name, 'service': display_name_for_service,
-                            'lang': kodi_target_lang_full, 'name': f"{movie_title_on_page} ({sc_lang_name_full}) [Shared]",
-                            'rating': 0, 'lang_code': kodi_target_lang_2_letter, 'sync': 'false', 'impaired': 'false',
-                            'color': item_color_shared,
-                            'action_args': action_args_shared
-                        })
-                        core.logger.debug(f"[{service_name}] Added result for shared translation: '{constructed_filename}'")
-                        shared_translation_found_and_used = True
-                    else:
-                        core.logger.debug(f"[{service_name}] Shared translation response for '{constructed_filename}' was empty or invalid. JSON: {str(json_response)[:200]}")
-                elif shared_response.status_code == 200: # Already a .debug call, body preview is fine
-                     core.logger.debug(f"[{service_name}] Shared translation for '{constructed_filename}' returned status 200 but non-JSON content-type: {shared_response.headers.get('content-type', '')}. Body: {shared_response.text[:200]}")
-                else: # Already a .debug call, body preview is fine
-                    core.logger.debug(f"[{service_name}] Failed to fetch shared translation for '{constructed_filename}'. Status: {shared_response.status_code}, Body: {shared_response.text[:200]}")
+                            results.append({
+                                'service_name': service_name,
+                                'service': display_name_for_service,
+                                'lang': kodi_target_lang_full,
+                                'name': f"{movie_title_on_page} ({sc_lang_name_full}) [Shared]",
+                                'rating': 0,
+                                'lang_code': kodi_target_lang_2_letter,
+                                'sync': 'false',
+                                'impaired': 'false',
+                                'color': item_color_shared,
+                                'action_args': action_args_shared
+                            })
+                            core.logger.debug(
+                                f"[{service_name}] Added result for shared translation: '{constructed_filename}'"
+                            )
+                            shared_translation_found_and_used = True
+                        else:
+                            core.logger.debug(
+                                f"[{service_name}] Shared translation response for '{constructed_filename}' was empty or invalid. JSON: {str(json_response)[:200]}"
+                            )
+                    elif shared_response.status_code == 200:  # Already a .debug call, body preview is fine
+                        core.logger.debug(
+                            f"[{service_name}] Shared translation for '{constructed_filename}' returned status 200 but non-JSON content-type: {shared_response.headers.get('content-type', '')}. Body: {shared_response.text[:200]}"
+                        )
+                    else:  # Already a .debug call, body preview is fine
+                        core.logger.debug(
+                            f"[{service_name}] Failed to fetch shared translation for '{constructed_filename}'. Status: {shared_response.status_code}, Body: {shared_response.text[:200]}"
+                        )
 
-            except system_requests.exceptions.RequestException as req_exc_shared:
-                core.logger.error(f"[{service_name}] RequestException fetching shared translation for '{constructed_filename}': {req_exc_shared}")
-            except ValueError as val_err_shared: # Catches JSONDecodeError
-                core.logger.error(f"[{service_name}] ValueError (JSON decode) fetching shared translation for '{constructed_filename}': {val_err_shared}")
-            except Exception as e_shared:
-                core.logger.error(f"[{service_name}] Unexpected error fetching shared translation for '{constructed_filename}': {e_shared}")
+                except system_requests.exceptions.RequestException as req_exc_shared:
+                    core.logger.error(
+                        f"[{service_name}] RequestException fetching shared translation for '{constructed_filename}': {req_exc_shared}"
+                    )
+                except ValueError as val_err_shared:  # Catches JSONDecodeError
+                    core.logger.error(
+                        f"[{service_name}] ValueError (JSON decode) fetching shared translation for '{constructed_filename}': {val_err_shared}"
+                    )
+                except Exception as e_shared:
+                    core.logger.error(
+                        f"[{service_name}] Unexpected error fetching shared translation for '{constructed_filename}': {e_shared}"
+                    )
 
             if shared_translation_found_and_used:
                 continue
