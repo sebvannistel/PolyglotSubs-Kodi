@@ -167,7 +167,18 @@ def download(core, params):
 
     service_name = params['service_name']
     service = core.services[service_name]
-    request = service.build_download_request(core, service_name, actions_args)
+
+    progress_dialog = None
+    if service_name == 'subtitlecat' and actions_args.get('needs_client_side_translation'):
+        progress_dialog = core.kodi.get_progress_dialog()
+        progress_dialog.open()
+        progress_dialog.update(0, 'Translating...')
+
+    try:
+        request = service.build_download_request(core, service_name, actions_args)
+    finally:
+        if progress_dialog:
+            progress_dialog.close()
 
     # --- START OF MODIFIED SECTION ---
     _is_raw_download = actions_args.get('raw', False)
