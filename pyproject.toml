@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "polyglotsubs-kodi"
+version = "0.1.0"
+description = "PolyglotSubs Kodi addon with Subtitlecat provider"
+authors = [{name="Sebastian Vannistel"}]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+]
