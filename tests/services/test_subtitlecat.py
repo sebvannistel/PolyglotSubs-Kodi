@@ -10,7 +10,7 @@ pytest.skip("Outdated provider tests", allow_module_level=True)
 
 # Ensure the repository root is on sys.path so 'a4kSubtitles' can be imported
 current_dir = os.path.dirname(__file__)
-repo_root = os.path.abspath(os.path.join(current_dir, '..', '..', '..'))
+repo_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
 sys.path.append(repo_root)
 
 # Ensure the Subtitlecat service loads with mocked Kodi modules
