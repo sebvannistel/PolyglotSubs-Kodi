@@ -88,6 +88,9 @@ This section covers the main behavior of the addon.
 *   **Prefer Forced Subtitles (ID: `general.prefer_forced`):**
     *   **What it does:** If enabled, the addon will try to prioritize "forced" subtitles. Forced subtitles are used to translate dialogue in a foreign language when the main audio track is in your preferred language (e.g., alien speech in a sci-fi movie). This preference is active when "Auto-select subtitle if only one result" is true or "Auto Download First Result Silently" is true.
     *   **Default:** True (Enabled).
+*   **Upload Translated Subtitles to Subtitlecat (ID: `subtitlecat_upload_translations`):**
+    *   **What it does:** When PolyglotSubs-Kodi requests an on-demand translation from Subtitlecat, enabling this option allows the addon to share the translated subtitle back with Subtitlecat so other users can benefit. Disable it if you prefer the translation to remain private.
+    *   **Default:** True (Enabled - contributes back to Subtitlecat).
 *   **Enable/Disable Embedded Subtitles:**
     *   **Note:** PolyglotSubs-Kodi primarily focuses on downloading external subtitle files. The handling of embedded subtitles (those already within your video file) is usually controlled by Kodi's main player settings, not this addon's settings specifically. Check under **Settings -> Player -> Language -> Enable parsing for closed captions / Teletext**.
 
@@ -100,9 +103,6 @@ This section allows you to enable or disable individual subtitle providers. Poly
 *   **OpenSubtitles (ID: `opensubtitles.enabled`):** Default: False (Disabled). *Requires account details in the "Accounts" section.*
 *   **Podnadpisi.NET (ID: `podnadpisi.enabled`):** Default: False (Disabled)
 *   **Subtitlecat.com (ID: `subtitlecat.enabled`):** Default: True (Enabled)
-    *   **Also for Subtitlecat - Upload translated subtitles (ID: `subtitlecat_upload_translations`):**
-        *   **What it does:** When PolyglotSubs-Kodi requests an on-demand translation from Subtitlecat, this setting (if enabled) allows the addon to indicate to Subtitlecat that the translated result can be shared and made available to other Subtitlecat users. This helps improve the Subtitlecat database over time. Disabling this means translations are for your use only.
-        *   **Default:** True (Enabled - contributes back to Subtitlecat).
 *   **SubDL (ID: `subdl.enabled`):** Default: False (Disabled). *May require API key in the "Accounts" section.*
 *   **SubSource (ID: `subsource.enabled`):** Default: False (Disabled)
 

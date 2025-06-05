@@ -10,6 +10,7 @@
         <setting id="general.auto_select"    label="33106" type="bool"   default="true"  />
         <setting id="general.prefer_sdh"     label="33107" type="bool"   default="false" enable="eq(-1,true)" />
         <setting id="general.prefer_forced"  label="33108" type="bool"   default="true"  enable="eq(-1,false)+eq(-2,true)" />
+        <setting id="subtitlecat_upload_translations" label="33209" type="bool" default="true"/>
     </category>
     <!-- Services -->
     <category label="33002">
@@ -17,8 +18,7 @@
         <setting id="bsplayer.enabled"      label="33202" type="bool" default="false"/>
         <setting id="opensubtitles.enabled" label="33201" type="bool" default="false"/>
         <setting id="podnadpisi.enabled"    label="33203" type="bool" default="false"/>
-        <setting id="subtitlecat.enabled"   label="33208" type="bool" default="true"/> 
-        <setting id="subtitlecat_upload_translations" label="33209" type="bool" default="true"/>
+        <setting id="subtitlecat.enabled"   label="33208" type="bool" default="true"/>
         <setting id="subdl.enabled"         label="33205" type="bool" default="false"/>
         <setting id="subsource.enabled"     label="33207" type="bool" default="false"/>
     </category>
