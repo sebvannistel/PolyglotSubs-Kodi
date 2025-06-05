@@ -64,7 +64,8 @@ def __get_addon_info(name):
         return os.path.join(os.path.dirname(__file__), '../../tmp')
 __addon.getAddonInfo = __get_addon_info
 __addon.getSetting = lambda _: ''
-xbmcaddon.Addon = lambda _: __addon
+# Allow Addon() to be called with or without parameters
+xbmcaddon.Addon = lambda *_, **__: __addon
 
 # xbmcplugin
 xbmcplugin = lambda: None
