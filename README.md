@@ -94,6 +94,9 @@ This section covers the main behavior of the addon.
 *   **Notify When Upload Completes (ID: `subtitlecat_notify_upload`):**
     *   **What it does:** Shows a Kodi notification once a translated subtitle has been successfully uploaded to Subtitlecat and a shareable URL is returned.
     *   **Default:** True (Enabled).
+*   **Include Server-Shared Translations (ID: `subtitlecat_include_shared`):**
+    *   **What it does:** Controls whether Subtitlecat results from its shared translation system (shown with "[Shared]") appear in your search results.
+    *   **Default:** True (Enabled).
 *   **Enable/Disable Embedded Subtitles:**
     *   **Note:** PolyglotSubs-Kodi primarily focuses on downloading external subtitle files. The handling of embedded subtitles (those already within your video file) is usually controlled by Kodi's main player settings, not this addon's settings specifically. Check under **Settings -> Player -> Language -> Enable parsing for closed captions / Teletext**.
 
