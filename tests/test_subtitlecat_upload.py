@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 from tests.common import api
+from tests import utils
 
 # Use the API helper to set up mocked Kodi environment
 api_instance = api.A4kSubtitlesApi({'kodi': True})
@@ -35,9 +36,12 @@ def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, m
     # Settings enabling upload
     core.settings.get.side_effect = lambda k, d=None: {
         'subtitlecat_upload_translations': True,
+        'subtitlecat_notify_upload': True,
         'force_bom': False,
         'http_timeout': 20
     }.get(k, d)
+
+    notify_spy = utils.spy_fn(core.kodi, 'notification')
 
     action_args = {
         'needs_client_side_translation': True,
@@ -53,9 +57,11 @@ def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, m
     assert result['method'] == 'REQUEST_CALLBACK'
     result['save_callback']('/tmp/out.srt')
     mock_upload.assert_called_once()
+    assert notify_spy.call_count == 1
     session.get.assert_called_with('http://subtitlecat.com/new.srt', timeout=20, stream=True)
     cache_key = (action_args['detail_url'], action_args['lang_code'])
     assert cache_key in api_instance.core.services['subtitlecat']._TRANSLATED_CACHE
+    notify_spy.restore()
 
 @patch('a4kSubtitles.services.subtitlecat._upload_translation_to_subtitlecat')
 @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk', return_value=(['Bonjour'], 'en'))

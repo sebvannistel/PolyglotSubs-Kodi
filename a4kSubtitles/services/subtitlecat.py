@@ -1452,6 +1452,8 @@ def build_download_request(core, service_name, args):
                 # Using __setitem__ from SimpleLRUCache for _TRANSLATED_CACHE
                 _TRANSLATED_CACHE[(args.get('detail_url'), cache_key_lang)] = new_url_from_sc
                 core.logger.debug(f"[{service_name}] Stored translated URL in _TRANSLATED_CACHE for key ({args.get('detail_url')}, {cache_key_lang})")
+                if _get_setting(core, 'subtitlecat_notify_upload', True):
+                    core.kodi.notification('Subtitle uploaded to Subtitlecat')
                 return {
                     'method': 'REQUEST_CALLBACK',
                     'save_callback': lambda path: _save_from_subtitlecat_url(path, new_url_from_sc),
