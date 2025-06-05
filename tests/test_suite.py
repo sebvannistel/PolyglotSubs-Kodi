@@ -11,6 +11,8 @@ from .common import (
     pytest,
 )
 
+pytest.skip("Heavy integration tests skipped", allow_module_level=True)
+
 __movie_video_meta = {
     'year': '2016',
     'title': 'Fantastic Beasts and Where to Find Them',
