@@ -1,4 +1,4 @@
-#--- START OF FILE subtitlecat.py ---
+# --- START OF FILE subtitlecat.py ---
 
 # C:\...\a4kSubtitles-SubtitlecatMod\a4kSubtitles\services\subtitlecat.py
 # -*- coding: utf-8 -*-
@@ -11,9 +11,10 @@
 import requests as system_requests
 from bs4 import BeautifulSoup
 import urllib.parse
-from urllib.parse import urljoin # Added for robust URL building
+from urllib.parse import urljoin  # Added for robust URL building
 
-import re, time # Retained as it will be used by client-side translation rate limiting
+import re
+import time  # Retained as it will be used by client-side translation rate limiting
 from functools import lru_cache                # ← simple cache
 from rapidfuzz import fuzz                    # ← fuzzy title match
 # import tempfile # Removed as no longer creating temp files in build_download_request
@@ -23,8 +24,8 @@ from rapidfuzz import fuzz                    # ← fuzzy title match
 # chardet and charset_normalizer are also imported locally within that function.
 
 # START OF ADDITIONS FOR CLIENT-SIDE TRANSLATION
-import srt # For parsing/composing SRT files (MODIFIED IMPORT)
-import html # For unescaping HTML entities (used in translation preparation)
+import srt  # For parsing/composing SRT files (MODIFIED IMPORT)
+import html  # For unescaping HTML entities (used in translation preparation)
 # urllib.parse.quote_plus is used via urllib.parse.quote_plus
 # END OF ADDITIONS FOR CLIENT-SIDE TRANSLATION
 
@@ -37,27 +38,27 @@ try:
 except ImportError:
     # asyncio might still be available if aiohttp is not (Python 3.7+),
     # but the async translation path relies on aiohttp.
-    asyncio = None # Ensure it's None if aiohttp import failed, to simplify checks
+    asyncio = None  # Ensure it's None if aiohttp import failed, to simplify checks
     aiohttp = None
     # No core.logger available at module import time to log this fallback.
     # If needed, it can be logged when _get_setting(core, "debug", False) is first accessible.
 # END OF ADDITIONS FOR AIOHTTP AND ASYNC OPERATIONS
 
-import threading # Added for thread-safe counter
-import sys # ADDED for sys.platform (conditional event loop policy)
-import concurrent.futures # ADDED for ThreadPoolExecutor
+import threading  # Added for thread-safe counter
+import sys  # ADDED for sys.platform (conditional event loop policy)
+import concurrent.futures  # ADDED for ThreadPoolExecutor
 
 # _SC_NEWLINE_MARKER_ REMOVED as it's unused
 
-from collections import Counter # Added for determining overall detected source language
-from collections import OrderedDict # ADDED for SimpleLRUCache implementation
+from collections import Counter  # Added for determining overall detected source language
+from collections import OrderedDict  # ADDED for SimpleLRUCache implementation
 
 # No 'log = logger.Logger.get_logger(__name__)' needed; use 'core.logger' directly.
 
 # MODIFIED: Changed _TRANSLATED_CACHE to use SimpleLRUCache for thread-safety.
 # LRU Cache (detail_url, lang_code) ➜ final .srt URL (e.g., after successful client translation & upload)
 # _TRANSLATED_CACHE = {}     # survives for the lifetime of the add-on (NOTE: Population mechanism via _wait_for_translated removed)
-_TRANSLATED_CACHE = None # Will be initialized to SimpleLRUCache below, after class definition
+_TRANSLATED_CACHE = None  # Will be initialized to SimpleLRUCache below, after class definition
 
 # ADDED: SimpleLRUCache class
 class SimpleLRUCache:
@@ -67,7 +68,7 @@ class SimpleLRUCache:
             raise ValueError("maxsize must be a positive integer")
         self._cache = OrderedDict()
         self._maxsize = maxsize
-        self._lock = threading.Lock() # Lock for thread-safe access to the cache itself
+        self._lock = threading.Lock()  # Lock for thread-safe access to the cache itself
 
     def get(self, key, default=None):
         with self._lock:
@@ -105,7 +106,7 @@ class SimpleLRUCache:
             return key in self._cache
 
 # Initialize _TRANSLATED_CACHE here now that SimpleLRUCache is defined
-_TRANSLATED_CACHE = SimpleLRUCache(maxsize=64) # survives for the lifetime of the add-on
+_TRANSLATED_CACHE = SimpleLRUCache(maxsize=64)  # survives for the lifetime of the add-on
 
 # ADDED: Cache for client-side translated content (if not uploaded or upload fails)
 # Key: (original_srt_url, target_gtranslate_lang_code), Value: {'srt_content': '...', 'detected_source_lang': '...'}
@@ -151,7 +152,7 @@ __subtitlecat_base_url = "https://www.subtitlecat.com"
 __user_agent = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 "
-    "Safari/537.36 a4kSubtitles-SubtitlecatMod/1.0.1" # Ensure your addon version is reflected if desired
+    "Safari/537.36 a4kSubtitles-SubtitlecatMod/1.0.1"  # Ensure your addon version is reflected if desired
 )
 
 # MODIFICATION: Use threading.local() for requests.Session
@@ -197,7 +198,8 @@ def _get_setting(core, key, default=None):
 
 # START OF MODIFICATION: Encoding fix helper
 def _post_download_fix_encoding(core, service_name, raw_bytes, outfile):
-    import html, io # html import is here locally
+    import html
+    import io  # html import is here locally
 
     _cd_module = None
     _cn_function = None
@@ -1452,6 +1454,11 @@ def build_download_request(core, service_name, args):
                 # Using __setitem__ from SimpleLRUCache for _TRANSLATED_CACHE
                 _TRANSLATED_CACHE[(args.get('detail_url'), cache_key_lang)] = new_url_from_sc
                 core.logger.debug(f"[{service_name}] Stored translated URL in _TRANSLATED_CACHE for key ({args.get('detail_url')}, {cache_key_lang})")
+                if _get_setting(core, 'subtitlecat_notify_upload', True):
+                    try:
+                        core.kodi.notification('Subtitle uploaded to Subtitlecat.')
+                    except Exception as e_notify:
+                        core.logger.error(f"[{service_name}] Failed to send upload notification: {e_notify}")
                 return {
                     'method': 'REQUEST_CALLBACK',
                     'save_callback': lambda path: _save_from_subtitlecat_url(path, new_url_from_sc),
