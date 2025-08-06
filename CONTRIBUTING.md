@@ -40,9 +40,11 @@ We welcome pull requests for bug fixes and improvements.
     ```bash
     flake8 .
     ```
-*   **Tests:** The repository may contain a `tests/` directory.
-    *   (Placeholder: Add specific instructions here if you have a test suite, e.g., `pytest`)
-    *   For Kodi addon development, testing can sometimes involve mocking Kodi's environment or running within a Kodi development setup. Please describe any specific test procedures if applicable.
+*   **Tests:** Run the automated test suite:
+    ```bash
+    pytest
+    ```
+    The tests mock Kodi's environment and can be run from the project root after installing `requirements-dev.txt`.
 
 #### Coding Standards
 *   Please follow the existing code style.
