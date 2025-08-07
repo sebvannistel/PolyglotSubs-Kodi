@@ -1,67 +1,44 @@
 import unittest
-from unittest.mock import MagicMock, patch, call
-import html
+from unittest.mock import MagicMock, patch
 import os
-import json
 import sys
-import pytest
+import json
 
-pytest.skip("Outdated provider tests", allow_module_level=True)
-
-# Ensure the repository root is on sys.path so 'a4kSubtitles' can be imported
+# Ensure repository root on sys.path
 current_dir = os.path.dirname(__file__)
 repo_root = os.path.abspath(os.path.join(current_dir, '..', '..'))
 sys.path.append(repo_root)
 
-# Ensure the Subtitlecat service loads with mocked Kodi modules
+# Mock Kodi modules on import
 os.environ["A4KSUBTITLES_API_MODE"] = json.dumps({"kodi": True})
 
 from a4kSubtitles.services import subtitlecat as subtitlecat_module
 
-_CHUNK_SEP = "|||SGMNTBRK|||"
-# subtitlecat_module.block_size_chars (1500) is a local const within build_download_request.
-# Tests manage chunking by controlling the length of 'protected_text' from _protect_subtitle_tags mock.
 
-class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
+class TestSubtitlecatClientTranslation(unittest.TestCase):
     def setUp(self):
-        self.core_mock = MagicMock()
-        self.core_mock.logger = MagicMock()
-        # Mock for core.settings.get used by _get_setting helper in subtitlecat.py
-        # Default behavior: 'force_bom' is False, 'http_timeout' is 20.
-        self.core_mock.settings.get.side_effect = lambda key, default: False if key == 'force_bom' else (default if default is not None else 20)
-
-        self.service_name = "subtitlecat_test_service"
-        # Base action_args for client translation, matching what build_download_request expects
-        self.base_action_args = {
-            'needs_client_side_translation': True,
-            'original_srt_url': 'http://example.com/orig.srt',
-            'target_translation_lang': 'fr',  # Corresponds to 'target_lang_code' in prompt
-            'filename': 'test.srt',
-            # 'original_lang_code' from prompt is not used by this part of build_download_request
+        self.core = MagicMock()
+        self.core.logger = MagicMock()
+        # Return default value for any setting lookup
+        self.core.settings.get.side_effect = lambda key, default=None: default
+        self.service = "subtitlecat_test"
+        self.args = {
+            "needs_client_side_translation": True,
+            "original_srt_url": "http://example.com/orig.srt",
+            "target_translation_lang": "fr",
+            "filename": "test.srt",
         }
-        # This list will be populated by the mock for srt.parse and is used for assertions
-        self.parsed_subs_list_reference = []
+        # Clear any cached translations between tests
+        subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = subtitlecat_module.SimpleLRUCache(maxsize=128)
 
-    def _create_mock_sub_item(self, content=""):
-        item = MagicMock(spec=['content'])
-        item.content = content
-        return item
-
-    # Helper to create the tuple structure that _protect_subtitle_tags is expected to return
-    def _create_protect_output(self, protected_text, tag_map=None, is_all_tag_line=False):
-        if tag_map is None:
-            tag_map = {}
-        return (protected_text, tag_map, is_all_tag_line)
-
-    # Helper to setup mocks that lead to internal creation of parsed_subs and translatable_items_info
-    def _setup_internal_states_mocks(self, mock_get_session, mock_srt_parse, mock_protect_tags,
-                                     original_srt_text, parsed_subs_contents, protect_tags_outputs):
+    def _prepare_session_and_parse(self, mock_get_session, mock_srt_parse, srt_text):
         mock_session = MagicMock()
-        mock_session_response = MagicMock()
-        mock_session_response.text = original_srt_text
-        mock_session_response.raise_for_status.return_value = None
-        mock_session.get.return_value = mock_session_response
+        mock_response = MagicMock()
+        mock_response.text = srt_text
+        mock_response.raise_for_status.return_value = None
+        mock_session.get.return_value = mock_response
         mock_get_session.return_value = mock_session
+
 
         self.parsed_subs_list_reference = [self._create_mock_sub_item(c) for c in parsed_subs_contents]
         mock_srt_parse.return_value = self.parsed_subs_list_reference
@@ -482,4 +459,5 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         pass
 
 if __name__ == '__main__':
+
     unittest.main()
