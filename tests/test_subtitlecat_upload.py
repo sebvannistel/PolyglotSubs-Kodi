@@ -7,14 +7,16 @@ from tests import utils
 api_instance = api.A4kSubtitlesApi({'kodi': True})
 core = api_instance.core
 core.settings = MagicMock()
+from a4kSubtitles.services import subtitlecat as subtitlecat_module
+api_instance.core.services['subtitlecat'] = subtitlecat_module
 
-@patch('a4kSubtitles.services.subtitlecat._upload_translation_to_subtitlecat')
-@patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-@patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-@patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, _map: text)
-@patch('a4kSubtitles.services.subtitlecat.srt.parse')
-@patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda items: '1\nBonjour\n')
-@patch('a4kSubtitles.services.subtitlecat._get_session')
+@patch('a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat')
+@patch('a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk')
+@patch('a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags')
+@patch('a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags', side_effect=lambda text, _map: text)
+@patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+@patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda items: '1\nBonjour\n')
+@patch('a4kSubtitles.services.subtitlecat.request._get_session')
 def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, mock_restore, mock_protect,
                                    mock_gtranslate, mock_upload):
     # Mock HTTP get for original subtitle
@@ -60,16 +62,17 @@ def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, m
     assert notify_spy.call_count == 1
     session.get.assert_called_with('http://subtitlecat.com/new.srt', timeout=20, stream=True)
     cache_key = (action_args['detail_url'], action_args['lang_code'])
-    assert cache_key in api_instance.core.services['subtitlecat']._TRANSLATED_CACHE
+    from a4kSubtitles.services.subtitlecat import translation as sc_translation
+    assert cache_key in sc_translation._TRANSLATED_CACHE
     notify_spy.restore()
 
-@patch('a4kSubtitles.services.subtitlecat._upload_translation_to_subtitlecat')
-@patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk', return_value=(['Bonjour'], 'en'))
-@patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags', return_value=('Hello', {}, False))
-@patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, _map: text)
-@patch('a4kSubtitles.services.subtitlecat.srt.parse')
-@patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda items: '1\nBonjour\n')
-@patch('a4kSubtitles.services.subtitlecat._get_session')
+@patch('a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat')
+@patch('a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk', return_value=(['Bonjour'], 'en'))
+@patch('a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags', return_value=('Hello', {}, False))
+@patch('a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags', side_effect=lambda text, _map: text)
+@patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+@patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda items: '1\nBonjour\n')
+@patch('a4kSubtitles.services.subtitlecat.request._get_session')
 def test_client_translation_no_upload(mock_get_session, mock_compose, mock_parse, mock_restore, mock_protect,
                                       mock_gtranslate, mock_upload):
     session = MagicMock()

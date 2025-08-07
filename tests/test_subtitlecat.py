@@ -70,14 +70,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
 
     # --- Test Scenarios ---
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_1_1_perfect_match_single_chunk(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                            mock_gtranslate, mock_restore_tags, mock_html_unescape,
                                            mock_srt_compose, mock_time_sleep):
@@ -109,14 +109,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
             self.assertTrue(result['save_callback']("/fake/path.srt"))
             mock_io_open.assert_called_once_with("/fake/path.srt", 'w', encoding='utf-8')
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_1_2_perfect_match_multi_chunk(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                           mock_gtranslate, mock_restore_tags, mock_html_unescape,
                                           mock_srt_compose, mock_time_sleep):
@@ -154,14 +154,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         self.assertNotIn("Segment count mismatch", log_calls_str)
         self.assertNotIn("discarded", log_calls_str)
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_2_1_fewer_segments_returned_single_chunk(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                                      mock_gtranslate, mock_restore_tags, mock_html_unescape,
                                                      mock_srt_compose, mock_time_sleep):
@@ -184,14 +184,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Final TII pointer (3) matches total translatable items (3). All items processed/attempted.")
         # The "Segment count mismatch" log indicates some items might not have received translations.
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_2_2_fewer_segments_returned_multi_chunk(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                                     mock_gtranslate, mock_restore_tags, mock_html_unescape,
                                                     mock_srt_compose, mock_time_sleep):
@@ -221,14 +221,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Segment count mismatch for chunk 2. Expected 2, got 1. Processing min of the two.")
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Final TII pointer (3) matches total translatable items (3). All items processed/attempted.")
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_3_1_more_segments_returned_single_chunk(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                                    mock_gtranslate, mock_restore_tags, mock_html_unescape,
                                                    mock_srt_compose, mock_time_sleep):
@@ -250,14 +250,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Chunk 1: Received 3 segments, but only processed 2 based on original chunking. 1 translated segments were discarded.")
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Final TII pointer (2) matches total translatable items (2). All items processed/attempted.")
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_3_2_more_segments_returned_multi_chunk(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                                     mock_gtranslate, mock_restore_tags, mock_html_unescape,
                                                     mock_srt_compose, mock_time_sleep):
@@ -287,14 +287,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Chunk 2: Received 2 segments, but only processed 1 based on original chunking. 1 translated segments were discarded.")
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Final TII pointer (2) matches total translatable items (2). All items processed/attempted.")
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_4_chunk_sep_usage_and_trailing_segment_handling(
         self,
         mock_get_session,
@@ -324,12 +324,12 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         self.assertNotIn("Segment count mismatch", log_calls_str)  # Trailing sep is popped, so counts match
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Final TII pointer (2) matches total translatable items (2). All items processed/attempted.")
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose')
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose')
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_5_empty_translatable_items_info(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                              mock_gtranslate, mock_srt_compose_call, mock_time_sleep):
         self._setup_internal_states_mocks(
@@ -348,14 +348,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         with patch('io.open', MagicMock()):  # save_callback should still work
             self.assertTrue(result['save_callback']("/fake/path.srt"))
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_6_single_segment_variations(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                          mock_gtranslate, mock_restore_tags, mock_html_unescape,
                                          mock_srt_compose, mock_time_sleep):
@@ -409,14 +409,14 @@ class TestSubtitlecatBuildDownloadRequestClientTranslation(unittest.TestCase):
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Chunk 1: Received 2 segments, but only processed 1 based on original chunking. 1 translated segments were discarded.")
         self.core_mock.logger.debug.assert_any_call(f"[{self.service_name}] Final TII pointer (1) matches total translatable items (1). All items processed/attempted.")
 
-    @patch('a4kSubtitles.services.subtitlecat.time.sleep')
-    @patch('a4kSubtitles.services.subtitlecat.srt.compose', side_effect=lambda x: "composed_srt_content")
-    @patch('a4kSubtitles.services.subtitlecat.html.unescape', side_effect=lambda x: x)
-    @patch('a4kSubtitles.services.subtitlecat._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
-    @patch('a4kSubtitles.services.subtitlecat._gtranslate_text_chunk')
-    @patch('a4kSubtitles.services.subtitlecat._protect_subtitle_tags')
-    @patch('a4kSubtitles.services.subtitlecat.srt.parse')
-    @patch('a4kSubtitles.services.subtitlecat._get_session')
+    @patch('a4kSubtitles.services.subtitlecat.request.time.sleep')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda x: "composed_srt_content")
+    @patch('a4kSubtitles.services.subtitlecat.request.html.unescape', side_effect=lambda x: x)
+    @patch('a4kSubtitles.services.subtitlecat.translation._restore_subtitle_tags', side_effect=lambda text, tag_map: text)
+    @patch('a4kSubtitles.services.subtitlecat.translation._gtranslate_text_chunk')
+    @patch('a4kSubtitles.services.subtitlecat.translation._protect_subtitle_tags')
+    @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
+    @patch('a4kSubtitles.services.subtitlecat.utils._get_session')
     def test_7_pointer_advancement_and_break_logic(self, mock_get_session, mock_srt_parse, mock_protect_tags,
                                                    mock_gtranslate, mock_restore_tags, mock_html_unescape,
                                                    mock_srt_compose, mock_time_sleep):
