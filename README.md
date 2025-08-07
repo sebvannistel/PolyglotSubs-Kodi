@@ -201,7 +201,7 @@ This addon, like the original, is licensed under the MIT License. See the [LICEN
 
 ## Contributing
 
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests.
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests. Note that our pre-commit configuration excludes bundled third-party modules under `a4kSubtitles/lib/third_party/`, so those files are intentionally not edited or linted.
 
 ## Icon
 

@@ -36,6 +36,11 @@ We welcome pull requests for bug fixes and improvements.
     The project uses `.flake8` for linting.
 
 #### Running Linters and Tests
+*   **Pre-commit:** Run the pre-commit hooks to format and lint code:
+    ```bash
+    pre-commit run --all-files
+    ```
+    The configuration excludes bundled third-party modules in `a4kSubtitles/lib/third_party/`.
 *   **Linting:** Ensure your changes pass linting before submitting:
     ```bash
     flake8 .
@@ -48,7 +53,8 @@ We welcome pull requests for bug fixes and improvements.
 
 #### Coding Standards
 *   Please follow the existing code style.
-*   Run `flake8` to check for linting errors before submitting a pull request. Configuration is in `.flake8`.
+*   Run `pre-commit run --all-files` to check for formatting and linting issues. Configuration is in `.pre-commit-config.yaml` and `.flake8`.
+*   Bundled third-party code lives in `a4kSubtitles/lib/third_party/`. These files are intentionally excluded from pre-commit hooks and should not be edited or linted.
 *   Ensure your code is well-commented, especially in complex or non-obvious parts.
 
 #### Submitting Pull Requests
