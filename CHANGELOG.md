@@ -1,3 +1,8 @@
+* PolyglotSubs-Kodi:
+  * Forked from [a4kSubtitles](https://github.com/a4k-openproject/a4kSubtitles) and maintained separately.
+  * Adds Subtitlecat.com provider with on-demand subtitle translation and optional sharing of translated subtitles.
+  * Distributed as standalone ZIP releases rather than through the original Kodi repository.
+
 * [v3.20.0](https://github.com/newt-sc/a4kSubtitles/releases/tag/service.subtitles.a4ksubtitles%2Fservice.subtitles.a4ksubtitles-3.20.0):
   * Auto download/selection improvements (by bbviking)
 
