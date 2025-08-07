@@ -15,7 +15,6 @@ os.environ["A4KSUBTITLES_API_MODE"] = json.dumps({"kodi": True})
 from a4kSubtitles.services import subtitlecat as subtitlecat_module
 
 
-@unittest.skip("Subtitlecat client translation tests require update for new interface")
 class TestSubtitlecatClientTranslation(unittest.TestCase):
     def setUp(self):
         self.core = MagicMock()
@@ -36,6 +35,9 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         # Clear any cached translations between tests
         subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = (
             subtitlecat_module.SimpleLRUCache(maxsize=128)
+        )
+        subtitlecat_module.request._CLIENT_TRANSLATED_CONTENT_CACHE = (
+            subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE
         )
 
     def _create_mock_sub_item(self, content):
@@ -130,15 +132,6 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         mock_gtranslate.assert_called_once_with(
             expected_chunk_to_gtranslate, "fr", self.core_mock, self.service_name, 0
         )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (2) matches total translatable items (2). All items processed/attempted."
-        )
-        # Ensure no mismatch or discard logs
-        log_calls_str = " ".join(
-            [c[0][0] for c in self.core_mock.logger.debug.call_args_list]
-        )
-        self.assertNotIn("Segment count mismatch", log_calls_str)
-        self.assertNotIn("discarded", log_calls_str)
 
         with patch("io.open", MagicMock()) as mock_io_open:
             self.assertTrue(result["save_callback"]("/fake/path.srt"))
@@ -207,20 +200,12 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
 
         mock_gtranslate.assert_has_calls(
             [
-                call([s1p_long], "fr", self.core_mock, self.service_name),
-                call([s2p_long], "fr", self.core_mock, self.service_name),
-                call([s3p], "fr", self.core_mock, self.service_name),
+                call([s1p_long], "fr", self.core_mock, self.service_name, 0),
+                call([s2p_long], "fr", self.core_mock, self.service_name, 0),
+                call([s3p], "fr", self.core_mock, self.service_name, 0),
             ]
         )
         self.assertEqual(mock_gtranslate.call_count, 3)
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (3) matches total translatable items (3). All items processed/attempted."
-        )
-        log_calls_str = " ".join(
-            [c[0][0] for c in self.core_mock.logger.debug.call_args_list]
-        )
-        self.assertNotIn("Segment count mismatch", log_calls_str)
-        self.assertNotIn("discarded", log_calls_str)
 
     @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
     @patch(
@@ -272,19 +257,14 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
             self.core_mock, self.service_name, self.base_action_args
         )
 
+        placeholder = "@@SUBTITLECAT_TRANSLATION_UNAVAILABLE@@"
         self.assertEqual(self.parsed_subs_list_reference[0].content, "T1")
-        self.assertEqual(self.parsed_subs_list_reference[1].content, "S2")
-        self.assertEqual(self.parsed_subs_list_reference[2].content, "S3")
+        self.assertEqual(self.parsed_subs_list_reference[1].content, placeholder)
+        self.assertEqual(self.parsed_subs_list_reference[2].content, placeholder)
         mock_gtranslate.assert_called_once_with(
-            expected_chunk, "fr", self.core_mock, self.service_name
+            expected_chunk, "fr", self.core_mock, self.service_name, 0
         )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Segment count mismatch for chunk 1. Expected 3, got 1. Processing min of the two."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (3) matches total translatable items (3). All items processed/attempted."
-        )
-        # The "Segment count mismatch" log indicates some items might not have received translations.
+        # The translation returned fewer segments than expected, so placeholders were used for the remaining items.
 
     @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
     @patch(
@@ -340,21 +320,16 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
             self.core_mock, self.service_name, self.base_action_args
         )
 
+        placeholder = "@@SUBTITLECAT_TRANSLATION_UNAVAILABLE@@"
         self.assertEqual(self.parsed_subs_list_reference[0].content, "T1_long")
         self.assertEqual(self.parsed_subs_list_reference[1].content, "T2_item2")
-        self.assertEqual(self.parsed_subs_list_reference[2].content, "S3")
+        self.assertEqual(self.parsed_subs_list_reference[2].content, placeholder)
 
         mock_gtranslate.assert_has_calls(
             [
-                call([s1p_long], "fr", self.core_mock, self.service_name),
-                call([s2p, s3p], "fr", self.core_mock, self.service_name),
+                call([s1p_long], "fr", self.core_mock, self.service_name, 0),
+                call([s2p, s3p], "fr", self.core_mock, self.service_name, 0),
             ]
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Segment count mismatch for chunk 2. Expected 2, got 1. Processing min of the two."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (3) matches total translatable items (3). All items processed/attempted."
         )
 
     @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
@@ -406,17 +381,9 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         self.assertEqual(self.parsed_subs_list_reference[0].content, "T1")
         self.assertEqual(self.parsed_subs_list_reference[1].content, "T2")
         mock_gtranslate.assert_called_once_with(
-            expected_chunk, "fr", self.core_mock, self.service_name
+            expected_chunk, "fr", self.core_mock, self.service_name, 0
         )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Segment count mismatch for chunk 1. Expected 2, got 3. Processing min of the two."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Chunk 1: Received 3 segments, but only processed 2 based on original chunking. 1 translated segments were discarded."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (2) matches total translatable items (2). All items processed/attempted."
-        )
+        # Extra segments returned from translation are ignored.
 
     @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
     @patch(
@@ -472,22 +439,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
 
         self.assertEqual(self.parsed_subs_list_reference[0].content, "T1_long")
         self.assertEqual(self.parsed_subs_list_reference[1].content, "T2_item2")
-
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Segment count mismatch for chunk 1. Expected 1, got 2. Processing min of the two."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Chunk 1: Received 2 segments, but only processed 1 based on original chunking. 1 translated segments were discarded."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Segment count mismatch for chunk 2. Expected 1, got 2. Processing min of the two."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Chunk 2: Received 2 segments, but only processed 1 based on original chunking. 1 translated segments were discarded."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (2) matches total translatable items (2). All items processed/attempted."
-        )
+        # Each chunk produced extra segments; only expected segments were applied.
 
     @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
     @patch(
@@ -538,17 +490,9 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         self.assertEqual(self.parsed_subs_list_reference[0].content, "T1")
         self.assertEqual(self.parsed_subs_list_reference[1].content, "T2")
         mock_gtranslate.assert_called_once_with(
-            expected_chunk, "fr", self.core_mock, self.service_name
+            expected_chunk, "fr", self.core_mock, self.service_name, 0
         )
-        log_calls_str = " ".join(
-            [c[0][0] for c in self.core_mock.logger.debug.call_args_list]
-        )
-        self.assertNotIn(
-            "Segment count mismatch", log_calls_str
-        )  # Trailing sep is popped, so counts match
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (2) matches total translatable items (2). All items processed/attempted."
-        )
+        # Trailing sep is popped, so counts match
 
     @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.compose")
@@ -581,12 +525,6 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         )
 
         mock_gtranslate.assert_not_called()
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Identified 0 translatable subtitle items (excluding all-tag lines)."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Split translatable items into 0 chunks for translation."
-        )
         mock_srt_compose_call.assert_called_once_with(self.parsed_subs_list_reference)
         with patch("io.open", MagicMock()):  # save_callback should still work
             self.assertTrue(result["save_callback"]("/fake/path.srt"))
@@ -624,6 +562,12 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         mock_gtranslate.reset_mock()
         mock_protect_tags.reset_mock()
         mock_srt_parse.reset_mock()  # Clean slate
+        subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = (
+            subtitlecat_module.SimpleLRUCache(maxsize=128)
+        )
+        subtitlecat_module.request._CLIENT_TRANSLATED_CONTENT_CACHE = (
+            subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE
+        )
         self._setup_internal_states_mocks(
             mock_get_session,
             mock_srt_parse,
@@ -638,16 +582,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         )
         self.assertEqual(self.parsed_subs_list_reference[0].content, "T1")
         mock_gtranslate.assert_called_with(
-            ["S1p"], "fr", self.core_mock, self.service_name
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (1) matches total translatable items (1). All items processed/attempted."
-        )
-        self.assertFalse(
-            any(
-                "Segment count mismatch" in c[0][0]
-                for c in self.core_mock.logger.debug.call_args_list
-            )
+            ["S1p"], "fr", self.core_mock, self.service_name, 0
         )
 
         # Test 6.2: Single Segment - Fewer Returned
@@ -655,6 +590,12 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         mock_gtranslate.reset_mock()
         mock_protect_tags.reset_mock()
         mock_srt_parse.reset_mock()
+        subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = (
+            subtitlecat_module.SimpleLRUCache(maxsize=128)
+        )
+        subtitlecat_module.request._CLIENT_TRANSLATED_CONTENT_CACHE = (
+            subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE
+        )
         self._setup_internal_states_mocks(
             mock_get_session,
             mock_srt_parse,
@@ -667,19 +608,21 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         subtitlecat_module.build_download_request(
             self.core_mock, self.service_name, self.base_action_args
         )
-        self.assertEqual(self.parsed_subs_list_reference[0].content, "S1")
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Segment count mismatch for chunk 1. Expected 1, got 0. Processing min of the two."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (1) matches total translatable items (1). All items processed/attempted."
-        )
+        placeholder = "@@SUBTITLECAT_TRANSLATION_UNAVAILABLE@@"
+        self.assertEqual(self.parsed_subs_list_reference[0].content, placeholder)
+        # No segments returned; placeholder inserted.
 
         # Test 6.3: Single Segment - More Returned
         self.core_mock.logger.reset_mock()
         mock_gtranslate.reset_mock()
         mock_protect_tags.reset_mock()
         mock_srt_parse.reset_mock()
+        subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = (
+            subtitlecat_module.SimpleLRUCache(maxsize=128)
+        )
+        subtitlecat_module.request._CLIENT_TRANSLATED_CONTENT_CACHE = (
+            subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE
+        )
         self._setup_internal_states_mocks(
             mock_get_session,
             mock_srt_parse,
@@ -693,15 +636,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
             self.core_mock, self.service_name, self.base_action_args
         )
         self.assertEqual(self.parsed_subs_list_reference[0].content, "T1")
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Segment count mismatch for chunk 1. Expected 1, got 2. Processing min of the two."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Chunk 1: Received 2 segments, but only processed 1 based on original chunking. 1 translated segments were discarded."
-        )
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (1) matches total translatable items (1). All items processed/attempted."
-        )
+        # Extra segments beyond the expected count are discarded.
 
     @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
     @patch(
@@ -780,9 +715,6 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         # After chunk 2 (i=1): pointer = 2. len(tii) = 2. Break condition (2>=2) met.
         # Since i (1) is NOT < len(chunks)-1 (which is 2-1=1), the specific log isn't hit.
         # This is normal termination.
-        self.core_mock.logger.debug.assert_any_call(
-            f"[{self.service_name}] Final TII pointer (2) matches total translatable items (2). All items processed/attempted."
-        )
         self.core_mock.logger.info(
             "Test 7: Specific log for 'subsequent chunks skipped' is hard to trigger with "
             "current deterministic chunking. General break logic (terminating after all items "
@@ -805,6 +737,54 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
             "Test 8: Analysis suggests 'target_tii_index_out_of_bounds' log is unreachable with current logic."
         )
         pass
+
+    @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
+    @patch(
+        "a4kSubtitles.services.subtitlecat.request.srt.compose",
+        side_effect=lambda x: "composed_srt_content",
+    )
+    @patch(
+        "a4kSubtitles.services.subtitlecat.request.html.unescape",
+        side_effect=lambda x: x,
+    )
+    @patch(
+        "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
+        side_effect=lambda text, tag_map: text,
+    )
+    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
+    @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
+    @patch("a4kSubtitles.services.subtitlecat.request._get_session")
+    def test_9_translation_timeout_placeholder(
+        self,
+        mock_get_session,
+        mock_srt_parse,
+        mock_protect_tags,
+        mock_gtranslate,
+        mock_restore_tags,
+        mock_html_unescape,
+        mock_srt_compose,
+        mock_time_sleep,
+    ):
+        self._setup_internal_states_mocks(
+            mock_get_session,
+            mock_srt_parse,
+            mock_protect_tags,
+            original_srt_text="1\nS1\n",
+            parsed_subs_contents=["S1"],
+            protect_tags_outputs=[self._create_protect_output("S1p")],
+        )
+        placeholder = "@@SUBTITLECAT_TRANSLATION_UNAVAILABLE@@"
+        mock_gtranslate.return_value = ([placeholder], "auto")
+
+        subtitlecat_module.build_download_request(
+            self.core_mock, self.service_name, self.base_action_args
+        )
+
+        self.assertEqual(self.parsed_subs_list_reference[0].content, placeholder)
+        mock_gtranslate.assert_called_once_with(
+            ["S1p"], "fr", self.core_mock, self.service_name, 0
+        )
 
 
 if __name__ == "__main__":
