@@ -36,9 +36,13 @@ We welcome pull requests for bug fixes and improvements.
     The project uses `.flake8` for linting.
 
 #### Running Linters and Tests
-*   **Linting:** Ensure your changes pass linting before submitting:
+*   **Install pre-commit hooks:**
     ```bash
-    flake8 .
+    pre-commit install
+    ```
+*   **Linting:** Run all pre-commit checks:
+    ```bash
+    pre-commit run --all-files
     ```
 *   **Tests:** Run the automated test suite:
     ```bash
@@ -48,7 +52,7 @@ We welcome pull requests for bug fixes and improvements.
 
 #### Coding Standards
 *   Please follow the existing code style.
-*   Run `flake8` to check for linting errors before submitting a pull request. Configuration is in `.flake8`.
+*   Run `pre-commit run --all-files` to check for linting errors before submitting a pull request. Configuration for `flake8` is in `.flake8`.
 *   Ensure your code is well-commented, especially in complex or non-obvious parts.
 
 #### Submitting Pull Requests
