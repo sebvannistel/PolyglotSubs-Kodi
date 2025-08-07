@@ -1,3 +1,4 @@
+exclude: ^a4kSubtitles/lib/third_party/
 repos:
   - repo: https://github.com/psf/black
     rev: 24.4.2
