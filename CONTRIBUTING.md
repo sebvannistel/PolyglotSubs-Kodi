@@ -31,14 +31,14 @@ We welcome pull requests for bug fixes and improvements.
 4.  **Dependencies for Linting/Testing:**
     Install development dependencies (linters, test runners):
     ```bash
-    pip install -r requirements-dev.txt 
+    pip install -r requirements-dev.txt
     ```
-    The project uses `.flake8` for linting.
+    This installs [pre-commit](https://pre-commit.com), which manages linting for the project.
 
 #### Running Linters and Tests
 *   **Linting:** Ensure your changes pass linting before submitting:
     ```bash
-    flake8 .
+    pre-commit run --all-files
     ```
 *   **Tests:** Run the automated test suite:
     ```bash
@@ -48,7 +48,7 @@ We welcome pull requests for bug fixes and improvements.
 
 #### Coding Standards
 *   Please follow the existing code style.
-*   Run `flake8` to check for linting errors before submitting a pull request. Configuration is in `.flake8`.
+*   Run `pre-commit run --all-files` to check for linting errors before submitting a pull request. Configuration is in `.pre-commit-config.yaml`.
 *   Ensure your code is well-commented, especially in complex or non-obvious parts.
 
 #### Submitting Pull Requests

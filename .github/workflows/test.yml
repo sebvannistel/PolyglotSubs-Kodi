@@ -20,7 +20,7 @@ jobs:
           pip install beautifulsoup4
       - name: Lint
         run: |
-          flake8 --exit-zero
+          pre-commit run --all-files
       - name: Test
         run: |
           pytest -q

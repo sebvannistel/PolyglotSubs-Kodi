@@ -201,7 +201,7 @@ This addon, like the original, is licensed under the MIT License. See the [LICEN
 
 ## Contributing
 
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests.
+We welcome contributions! Install the development dependencies with `pip install -r requirements-dev.txt` and run `pre-commit run --all-files` to lint your code before submitting. Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests.
 
 ## Icon
 
