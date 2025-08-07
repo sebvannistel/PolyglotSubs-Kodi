@@ -58,6 +58,10 @@ We welcome pull requests for bug fixes and improvements.
     pytest
     ```
     The tests mock Kodi's environment and can be run from the project root after installing `requirements-dev.txt`.
+    Integration tests are skipped by default. Include them with:
+    ```bash
+    pytest --run-integration
+    ```
 
 #### Coding Standards
 *   Please follow the existing code style.
