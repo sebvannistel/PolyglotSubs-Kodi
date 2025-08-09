@@ -217,6 +217,14 @@ pytest --run-integration
 
 We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests. Note that our pre-commit configuration excludes bundled third-party modules under `a4kSubtitles/lib/third_party/`, so those files are intentionally not edited or linted.
 
+Before committing or pushing changes, run the preflight script to execute the linters and tests:
+
+```bash
+scripts/preflight.sh
+```
+
+This script runs `pre-commit run --all-files` and `pytest` to catch formatting problems and failing tests early.
+
 ## Icon
 
 Original logo `quill` by Ramy Wafaa ([RoundIcons](https://roundicons.com)).
