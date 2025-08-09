@@ -37,6 +37,14 @@ We welcome pull requests for bug fixes and improvements.
 
 #### Running Linters and Tests
 
+To run all linters and the test suite in one step before committing or pushing, use the preflight script:
+
+```bash
+scripts/preflight.sh
+```
+
+It executes `pre-commit run --all-files` and `pytest` to catch formatting issues and failing tests early.
+
 *   **Install pre-commit hooks:**
 
 *   **Pre-commit:** Run the pre-commit hooks to format and lint code:
