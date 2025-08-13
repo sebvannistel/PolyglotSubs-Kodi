@@ -24,6 +24,9 @@ jobs:
       - name: Test
         run: |
           pytest -q
+      - name: Integration Tests
+        run: |
+          pytest --run-integration -q
       - name: Validate commit
         run: |
           python scripts/validate_commit.py
