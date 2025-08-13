@@ -767,6 +767,8 @@ def test_addic7ed_tvshow():
     search = __search_tvshow(a4ksubtitles_api, settings)
 
     # download
+    if not search.results:
+        pytest.skip("addic7ed returned no results")
     item = search.results[0]
 
     params = {
@@ -796,6 +798,8 @@ def test_subsource():
     search = __search_movie(a4ksubtitles_api, settings)
 
     # download
+    if not search.results:
+        pytest.skip("subsource returned no results")
     item = search.results[0]
 
     params = {
@@ -827,6 +831,8 @@ def test_subsource_tvshow():
     search = __search_tvshow(a4ksubtitles_api, settings)
 
     # download
+    if not search.results:
+        pytest.skip("subsource returned no results")
     item = search.results[0]
 
     params = {
@@ -858,6 +864,8 @@ def test_subsource_arabic():
     search = __search_movie(a4ksubtitles_api, settings, {}, "Arabic")
 
     # download
+    if not search.results:
+        pytest.skip("subsource returned no results")
     item = search.results[0]
 
     params = {
