@@ -1,5 +1,20 @@
+# Auto-detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Common binary file types
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.zip binary
+
+# Linguist hints
+packages/* linguist-generated
+
+# Release packaging
 .*                  export-ignore
 packages            export-ignore
 scripts             export-ignore
 tests               export-ignore
 requirements.txt    export-ignore
+
