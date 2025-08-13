@@ -1,3 +1,7 @@
+* Unreleased:
+  * Normalize line endings and add linguist hints in `.gitattributes`.
+  * Introduce `.editorconfig` for consistent formatting across editors.
+
 * PolyglotSubs-Kodi:
   * Forked from [a4kSubtitles](https://github.com/a4k-openproject/a4kSubtitles) and maintained separately.
   * Adds Subtitlecat.com provider with on-demand subtitle translation and optional sharing of translated subtitles.
