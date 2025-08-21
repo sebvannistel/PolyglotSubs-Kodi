@@ -85,6 +85,15 @@ def initialize() -> bool:
         _THIRD_PARTY_LIBS_PATH = os.path.join(_A4KSUBTITLES_DIR, "lib", "third_party")
 
         if os.path.isdir(_THIRD_PARTY_LIBS_PATH):
+            try:
+                # Import requests before exposing vendored libraries to avoid
+                # its dependency check from picking up our bundled chardet.
+                import requests  # noqa: F401
+            except Exception:
+                logger.debug(
+                    "a4kSubtitles/__init__.py: 'requests' not imported prior to sys.path modification"
+                )
+
             if _THIRD_PARTY_LIBS_PATH not in sys.path:
                 sys.path.insert(0, _THIRD_PARTY_LIBS_PATH)
                 logger.debug(
