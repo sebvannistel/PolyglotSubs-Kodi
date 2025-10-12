@@ -30,6 +30,16 @@ def __set_api_headers(core, service_name, request, token_cache=None):
         request['headers']['Authorization'] = 'Bearer %s' % token_cache['token']
 
 def build_auth_request(core, service_name):
+    """
+    Builds the authentication request for the opensubtitles service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+
+    Returns:
+        dict: The authentication request.
+    """
     if core.os.getenv('A4KSUBTITLES_TESTRUN') == 'true':
         return
 
@@ -64,6 +74,14 @@ def build_auth_request(core, service_name):
     return request
 
 def parse_auth_response(core, service_name, response):
+    """
+    Parses the authentication response from the opensubtitles service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        response (requests.Response): The response from the service.
+    """
     if response.status_code == 400:
         core.kodi.notification('OpenSubtitles authentication failed! Bad username. Make sure you have entered your username and not your email in the username field.')
         return
@@ -95,6 +113,17 @@ def parse_auth_response(core, service_name, response):
     core.cache.save_tokens_cache(cache)
 
 def build_search_requests(core, service_name, meta):
+    """
+    Builds the search requests for the opensubtitles service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        list: A list of search requests.
+    """
     cache = core.cache.get_tokens_cache()
     token_cache = cache.get(service_name, None)
     if token_cache is None and core.os.getenv('A4KSUBTITLES_TESTRUN') != 'true':
@@ -140,6 +169,18 @@ def build_search_requests(core, service_name, meta):
     return [request]
 
 def parse_search_response(core, service_name, meta, response):
+    """
+    Parses the search response from the opensubtitles service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+        response (requests.Response): The response from the service.
+
+    Returns:
+        list: A list of subtitle results.
+    """
     try:
         results = core.json.loads(response.text)
     except Exception as exc:
@@ -178,6 +219,17 @@ def parse_search_response(core, service_name, meta, response):
     return list(map(map_result, results['data']))
 
 def build_download_request(core, service_name, args):
+    """
+    Builds the download request for the opensubtitles service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        args (dict): The arguments for the download.
+
+    Returns:
+        dict: The download request.
+    """
     def download_request(response):
         result = core.json.loads(response.text)
 

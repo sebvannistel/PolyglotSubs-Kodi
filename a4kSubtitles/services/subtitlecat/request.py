@@ -43,6 +43,17 @@ __kodi_regional_lang_map = {
 
 
 def build_search_requests(core, service_name, meta):
+    """
+    Builds the search requests for the subtitlecat service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        list: A list of search requests.
+    """
     if not _AIOHTTP_AVAILABLE and _get_setting(
         core, "debug", False
     ):  # Log aiohttp fallback if debug is on
@@ -91,6 +102,18 @@ def build_search_requests(core, service_name, meta):
 # SEARCH RESPONSE PARSER
 # ---------------------------------------------------------------------------
 def parse_search_response(core, service_name, meta, response):
+    """
+    Parses the search response from the subtitlecat service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+        response (requests.Response): The response from the service.
+
+    Returns:
+        list: A list of subtitle results.
+    """
     core.logger.debug(
         f"[{service_name}] Parsing search response. Status: {response.status_code}, URL: {response.url if response else 'N/A'}"
     )
@@ -544,6 +567,17 @@ def parse_search_response(core, service_name, meta, response):
 # ---------------------------------------------------------------------------
 # DOWNLOAD REQUEST BUILDER
 def build_download_request(core, service_name, args):
+    """
+    Builds the download request for the subtitlecat service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        args (dict): The arguments for the download.
+
+    Returns:
+        dict: The download request.
+    """
     _filename_from_args = args.get("filename", "unknown_subtitle.srt")
     core.logger.debug(
         f"[{service_name}] Building download request for: {_filename_from_args}, Args: {str(args)[:500]}"

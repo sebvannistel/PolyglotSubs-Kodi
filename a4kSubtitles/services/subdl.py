@@ -1,6 +1,17 @@
 # -*- coding: utf-8 -*-
 
 def build_search_requests(core, service_name, meta):
+    """
+    Builds the search requests for the subdl service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        list: A list of search requests.
+    """
     apikey = core.kodi.get_setting(service_name, 'apikey')
 
     if not apikey:
@@ -43,6 +54,18 @@ def build_search_requests(core, service_name, meta):
     return [request]
 
 def parse_search_response(core, service_name, meta, response):
+    """
+    Parses the search response from the subdl service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+        response (requests.Response): The response from the service.
+
+    Returns:
+        list: A list of subtitle results.
+    """
     try:
         results = core.json.loads(response.text)
     except Exception as exc:
@@ -83,6 +106,17 @@ def parse_search_response(core, service_name, meta, response):
     return list(map(map_result, results['subtitles']))
 
 def build_download_request(core, service_name, args):
+    """
+    Builds the download request for the subdl service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        args (dict): The arguments for the download.
+
+    Returns:
+        dict: The download request.
+    """
     request = {
         'method': 'GET',
         'url': 'https://dl.subdl.com' + args['url']

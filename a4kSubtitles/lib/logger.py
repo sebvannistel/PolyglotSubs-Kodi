@@ -31,7 +31,19 @@ def __log(message, level):
     xbmc.log('{0}: {1}'.format(addon_id, message), level)
 
 def error(message):
+    """
+    Logs an error message.
+
+    Args:
+        message (str or function): The message to log. If it's a function, it will be called to get the message.
+    """
     __log(message, xbmc.LOGERROR)
 
 def debug(message):
+    """
+    Logs a debug message.
+
+    Args:
+        message (str or function): The message to log. If it's a function, it will be called to get the message.
+    """
     __log(message, notice_type)

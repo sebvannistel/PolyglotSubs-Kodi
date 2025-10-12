@@ -1,47 +1,64 @@
 <img align="left" width="90px" height="90px" src="icon.png">
 
+# a4kSubtitles
 
-# PolyglotSubs-Kodi
+[![Kodi version](https://img.shields.io/badge/kodi%20versions-19+-blue)](https://kodi.tv/)
+[![View Releases](https://img.shields.io/badge/releases-on%20GitHub-blue)](https://github.com/a4k-openproject/a4kSubtitles/releases)
 
-
-
-
-[![Kodi version](https://img.shields.io/badge/kodi%20versions-20--21-blue)](https://kodi.tv/)
-[![View Releases](https://img.shields.io/badge/releases-on%20GitHub-blue)](https://github.com/sebvannistel/PolyglotSubs-Kodi/releases)
-
-This is a fork of the original [a4kSubtitles](https://github.com/a4k-openproject/a4kSubtitles) addon, modified to include **Subtitlecat.com** as an additional subtitle provider.
+a4kSubtitles is a subtitle addon for Kodi.
 
 ## Description
 
-a4kSubtitles is a subtitle addon for KODI. This version retains the features and providers of the original while adding support for Subtitlecat.com.
+a4kSubtitles is a subtitle addon for KODI. It supports multiple subtitle services and provides a simple API for developers to integrate subtitle functionality into their own addons.
 
-**Key Features of PolyglotSubs-Kodi:**
-*   Includes all original providers from a4kSubtitles.
-*   **Adds Subtitlecat.com:**
-    *   Searches for subtitles on Subtitlecat.com.
-    *   Supports on-demand translation of subtitles via Subtitlecat's server-side translation feature. If a direct subtitle in your desired language isn't available but can be translated by Subtitlecat, this addon will trigger the translation and poll for the result.
+## Features
 
-**Supported Subtitle Services:**
-*   Addic7ed
-*   BSPlayer
-*   OpenSubtitles
-*   Podnadpisi.NET
-*   SubDL
-*   SubSource
-*   **Subtitlecat.com (New in this Mod)**
+*   **Multiple Subtitle Services:** Supports a variety of subtitle services, including:
+    *   Addic7ed
+    *   BSPlayer
+    *   OpenSubtitles
+    *   Podnadpisi.NET
+    *   SubDL
+    *   SubSource
+    *   Subtitlecat.com
+*   **Automatic Subtitle Search and Download:** Automatically searches for and downloads subtitles for the currently playing video.
+*   **Manual Subtitle Search:** Allows users to manually search for subtitles.
+*   **Subtitle Post-Processing:** Cleans up and formats subtitles for optimal viewing.
+*   **API for Developers:** Provides a simple API for developers to integrate subtitle functionality into their own addons.
 
-## What's New in this Fork?
+## Installation
 
-This fork integrates [Subtitlecat.com](https://www.subtitlecat.com) as a subtitle service. The main changes are within the `a4kSubtitles/services/subtitlecat.py` file, enabling:
-*   Direct searching and downloading of subtitles from Subtitlecat.
-*   Automated requests for server-side translation of subtitles if a direct match for your language isn't immediately available. The addon will then wait for the translation to complete and download the subtitle.
-*   Robust URL handling and parsing tailored for Subtitlecat.
+1.  **Download the Addon:**
+    *   Go to the [releases page](https://github.com/a4k-openproject/a4kSubtitles/releases).
+    *   Download the latest `service.subtitles.a4ksubtitles-X.X.X.zip` file.
+2.  **Enable Unknown Sources in KODI:**
+    *   Go to **Settings -> System -> Add-ons -> Unknown sources**.
+    *   Toggle this option **on**.
+3.  **Install in KODI:**
+    *   Go to **Settings -> Add-ons -> Install from zip file**.
+    *   Browse to the location where you downloaded the `.zip` file and select it.
+    *   Wait for the "Add-on installed" notification.
 
-Otherwise, this fork aims to keep the core functionality and other providers as they are in the upstream `a4k-openproject` version.
+## Usage
+
+### Subtitle Search
+
+1.  While a video is playing, open the subtitles menu.
+2.  Select "Download...".
+3.  a4kSubtitles will search for subtitles using the enabled services.
+4.  Select a subtitle from the list to download and display it.
+
+### Automatic Subtitle Search
+
+a4kSubtitles can automatically search for and download subtitles when a video starts playing. To enable this feature:
+
+1.  Go to the addon settings.
+2.  Enable "Auto search first item".
+3.  Optionally, enable "Auto download first result silently" to automatically download the best-matched subtitle.
 
 ## Configuration
 
-You can customize PolyglotSubs-Kodi to your preferences through the addon settings.
+You can customize a4kSubtitles to your preferences through the addon settings.
 
 **How to Access Addon Settings:**
 1.  Open KODI.
@@ -49,10 +66,9 @@ You can customize PolyglotSubs-Kodi to your preferences through the addon settin
 3.  Select **Add-ons**.
 4.  Choose **My add-ons**.
 5.  Scroll down and select **Subtitle add-ons**.
-6.  Find and select **PolyglotSubs-Kodi** (it might be listed as a4kSubtitles or a similar name).
+6.  Find and select **a4kSubtitles**.
 7.  Click on **Configure**.
 
-*(The existing configuration GIF from the original project that provides a good general overview of navigating the settings panel.)*
 ![configuration](https://media.giphy.com/media/kewuE4BgfOnFin0vEC/source.gif)
 
 Below is a description of the available settings, generally following the structure you'll find in the configuration dialog:
@@ -62,8 +78,8 @@ Below is a description of the available settings, generally following the struct
 This section covers the main behavior of the addon.
 
 *   **Preferred Subtitle Languages:**
-    *   **What it does:** Standard Kodi feature allowing you to set your primary, secondary, and tertiary languages for subtitles. PolyglotSubs-Kodi will prioritize results in these languages.
-    *   **How to access:** This is typically configured in Kodi's global settings: **Settings -> Player -> Language**. Look for "Preferred subtitle language". Some skins or setups might also offer quick access during playback. PolyglotSubs-Kodi will use these system-wide settings.
+    *   **What it does:** Standard Kodi feature allowing you to set your primary, secondary, and tertiary languages for subtitles. a4kSubtitles will prioritize results in these languages.
+    *   **How to access:** This is typically configured in Kodi's global settings: **Settings -> Player -> Language**. Look for "Preferred subtitle language". Some skins or setups might also offer quick access during playback. a4kSubtitles will use these system-wide settings.
 *   **Timeout for Services (ID: `general.timeout`):**
     *   **What it does:** Sets the maximum time (in seconds) the addon will wait for each subtitle service to respond.
     *   **Default:** 15 seconds. You can increase this if you have a slow connection or decrease it for faster searches (though some services might be missed).
@@ -89,7 +105,7 @@ This section covers the main behavior of the addon.
     *   **What it does:** If enabled, the addon will try to prioritize "forced" subtitles. Forced subtitles are used to translate dialogue in a foreign language when the main audio track is in your preferred language (e.g., alien speech in a sci-fi movie). This preference is active when "Auto-select subtitle if only one result" is true or "Auto Download First Result Silently" is true.
     *   **Default:** True (Enabled).
 *   **Upload Translated Subtitles to Subtitlecat (ID: `subtitlecat_upload_translations`):**
-    *   **What it does:** When PolyglotSubs-Kodi requests an on-demand translation from Subtitlecat, enabling this option allows the addon to share the translated subtitle back with Subtitlecat so other users can benefit. Disable it if you prefer the translation to remain private.
+    *   **What it does:** When a4kSubtitles requests an on-demand translation from Subtitlecat, enabling this option allows the addon to share the translated subtitle back with Subtitlecat so other users can benefit. Disable it if you prefer the translation to remain private.
     *   **Default:** True (Enabled - contributes back to Subtitlecat).
 *   **Notify When Upload Completes (ID: `subtitlecat_notify_upload`):**
     *   **What it does:** Shows a Kodi notification once a translated subtitle has been successfully uploaded to Subtitlecat and a shareable URL is returned.
@@ -98,11 +114,11 @@ This section covers the main behavior of the addon.
     *   **What it does:** Controls whether Subtitlecat results from its shared translation system (shown with "[Shared]") appear in your search results.
     *   **Default:** True (Enabled).
 *   **Enable/Disable Embedded Subtitles:**
-    *   **Note:** PolyglotSubs-Kodi primarily focuses on downloading external subtitle files. The handling of embedded subtitles (those already within your video file) is usually controlled by Kodi's main player settings, not this addon's settings specifically. Check under **Settings -> Player -> Language -> Enable parsing for closed captions / Teletext**.
+    *   **Note:** a4kSubtitles primarily focuses on downloading external subtitle files. The handling of embedded subtitles (those already within your video file) is usually controlled by Kodi's main player settings, not this addon's settings specifically. Check under **Settings -> Player -> Language -> Enable parsing for closed captions / Teletext**.
 
 ### 2. Services (Subtitle Providers)
 
-This section allows you to enable or disable individual subtitle providers. PolyglotSubs-Kodi will only search for subtitles on services that are enabled here.
+This section allows you to enable or disable individual subtitle providers. a4kSubtitles will only search for subtitles on services that are enabled here.
 
 *   **Addic7ed (ID: `addic7ed.enabled`):** Default: False (Disabled)
 *   **BSPlayer (ID: `bsplayer.enabled`):** Default: False (Disabled)
@@ -123,81 +139,31 @@ Some subtitle services require you to have an account (and sometimes API keys) t
     *   **API Key (ID: `subdl.apikey`):** Your SubDL API key, if you have one.
 
 **Note on Languages and Providers:**
-Remember to set your preferred languages in Kodi's main settings. PolyglotSubs-Kodi uses these preferences to search across all enabled providers. The availability and quality of subtitles can vary greatly between providers and languages. If you're not finding subtitles for specific content, try enabling more providers or checking their individual websites.
+Remember to set your preferred languages in Kodi's main settings. a4kSubtitles uses these preferences to search across all enabled providers. The availability and quality of subtitles can vary greatly between providers and languages. If you're not finding subtitles for specific content, try enabling more providers or checking their individual websites.
 
-## Installation of this Fork (PolyglotSubs-Kodi)
+## API
 
-To install this specific version of a4kSubtitles:
+a4kSubtitles provides a simple API for developers to integrate subtitle functionality into their own addons.
 
-**Important First Step:** To prevent potential conflicts or issues, it is **highly recommended to uninstall any previous versions of `a4kSubtitles` or other conflicting subtitle addons** before installing this fork.
+### Example
 
-1.  **Download the Addon:**
-    *   Go to the releases page for this fork: (https://github.com/sebvannistel/PolyglotSubs-Kodi/releases)
-    *   Download the latest `service.subtitles.polyglotsubs-kodi-X.X.X.sc.X.zip` file (e.g., `service.subtitles.polyglotsubs-kodi-3.20.0.sc.9.zip`).
+```python
+from a4kSubtitles import api
 
-2.  **Enable Unknown Sources in KODI (If Not Already Done):**
-    *   Before you can install from a zip file, you might need to enable "Unknown Sources".
-    *   Typically, you can find this under **Settings** (often a gear icon) **-> System -> Add-ons -> Unknown sources**.
-    *   Toggle this option **on**.
-    *   Kodi will likely show a warning about the risks of installing from unknown sources; you'll need to read and accept this warning to proceed.
-    *   *Note: The exact path to this setting might vary slightly depending on your Kodi version or skin. If you can't find it, you can refer to the [official Kodi Wiki](https://kodi.wiki/view/Settings/System/Add-ons#Unknown_sources) for the most current instructions.*
+# Initialize the API
+a4k = api.A4kSubtitlesApi()
 
-3.  **Install in KODI:**
-    *   Open KODI.
-    *   Navigate to **Settings** (often a gear icon on the main menu) **-> Add-ons** -> **Install from zip file**.
-    *   Browse to the location where you downloaded the `.zip` file (from Step 1) and select it.
-    *   Wait for the "Add-on installed" notification.
+# Search for subtitles
+results = a4k.search({
+    'languages': 'en',
+    'preferredlanguage': 'en',
+})
 
-4.  **Configure (Recommended):**
-    *   After installation, find "PolyglotSubs-Kodi" in your Subtitle add-ons.
-    *   Open its settings. **Subtitlecat.com is enabled by default.** You can review other provider settings and also configure your preferred languages here, though main language preferences are typically set globally in Kodi's Player settings (see Configuration section).
-
-**Note:** This installation method installs the addon directly. It differs from the original a4kSubtitles installation that typically uses a repository.
-
-## Using PolyglotSubs-Kodi
-
-This section explains common user actions. The general process of searching and selecting subtitles is also visually demonstrated in the "Preview" section below.
-
-### Subtitle Search
-
-1.  **Access Player Controls:** While your video is playing, access the video player controls. This might vary by Kodi skin, but often involves pressing 'Enter', 'OK', or a menu button on your remote.
-2.  **Open Subtitles Menu:** Navigate to the Subtitles icon/button (often looks like a speech bubble or 'cc' icon) within the player controls.
-3.  **Search Process:** PolyglotSubs-Kodi will then search for subtitles using your enabled providers. If multiple services are active, this might take a few moments.
-4.  **Select and Download:** You'll be presented with a list of found subtitles. Results are typically sorted by relevance or language. Select a subtitle from the list to download and display it on your video. If "subtitlecat.com" is shown in yellow colour it means that the subtitles have not been translated yet. Therefore when you select it you need to give it around 2-3min time to translate. After it finished it will download automatically.
-
-
-### Subtitlecat.com Integration
-
-PolyglotSubs-Kodi automatically leverages Subtitlecat.com if Subtitlecat is enabled as a provider in the addon's settings.
-
-*   **Direct Matches:** If a subtitle in your preferred language is found directly on Subtitlecat, it will be listed in your search results like any other provider.
-*   **On-Demand Translation:** This is a key feature of the Subtitlecat integration.
-    *   If a direct subtitle match isn't found in your preferred language, but Subtitlecat has a version it can translate (e.g., an English subtitle that can be translated to your Spanish preferred language), the addon will automatically request this translation from Subtitlecat's servers.
-    *   The listing will have "subtitlecat.com" written in yellow. 
-    *   Once you select it, the translation process happens in the background. You might see a notification about the translation being initiated..
-    *   No extra steps are usually needed from your side other than waiting (usually 2-3min, depending on the server load and the length of the subtitle) for the translation to finish and then it will be automatically downloaded.
-
-### Automatic & Other Features
-
-PolyglotSubs-Kodi inherits many features from the original a4kSubtitles, including options for automation.
-
-*   **Explore Settings:** You can explore the addon's settings for features like "Auto download first subtitle result silently" or other options to automatically download the best-matched subtitle based on your preferences.
-*   These settings can help streamline your subtitle experience, but their availability and behavior might depend on the specific version and your overall Kodi setup.
-
-## Preview
-The general usage for searching and selecting subtitles remains consistent with the original a4kSubtitles addon.
-*(Original usage GIF, still largely applicable)*
-![usage](https://media.giphy.com/media/QTmhgEJTpTPTPxByfj/source.gif)
-
-## Differences from Original a4kSubtitles
-
-*   **Primary Change:** This fork's main purpose is to add **Subtitlecat.com** as a provider, including its unique translation-on-demand feature.
-*   **Source:** This version is maintained by [sebvannistel](https://github.com/sebvannistel), not the original `a4k-openproject` team.
-*   **Release Method:** Releases for this fork are provided as direct ZIP files on the [sebvannistel/PolyglotSubs-Kodi releases page](https://github.com/sebvannistel/PolyglotSubs-Kodi/releases).
-
-## License
-
-This addon, like the original, is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+# Download a subtitle
+if results:
+    subfile = a4k.download(results[0])
+    print("Subtitle downloaded to:", subfile)
+```
 
 ## Testing
 
@@ -215,7 +181,7 @@ pytest --run-integration
 
 ## Contributing
 
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests. Note that our pre-commit configuration excludes bundled third-party modules under `a4kSubtitles/lib/third_party/`, so those files are intentionally not edited or linted.
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests.
 
 Before committing or pushing changes, run the preflight script to execute the linters and tests:
 
@@ -224,6 +190,10 @@ scripts/preflight.sh
 ```
 
 This script runs `pre-commit run --all-files` and `pytest` to catch formatting problems and failing tests early.
+
+## License
+
+This addon is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
 ## Icon
 

@@ -42,6 +42,15 @@ from .download import download
 from .data import data
 
 def main(handle, paramstring):  # pragma: no cover
+    """
+    The main entry point for the addon.
+
+    It parses the parameters and calls the appropriate function.
+
+    Args:
+        handle (int): The handle of the plugin.
+        paramstring (str): The parameter string.
+    """
     core.api_mode_enabled = False
     core.handle = handle
 

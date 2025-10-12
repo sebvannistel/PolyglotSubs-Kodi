@@ -3,6 +3,17 @@
 __url = 'https://www.podnapisi.net'
 
 def build_search_requests(core, service_name, meta):
+    """
+    Builds the search requests for the podnadpisi service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        list: A list of search requests.
+    """
     params = {
         'keywords': meta.title if meta.is_movie else meta.tvshow,
         'language': core.utils.get_lang_ids(meta.languages, core.kodi.xbmc.ISO_639_1),
@@ -33,6 +44,18 @@ def build_search_requests(core, service_name, meta):
     return [request]
 
 def parse_search_response(core, service_name, meta, response):
+    """
+    Parses the search response from the podnadpisi service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+        response (requests.Response): The response from the service.
+
+    Returns:
+        list: A list of subtitle results.
+    """
     try:
         results = core.json.loads(response.text)
     except Exception as exc:
@@ -81,6 +104,17 @@ def parse_search_response(core, service_name, meta, response):
     return list(map(map_result, results['data']))
 
 def build_download_request(core, service_name, args):
+    """
+    Builds the download request for the podnadpisi service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        args (dict): The arguments for the download.
+
+    Returns:
+        dict: The download request.
+    """
     def retry_download(response):
         if response.status_code >= 500:
             return {

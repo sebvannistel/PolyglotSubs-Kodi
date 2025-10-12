@@ -52,6 +52,17 @@ except AttributeError as e:
 
 
 def json_rpc(method, params, log_error=True):  # pragma: no cover
+    """
+    Executes a JSON-RPC method.
+
+    Args:
+        method (str): The JSON-RPC method to execute.
+        params (dict): The parameters for the method.
+        log_error (bool, optional): Whether to log errors. Defaults to True.
+
+    Returns:
+        The result of the JSON-RPC method, or None if an error occurred.
+    """
     try:
         result = xbmc.executeJSONRPC(
             json.dumps(
@@ -76,10 +87,29 @@ def json_rpc(method, params, log_error=True):  # pragma: no cover
 
 
 def get_kodi_setting(setting, log_error=True):  # pragma: no cover
+    """
+    Gets a Kodi setting.
+
+    Args:
+        setting (str): The setting to get.
+        log_error (bool, optional): Whether to log errors. Defaults to True.
+
+    Returns:
+        The value of the setting, or None if an error occurred.
+    """
     return json_rpc("Settings.GetSettingValue", {"setting": setting}, log_error)
 
 
 def get_kodi_player_subtitles(log_error=True):  # pragma: no cover
+    """
+    Gets the subtitles of the current player.
+
+    Args:
+        log_error (bool, optional): Whether to log errors. Defaults to True.
+
+    Returns:
+        The subtitles of the current player, or None if an error occurred.
+    """
     return json_rpc(
         "Player.GetProperties",
         {
@@ -91,12 +121,25 @@ def get_kodi_player_subtitles(log_error=True):  # pragma: no cover
 
 
 def notification(text, time=3000):  # pragma: no cover
+    """
+    Shows a notification.
+
+    Args:
+        text (str): The text to show.
+        time (int, optional): The time to show the notification in milliseconds. Defaults to 3000.
+    """
     xbmc.executebuiltin(
         "Notification(%s, %s, %d, %s)" % (addon_name, text, time, addon_icon)
     )
 
 
 def get_progress_dialog():  # pragma: no cover
+    """
+    Gets a progress dialog.
+
+    Returns:
+        A progress dialog wrapper.
+    """
     wrapper = lambda: None
     wrapper.dialog = None
     wrapper.latest_update = None
@@ -130,6 +173,12 @@ def get_progress_dialog():  # pragma: no cover
 
 
 def update_progress(core):  # pragma: no cover
+    """
+    Updates the progress dialog.
+
+    Args:
+        core: The core module.
+    """
     if core.progress_dialog is None or core.progress_dialog.iscanceled():
         return
 
@@ -141,6 +190,15 @@ def update_progress(core):  # pragma: no cover
 
 
 def parse_language(language):  # pragma: no cover
+    """
+    Parses a language string.
+
+    Args:
+        language (str): The language string to parse.
+
+    Returns:
+        str: The parsed language.
+    """
     if language == "original":
         audio_streams = xbmc.Player().getAvailableAudioStreams()
         if len(audio_streams) == 0:
@@ -157,6 +215,15 @@ def parse_language(language):  # pragma: no cover
 
 
 def create_listitem(item):  # pragma: no cover
+    """
+    Creates a list item.
+
+    Args:
+        item (dict): The item to create a list item for.
+
+    Returns:
+        xbmcgui.ListItem: The created list item.
+    """
     (item_name, item_ext) = os.path.splitext(item["name"])
     item_name = item_name.replace(".", " ")
     item_ext = item_ext.upper()[1:]
@@ -184,33 +251,93 @@ def create_listitem(item):  # pragma: no cover
 
 
 def get_setting(group, id=None):
+    """
+    Gets an addon setting.
+
+    Args:
+        group (str): The group of the setting.
+        id (str, optional): The ID of the setting. Defaults to None.
+
+    Returns:
+        str: The value of the setting.
+    """
     key = "%s.%s" % (group, id) if id else group
     return addon.getSetting(key).strip()
 
 
 def get_int_setting(group, id=None):
+    """
+    Gets an addon setting as an integer.
+
+    Args:
+        group (str): The group of the setting.
+        id (str, optional): The ID of the setting. Defaults to None.
+
+    Returns:
+        int: The value of the setting.
+    """
     return int(get_setting(group, id))
 
 
 def get_bool_setting(group, id=None):
+    """
+    Gets an addon setting as a boolean.
+
+    Args:
+        group (str): The group of the setting.
+        id (str, optional): The ID of the setting. Defaults to None.
+
+    Returns:
+        bool: The value of the setting.
+    """
     return get_setting(group, id).lower() == "true"
 
 
 def get_versionstring():
+    """
+    Gets the Kodi version string.
+
+    Returns:
+        str: The Kodi version string.
+    """
     return xbmc.getInfoLabel("System.BuildVersionCode")
 
 
 def get_version():
+    """
+    Gets the Kodi version as a list of integers.
+
+    Returns:
+        list: The Kodi version as a list of integers.
+    """
     return list(map(int, get_versionstring().split(".")))
 
 
 def get_version_major():
+    """
+    Gets the major Kodi version.
+
+    Returns:
+        int: The major Kodi version.
+    """
     return get_version()[0]
 
 
 def get_version_minor():
+    """
+    Gets the minor Kodi version.
+
+    Returns:
+        int: The minor Kodi version.
+    """
     return get_version()[1]
 
 
 def get_version_patch():
+    """
+    Gets the patch Kodi version.
+
+    Returns:
+        int: The patch Kodi version.
+    """
     return get_version()[2]

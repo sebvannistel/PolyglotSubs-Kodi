@@ -2,6 +2,14 @@
 
 
 def start(api):
+    """
+    Starts the a4kSubtitles service.
+
+    This service runs in the background and automatically searches for and downloads subtitles for playing videos.
+
+    Args:
+        api (A4kSubtitlesApi): An instance of the A4kSubtitlesApi.
+    """
     core = api.core
     monitor = core.kodi.xbmc.Monitor()
     has_done_subs_check = False
