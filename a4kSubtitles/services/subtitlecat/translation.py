@@ -490,6 +490,15 @@ _CLEAN_CTRL_TRANSLATION_TABLE = str.maketrans("", "", _CONTROL_CHARS_TO_CLEAN)
 
 
 def _protect_subtitle_tags(text_line):
+    """
+    Protects subtitle tags from being translated.
+
+    Args:
+        text_line (str): The line of text to protect.
+
+    Returns:
+        tuple: A tuple containing the protected text, a list of the tags found, and a boolean indicating whether the line is all tags.
+    """
     stripped_line_no_tags = __TAG_REGEX_FOR_PROTECTION.sub("", text_line).strip()
     if not stripped_line_no_tags:
         return text_line, [], True
@@ -508,6 +517,16 @@ def _protect_subtitle_tags(text_line):
 
 
 def _restore_subtitle_tags(text_line_with_placeholders, tags_list):
+    """
+    Restores subtitle tags that were protected.
+
+    Args:
+        text_line_with_placeholders (str): The line of text with placeholders.
+        tags_list (list): The list of tags to restore.
+
+    Returns:
+        str: The line of text with the tags restored.
+    """
     for i in range(len(tags_list) - 1, -1, -1):
         original_tag_content = tags_list[i]
         placeholder_idx_str = hex(i)[2:]
@@ -529,6 +548,21 @@ def _upload_translation_to_subtitlecat(
     detected_source_language_code,
     movie_page_full_url,
 ):
+    """
+    Uploads a translated subtitle to Subtitlecat.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        translated_srt_content_str (str): The translated SRT content.
+        target_sc_lang_code (str): The target language code.
+        original_filename_stem_from_sc (str): The original filename stem.
+        detected_source_language_code (str): The detected source language code.
+        movie_page_full_url (str): The URL of the movie page.
+
+    Returns:
+        str: The URL of the uploaded subtitle, or None if the upload failed.
+    """
     upload_url = "https://www.subtitlecat.com/upload_subtitles.php"
     name_for_upload = original_filename_stem_from_sc
     if original_filename_stem_from_sc.endswith("-orig.srt"):

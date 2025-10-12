@@ -12,7 +12,18 @@ from requests import adapters
 from .third_party.cloudscraper import cloudscraper
 
 class TLSAdapter(adapters.HTTPAdapter):
+    """
+    A TLS adapter that allows for custom SSL/TLS versions.
+    """
     def init_poolmanager(self, connections, maxsize, block=False):
+        """
+        Initializes the pool manager.
+
+        Args:
+            connections (int): The number of connections.
+            maxsize (int): The maximum size of the pool.
+            block (bool, optional): Whether to block when no free connections are available. Defaults to False.
+        """
         ctx = ssl.create_default_context()
         ctx.set_ciphers('DEFAULT@SECLEVEL=1')
         self.poolmanager = urllib3.poolmanager.PoolManager(num_pools=connections,
@@ -40,6 +51,18 @@ def __retry(core, request, response, next, cfscrape, retry=0):
         return request
 
 def execute(core, request, progress=True, session=None):
+    """
+    Executes a request.
+
+    Args:
+        core (module): The core module.
+        request (dict): The request to execute.
+        progress (bool, optional): Whether to show a progress dialog. Defaults to True.
+        session (requests.Session, optional): The session to use. Defaults to None.
+
+    Returns:
+        requests.Response: The response.
+    """
     try: default_timeout = get_int_setting('general.timeout')
     except: default_timeout = 10
     request.setdefault('timeout', default_timeout)

@@ -69,6 +69,9 @@ data_dir = os.path.join(kodi.addon_profile, "data")
 
 
 class DictAsObject(dict):
+    """
+    A dictionary that can be accessed as an object.
+    """
     def __getattr__(self, name):
         return self.get(name, None)
 
@@ -77,6 +80,17 @@ class DictAsObject(dict):
 
 
 def get_all_relative_entries(relative_file, ext=".py", ignore_private=True):
+    """
+    Gets all relative entries in a directory.
+
+    Args:
+        relative_file (str): The file to get the relative entries from.
+        ext (str, optional): The extension of the files to get. Defaults to ".py".
+        ignore_private (bool, optional): Whether to ignore private files. Defaults to True.
+
+    Returns:
+        list: A list of relative entries.
+    """
     entries = os.listdir(os.path.dirname(relative_file))
     return [
         os.path.splitext(name)[0]
@@ -86,6 +100,15 @@ def get_all_relative_entries(relative_file, ext=".py", ignore_private=True):
 
 
 def strip_non_ascii_and_unprintable(text):
+    """
+    Strips non-ASCII and unprintable characters from a string.
+
+    Args:
+        text (str): The string to strip.
+
+    Returns:
+        str: The stripped string.
+    """
     if not isinstance(text, str) and (not py2 or not isinstance(text, unicode)):
         return str(text)
 
@@ -94,10 +117,29 @@ def strip_non_ascii_and_unprintable(text):
 
 
 def slugify_filename(text):
+    """
+    Slugifies a filename.
+
+    Args:
+        text (str): The filename to slugify.
+
+    Returns:
+        str: The slugified filename.
+    """
     return re.sub(r'[\\/*?:"<>|]', "_", text)
 
 
 def get_lang_id(language, lang_format):
+    """
+    Gets the language ID for a language.
+
+    Args:
+        language (str): The language to get the ID for.
+        lang_format (int): The format of the language ID.
+
+    Returns:
+        str: The language ID.
+    """
     try:
         return get_lang_ids([language], lang_format)[0]
     except IndexError as e:
@@ -106,6 +148,16 @@ def get_lang_id(language, lang_format):
 
 
 def get_lang_ids(languages, lang_format=kodi.xbmc.ISO_639_2):
+    """
+    Gets the language IDs for a list of languages.
+
+    Args:
+        languages (list): The list of languages to get the IDs for.
+        lang_format (int, optional): The format of the language IDs. Defaults to kodi.xbmc.ISO_639_2.
+
+    Returns:
+        list: A list of language IDs.
+    """
     try:
         lang_ids = []
         for language in languages:
@@ -139,6 +191,12 @@ def get_lang_ids(languages, lang_format=kodi.xbmc.ISO_639_2):
 
 
 def wait_threads(threads):
+    """
+    Waits for a list of threads to finish.
+
+    Args:
+        threads (list): The list of threads to wait for.
+    """
     for thread in threads:
         thread.start()
     for thread in threads:
@@ -146,6 +204,15 @@ def wait_threads(threads):
 
 
 def get_any_of_regex(array):
+    """
+    Gets a regex that matches any of the strings in an array.
+
+    Args:
+        array (list): The array of strings to match.
+
+    Returns:
+        str: The regex.
+    """
     regex = r"("
     for target in array:
         regex += re.escape(target) + r"|"
@@ -153,6 +220,16 @@ def get_any_of_regex(array):
 
 
 def cleanup_subtitles(core, sub_contents):
+    """
+    Cleans up a subtitle file.
+
+    Args:
+        core (module): The core module.
+        sub_contents (str): The contents of the subtitle file.
+
+    Returns:
+        str: The cleaned up subtitle file.
+    """
     service_names_regex = get_any_of_regex(core.services.keys())
     all_lines = sub_contents.split("\n")
     cleaned_lines = []
@@ -202,12 +279,33 @@ def cleanup_subtitles(core, sub_contents):
 
 
 def open_file_wrapper(file, mode="r", encoding="utf-8"):
+    """
+    A wrapper for opening files that works in both Python 2 and 3.
+
+    Args:
+        file (str): The path to the file to open.
+        mode (str, optional): The mode to open the file in. Defaults to "r".
+        encoding (str, optional): The encoding of the file. Defaults to "utf-8".
+
+    Returns:
+        function: A function that opens the file.
+    """
     if py2:
         return lambda: open(file, mode)
     return lambda: open(file, mode, encoding=encoding)
 
 
 def get_json(path, filename):
+    """
+    Gets a JSON file.
+
+    Args:
+        path (str): The path to the directory containing the JSON file.
+        filename (str): The name of the JSON file.
+
+    Returns:
+        dict: The JSON file as a dictionary, or None if an error occurred.
+    """
     path = path if os.path.isdir(path) else os.path.dirname(path)
     if not filename.endswith(".json"):
         filename += ".json"
@@ -222,6 +320,18 @@ def get_json(path, filename):
 
 
 def find_file_in_archive(core, namelist, exts, episode_number=""):
+    """
+    Finds a file in an archive.
+
+    Args:
+        core (module): The core module.
+        namelist (list): The list of files in the archive.
+        exts (list): The list of extensions to search for.
+        episode_number (str, optional): The episode number to search for. Defaults to "".
+
+    Returns:
+        str: The name of the file, or None if no file was found.
+    """
     first_ext_match = None
     exact_file = None
     for file in namelist:
@@ -238,6 +348,15 @@ def find_file_in_archive(core, namelist, exts, episode_number=""):
 
 
 def get_zipfile_namelist(zipfile):
+    """
+    Gets the namelist of a zipfile.
+
+    Args:
+        zipfile (zipfile.ZipFile): The zipfile to get the namelist from.
+
+    Returns:
+        list: The namelist of the zipfile.
+    """
     infolist = zipfile.infolist()
     namelist = []
 
@@ -257,6 +376,17 @@ def get_zipfile_namelist(zipfile):
 
 
 def extract_zipfile_member(zipfile, filename, dest):
+    """
+    Extracts a member from a zipfile.
+
+    Args:
+        zipfile (zipfile.ZipFile): The zipfile to extract the member from.
+        filename (str): The name of the member to extract.
+        dest (str): The destination to extract the member to.
+
+    Returns:
+        str: The path to the extracted member.
+    """
     if py2:
         return zipfile.extract(filename.encode(default_encoding), dest)
     else:
@@ -271,6 +401,17 @@ def extract_zipfile_member(zipfile, filename, dest):
 
 
 def extract_season_episode(filename, episode_fallback=False, zfill=3):
+    """
+    Extracts the season and episode number from a filename.
+
+    Args:
+        filename (str): The filename to extract the season and episode number from.
+        episode_fallback (bool, optional): Whether to fallback to a simpler episode number extraction method. Defaults to False.
+        zfill (int, optional): The number of digits to pad the season and episode numbers with. Defaults to 3.
+
+    Returns:
+        DictAsObject: An object containing the season and episode number.
+    """
     episode_pattern = r"(?:e|ep.?|episode.?)(\d{1,5})(?:v\d?)?"
     season_pattern = r"(?:s|season.?)(\d{1,5})"
     combined_pattern = (

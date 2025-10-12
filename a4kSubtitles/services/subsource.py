@@ -22,6 +22,17 @@ ss_to_code = {
 }
 
 def build_search_requests(core, service_name, meta):
+    """
+    Builds the search requests for the subsource service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        list: A list of search requests.
+    """
     def get_movie(response):
         results = response.json()
         found = results.get("found", [])
@@ -57,6 +68,18 @@ def build_search_requests(core, service_name, meta):
 
 
 def parse_search_response(core, service_name, meta, response):
+    """
+    Parses the search response from the subsource service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+        response (requests.Response): The response from the service.
+
+    Returns:
+        list: A list of subtitle results.
+    """
     try:
         results = response.json()
     except Exception as exc:
@@ -102,6 +125,17 @@ def parse_search_response(core, service_name, meta, response):
 
 
 def build_download_request(core, service_name, args):
+    """
+    Builds the download request for the subsource service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        args (dict): The arguments for the download.
+
+    Returns:
+        dict: The download request.
+    """
     *_, movie, lang, sub_id = args["full_link"].split("/")
     params = {"movie": movie, "lang": lang, "id": sub_id}
 

@@ -353,6 +353,15 @@ def __is_imdb_id(id: str) -> bool:
     return id.startswith(__imdb_id_prefix)
 
 def get_meta(core):
+    """
+    Gets the metadata of the currently playing video.
+
+    Args:
+        core (module): The core module.
+
+    Returns:
+        DictAsObject: The metadata of the currently playing video.
+    """
     meta = __get_basic_info(core)
 
     # Depending on the used scraper, the imdb_id returned by Kodi might not actually be an IMDB ID.

@@ -65,6 +65,15 @@ def __spell_integer(n):
         return __last_and(num)
 
 def convert(n):
+    """
+    Converts a number to its ordinal representation.
+
+    Args:
+        n (int or str): The number to convert.
+
+    Returns:
+        str: The ordinal representation of the number.
+    """
     conversion = int(float(n))
     num = __spell_integer(conversion)
     hyphen = num.rsplit("-", 1)

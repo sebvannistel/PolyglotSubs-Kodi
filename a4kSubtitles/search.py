@@ -369,6 +369,19 @@ def __search(core, service_name, meta, results):
     core.utils.wait_threads(threads)
 
 def search(core, params):
+    """
+    Searches for subtitles.
+
+    It orchestrates the search process by querying all enabled services,
+    and then processing and ranking the results.
+
+    Args:
+        core (module): The core module.
+        params (dict): A dictionary of search parameters.
+
+    Returns:
+        list: A list of subtitle results.
+    """
     meta = core.video.get_meta(core)
     meta.languages = __parse_languages(core, core.utils.unquote(params['languages']).split(','))
     meta.preferredlanguage = core.kodi.parse_language(params['preferredlanguage'])

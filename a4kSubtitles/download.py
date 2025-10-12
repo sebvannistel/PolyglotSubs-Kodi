@@ -151,6 +151,18 @@ def __copy_sub_local(core, subfile):
         core.kodi.xbmcvfs.copy(subfile, file_dest)
 
 def download(core, params):
+    """
+    Downloads a subtitle file.
+
+    It handles downloading, extracting, and post-processing of subtitles.
+
+    Args:
+        core (module): The core module.
+        params (dict): A dictionary of parameters.
+
+    Returns:
+        str: The path to the downloaded subtitle file if in API mode, otherwise None.
+    """
     core.logger.debug(lambda: core.json.dumps(params, indent=2))
 
     core.shutil.rmtree(core.utils.temp_dir, ignore_errors=True)

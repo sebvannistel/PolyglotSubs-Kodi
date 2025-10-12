@@ -31,6 +31,17 @@ def __get_language_ids(core, service_name, meta):
     return '|'.join(lang_ids)
 
 def build_search_requests(core, service_name, meta):
+    """
+    Builds the search requests for the addic7ed service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        list: A list of search requests.
+    """
     if meta.is_movie:
         return []
 
@@ -58,6 +69,18 @@ def build_search_requests(core, service_name, meta):
     return [request]
 
 def parse_search_response(core, service_name, meta, response):
+    """
+    Parses the search response from the addic7ed service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+        response (requests.Response): The response from the service.
+
+    Returns:
+        list: A list of subtitle results.
+    """
     try:
         results = response.text.split('<tr')
     except:
@@ -123,6 +146,17 @@ def parse_search_response(core, service_name, meta, response):
     return list(filter(lambda v: v, map(map_result, results)))
 
 def build_download_request(core, service_name, args):
+    """
+    Builds the download request for the addic7ed service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        args (dict): The arguments for the download.
+
+    Returns:
+        dict: The download request.
+    """
     request = {
         'method': 'GET',
         'url': args['url'],

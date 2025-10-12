@@ -22,7 +22,16 @@ def _get_session():
     return _thread_local_session_storage.session
 
 class SimpleLRUCache:
+    """
+    A simple thread-safe LRU cache.
+    """
     def __init__(self, maxsize=128):
+        """
+        Initializes the cache.
+
+        Args:
+            maxsize (int, optional): The maximum size of the cache. Defaults to 128.
+        """
         if not isinstance(maxsize, int) or maxsize <= 0:
             raise ValueError("maxsize must be a positive integer")
         self._cache = OrderedDict()
@@ -30,6 +39,16 @@ class SimpleLRUCache:
         self._lock = threading.Lock()
 
     def get(self, key, default=None):
+        """
+        Gets an item from the cache.
+
+        Args:
+            key: The key of the item to get.
+            default: The default value to return if the key is not in the cache.
+
+        Returns:
+            The value of the item, or the default value if the key is not in the cache.
+        """
         with self._lock:
             if key not in self._cache:
                 return default
@@ -38,6 +57,13 @@ class SimpleLRUCache:
             return value
 
     def __setitem__(self, key, value):
+        """
+        Sets an item in the cache.
+
+        Args:
+            key: The key of the item to set.
+            value: The value of the item to set.
+        """
         with self._lock:
             if key in self._cache:
                 self._cache.pop(key)
@@ -46,6 +72,15 @@ class SimpleLRUCache:
             self._cache[key] = value
 
     def __getitem__(self, key):
+        """
+        Gets an item from the cache.
+
+        Args:
+            key: The key of the item to get.
+
+        Returns:
+            The value of the item.
+        """
         with self._lock:
             if key not in self._cache:
                 raise KeyError(key)
@@ -54,6 +89,15 @@ class SimpleLRUCache:
             return value
 
     def __contains__(self, key):
+        """
+        Checks if an item is in the cache.
+
+        Args:
+            key: The key of the item to check.
+
+        Returns:
+            True if the item is in the cache, False otherwise.
+        """
         with self._lock:
             return key in self._cache
 

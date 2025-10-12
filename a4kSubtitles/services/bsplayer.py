@@ -102,6 +102,16 @@ def __logout(core, service_name):
     thread.start()
 
 def build_auth_request(core, service_name):
+    """
+    Builds the authentication request for the bsplayer service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+
+    Returns:
+        dict: The authentication request.
+    """
     action = 'logIn'
     params = (
         '<username></username>'
@@ -111,6 +121,14 @@ def build_auth_request(core, service_name):
     return __get_request(core, service_name, action, params)
 
 def parse_auth_response(core, service_name, response):
+    """
+    Parses the authentication response from the bsplayer service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        response (requests.Response): The response from the service.
+    """
     if response.status_code != 200 or not response.text:
         return
 
@@ -123,6 +141,17 @@ def parse_auth_response(core, service_name, response):
         core.services[service_name].context.token = token
 
 def build_search_requests(core, service_name, meta):
+    """
+    Builds the search requests for the bsplayer service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        list: A list of search requests.
+    """
     token = core.services[service_name].context.token
     if not token:
         return []
@@ -149,6 +178,18 @@ def build_search_requests(core, service_name, meta):
     return [__get_request(core, service_name, action, params)]
 
 def parse_search_response(core, service_name, meta, response):
+    """
+    Parses the search response from the bsplayer service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+        response (requests.Response): The response from the service.
+
+    Returns:
+        list: A list of subtitle results.
+    """
     __logout(core, service_name)
 
     service = core.services[service_name]
@@ -196,6 +237,17 @@ def parse_search_response(core, service_name, meta, response):
     return list(map(map_result, results))
 
 def build_download_request(core, service_name, args):
+    """
+    Builds the download request for the bsplayer service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        args (dict): The arguments for the download.
+
+    Returns:
+        dict: The download request.
+    """
     request = {
         'method': 'GET',
         'url': args['url']
