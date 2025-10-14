@@ -70,12 +70,36 @@ data_dir = os.path.join(kodi.addon_profile, "data")
 
 class DictAsObject(dict):
     """
-    A dictionary that can be accessed as an object.
+    A dictionary that allows its keys to be accessed as attributes.
+
+    Example:
+        >>> d = DictAsObject({'a': 1})
+        >>> d.a
+        1
+        >>> d.b = 2
+        >>> d['b']
+        2
     """
     def __getattr__(self, name):
+        """
+        Retrieves an item as an attribute.
+
+        Args:
+            name (str): The name of the attribute (dictionary key).
+
+        Returns:
+            The value associated with the key, or None if the key does not exist.
+        """
         return self.get(name, None)
 
     def __setattr__(self, name, value):
+        """
+        Sets an item as an attribute.
+
+        Args:
+            name (str): The name of the attribute (dictionary key).
+            value: The value to set.
+        """
         self[name] = value
 
 

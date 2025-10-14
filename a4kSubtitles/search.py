@@ -1,11 +1,29 @@
 # -*- coding: utf-8 -*-
 
 def __auth_service(core, service_name, request):
+    """
+    Authenticates with a subtitle service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service to authenticate with.
+        request (dict): The authentication request.
+    """
     service = core.services[service_name]
     response = core.request.execute(core, request)
     service.parse_auth_response(core, service_name, response)
 
 def __query_service(core, service_name, meta, request, results):
+    """
+    Queries a subtitle service for subtitles.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service to query.
+        meta (dict): The video metadata.
+        request (dict): The search request.
+        results (list): A list to store the search results.
+    """
     try:
         service = core.services[service_name]
         response = core.request.execute(core, request)
@@ -27,6 +45,14 @@ def __query_service(core, service_name, meta, request, results):
         core.kodi.update_progress(core)
 
 def __add_results(core, results, meta):  # pragma: no cover
+    """
+    Adds subtitle results to the Kodi directory.
+
+    Args:
+        core (module): The core module.
+        results (list): A list of subtitle results.
+        meta (dict): The video metadata.
+    """
     for item in results:
         listitem = core.kodi.create_listitem(item)
 
@@ -41,9 +67,27 @@ def __add_results(core, results, meta):  # pragma: no cover
         )
 
 def __has_results(service_name, results):
+    """
+    Checks if there are results from a specific service.
+
+    Args:
+        service_name (str): The name of the service.
+        results (list): A list of subtitle results.
+
+    Returns:
+        bool: True if there are results from the service, False otherwise.
+    """
     return any(map(lambda r: r['service_name'] == service_name, results))
 
 def __save_results(core, meta, results):
+    """
+    Saves search results to a cache file.
+
+    Args:
+        core (module): The core module.
+        meta (dict): The video metadata.
+        results (list): A list of subtitle results.
+    """
     try:
         if len(results) == 0:
             return
@@ -60,6 +104,16 @@ def __save_results(core, meta, results):
         traceback.print_exc()
 
 def __get_last_results(core, meta):
+    """
+    Retrieves the last search results from the cache.
+
+    Args:
+        core (module): The core module.
+        meta (dict): The video metadata.
+
+    Returns:
+        tuple: A tuple containing a list of results and a list of services to force search.
+    """
     force_search = []
 
     try:
@@ -82,6 +136,17 @@ def __get_last_results(core, meta):
     return ([], [])
 
 def __sanitize_results(core, meta, results):
+    """
+    Sanitizes and removes duplicate subtitle results.
+
+    Args:
+        core (module): The core module.
+        meta (dict): The video metadata.
+        results (list): A list of subtitle results.
+
+    Returns:
+        list: A list of sanitized subtitle results.
+    """
     temp_dict = {}
     for result in results:
         # --- START OF MODIFIED SECTION FOR KEY GENERATION ---
@@ -115,9 +180,30 @@ def __sanitize_results(core, meta, results):
     return list(temp_dict.values())
 
 def __apply_language_filter(meta, results):
+    """
+    Filters results by language.
+
+    Args:
+        meta (dict): The video metadata.
+        results (list): A list of subtitle results.
+
+    Returns:
+        list: A list of filtered subtitle results.
+    """
     return list(filter(lambda x: x and x['lang'] in meta.languages, results))
 
 def __apply_limit(core, all_results, meta):
+    """
+    Limits the number of results.
+
+    Args:
+        core (module): The core module.
+        all_results (list): A list of all subtitle results.
+        meta (dict): The video metadata.
+
+    Returns:
+        list: A list of limited subtitle results.
+    """
     limit = core.kodi.get_int_setting('general.results_limit')
     lang_limit = int(limit / len(meta.languages))
     if lang_limit * len(meta.languages) < limit:
@@ -133,6 +219,17 @@ def __apply_limit(core, all_results, meta):
     return results[:limit]
 
 def __prepare_results(core, meta, results):
+    """
+    Prepares and sorts the final list of subtitle results.
+
+    Args:
+        core (module): The core module.
+        meta (dict): The video metadata.
+        results (list): A list of subtitle results.
+
+    Returns:
+        list: A list of prepared and sorted subtitle results.
+    """
     results = __apply_language_filter(meta, results)
     results = __sanitize_results(core, meta, results)
 
@@ -330,15 +427,40 @@ def __prepare_results(core, meta, results):
     return results
 
 def __parse_languages(core, languages):
+    """
+    Parses a comma-separated string of languages.
+
+    Args:
+        core (module): The core module.
+        languages (str): A comma-separated string of languages.
+
+    Returns:
+        list: A list of parsed languages.
+    """
     return list({language for language in (core.kodi.parse_language(x) for x in languages) if language is not None})
 
 def __chain_auth_and_search_threads(core, auth_thread, search_thread):
+    """
+    Chains authentication and search threads.
+
+    Args:
+        core (module): The core module.
+        auth_thread (threading.Thread): The authentication thread.
+        search_thread (threading.Thread): The search thread.
+    """
     auth_thread.start()
     auth_thread.join()
     search_thread.start()
     search_thread.join()
 
 def __wait_threads(core, request_threads):
+    """
+    Waits for a list of threads to complete.
+
+    Args:
+        core (module): The core module.
+        request_threads (list): A list of tuples containing authentication and search threads.
+    """
     threads = []
 
     for (auth_thread, search_thread) in request_threads:
@@ -351,12 +473,32 @@ def __wait_threads(core, request_threads):
     core.utils.wait_threads(threads)
 
 def __complete_search(core, results, meta):
+    """
+    Completes the search process.
+
+    Args:
+        core (module): The core module.
+        results (list): A list of subtitle results.
+        meta (dict): The video metadata.
+
+    Returns:
+        list: A list of subtitle results if in API mode, otherwise None.
+    """
     if core.api_mode_enabled:
         return results
 
     __add_results(core, results, meta)  # pragma: no cover
 
 def __search(core, service_name, meta, results):
+    """
+    Searches a single service for subtitles.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service to search.
+        meta (dict): The video metadata.
+        results (list): A list to store the search results.
+    """
     service = core.services[service_name]
     requests = service.build_search_requests(core, service_name, meta)
     core.logger.debug(lambda: '%s - %s' % (service_name, core.json.dumps(requests, default=lambda o: '', indent=2)))

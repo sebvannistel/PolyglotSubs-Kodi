@@ -25,9 +25,29 @@ __small = [
 __huge = [None, None] + [h + "illion" for h in ("m", "b", "tr", "quadr", "quint", "sext", "sept", "oct", "non", "dec")]
 
 def __nonzero(c, n, connect=''):
+    """
+    Handles non-zero numbers.
+
+    Args:
+        c (str): The character to connect with.
+        n (int): The number.
+        connect (str, optional): The connection string. Defaults to ''.
+
+    Returns:
+        str: The string representation of the number.
+    """
     return "" if n == 0 else connect + c + __spell_integer(n)
 
 def __last_and(num):
+    """
+    Adds 'and' to the last part of a number string.
+
+    Args:
+        num (str): The number string.
+
+    Returns:
+        str: The number string with 'and' added.
+    """
     if ',' in num:
         pre, last = num.rsplit(',', 1)
         if ' and ' not in last:
@@ -36,6 +56,16 @@ def __last_and(num):
     return num
 
 def __big(e, n):
+    """
+    Handles big numbers.
+
+    Args:
+        e (int): The exponent.
+        n (int): The number.
+
+    Returns:
+        str: The string representation of the number.
+    """
     if e == 0:
         return __spell_integer(n)
     elif e == 1:
@@ -44,11 +74,29 @@ def __big(e, n):
         return __spell_integer(n) + " " + __huge[e]
 
 def __base1000_rev(n):
+    """
+    Generator for base 1000 representation of a number.
+
+    Args:
+        n (int): The number.
+
+    Yields:
+        int: The next part of the number.
+    """
     while n != 0:
         n, r = divmod(n, 1000)
         yield r
 
 def __spell_integer(n):
+    """
+    Spells out an integer.
+
+    Args:
+        n (int): The integer to spell out.
+
+    Returns:
+        str: The spelled out integer.
+    """
     if n < 0:
         return "minus " + __spell_integer(-n)
     elif n < 20:

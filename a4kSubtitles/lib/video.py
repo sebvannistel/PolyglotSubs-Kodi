@@ -16,6 +16,13 @@ __byte_size = struct.calcsize(__longlong_format_char)
 __imdb_id_prefix = 'tt'
 
 def __sum_64k_bytes(file, result):
+    """
+    Sums the first and last 64k bytes of a file.
+
+    Args:
+        file (xbmcvfs.File): The file to sum.
+        result (object): An object to store the result in.
+    """
     range_value = __64k / __byte_size
     if utils.py3:
         range_value = round(range_value)
@@ -28,6 +35,14 @@ def __sum_64k_bytes(file, result):
         result.filehash &= 0xFFFFFFFFFFFFFFFF
 
 def __set_size_and_hash(core, meta, filepath):
+    """
+    Sets the size and hash of a file.
+
+    Args:
+        core (module): The core module.
+        meta (DictAsObject): The metadata object to set the size and hash in.
+        filepath (str): The path to the file.
+    """
     if core.progress_dialog and not core.progress_dialog.dialog:
         core.progress_dialog.open()
 
@@ -58,6 +73,15 @@ def __set_size_and_hash(core, meta, filepath):
         f.close()
 
 def __get_filename(title):
+    """
+    Gets the filename of the currently playing video.
+
+    Args:
+        title (str): The title of the video.
+
+    Returns:
+        str: The filename of the video.
+    """
     filename = title
     video_exts = ['mkv', 'mp4', 'avi', 'mov', 'mpeg', 'flv', 'wmv']
 
@@ -75,6 +99,13 @@ def __get_filename(title):
     return filename
 
 def __scrape_tvshow_year(core, meta):
+    """
+    Scrapes the year of a TV show from IMDb.
+
+    Args:
+        core (module): The core module.
+        meta (DictAsObject): The metadata of the video.
+    """
     imdb_response = request.execute(core, {
         'method': 'GET',
         'url': 'https://www.imdb.com/title/' + meta.imdb_id,
@@ -98,6 +129,13 @@ def __scrape_tvshow_year(core, meta):
         cache.save_tvshow_years_cache(tvshow_years_cache)
 
 def __scrape_imdb_id(core, meta):
+    """
+    Scrapes the IMDb ID of a video.
+
+    Args:
+        core (module): The core module.
+        meta (DictAsObject): The metadata of the video.
+    """
     if meta.title == '' or meta.year == '':
         return
 
@@ -179,6 +217,14 @@ def __scrape_imdb_id(core, meta):
             return
 
 def __update_info_from_imdb(core, meta, pagination_token=''):
+    """
+    Updates the metadata of a video from IMDb's GraphQL API.
+
+    Args:
+        core (module): The core module.
+        meta (DictAsObject): The metadata of the video.
+        pagination_token (str, optional): The pagination token to use. Defaults to ''.
+    """
     request = {
         'method': 'POST',
         'url': 'https://graphql.imdb.com',
@@ -295,6 +341,15 @@ def __update_info_from_imdb(core, meta, pagination_token=''):
         return
 
 def __get_basic_info(core):
+    """
+    Gets basic information about the currently playing video from Kodi.
+
+    Args:
+        core (module): The core module.
+
+    Returns:
+        DictAsObject: The basic information about the currently playing video.
+    """
     meta = utils.DictAsObject({})
     filename_and_path = ''
 
@@ -350,6 +405,15 @@ def __get_basic_info(core):
     return meta
 
 def __is_imdb_id(id: str) -> bool:
+    """
+    Checks if an ID is an IMDb ID.
+
+    Args:
+        id (str): The ID to check.
+
+    Returns:
+        bool: True if the ID is an IMDb ID, False otherwise.
+    """
     return id.startswith(__imdb_id_prefix)
 
 def get_meta(core):

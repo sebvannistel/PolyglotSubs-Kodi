@@ -54,6 +54,14 @@ def start(api):
         try:
 
             def update_sub_stream():
+                """
+                Updates the subtitle stream for the currently playing video.
+
+                It tries to find the best matching subtitle stream based on user preferences.
+
+                Returns:
+                    bool: True if a subtitle stream was updated, False otherwise.
+                """
                 if not core.kodi.get_bool_setting("general", "auto_select"):
                     return
                 if preferredlang is None:
