@@ -3,6 +3,21 @@
 __url = 'https://www.addic7ed.com'
 
 def __get_show_id(core, service_name, meta):
+    """
+    Gets the show ID for a given TV show from the addic7ed data.
+
+    It first tries to find the show with the year, and if not found,
+    it tries to find it without the year. It also sets the referer
+    in the service context.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        str: The show ID, or an empty string if not found.
+    """
     service = core.services[service_name]
     tvshows = core.data[service_name].tvshows
 
@@ -17,6 +32,17 @@ def __get_show_id(core, service_name, meta):
     return tvshow_id
 
 def __get_language_ids(core, service_name, meta):
+    """
+    Gets the language IDs for a given list of languages from the addic7ed data.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        meta (dict): The metadata of the video.
+
+    Returns:
+        str: A pipe-separated string of language IDs.
+    """
     languages = core.data[service_name].languages
 
     lang_ids = []

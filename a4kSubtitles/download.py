@@ -4,6 +4,14 @@ subtitles_exts_secondary = ['.smi', '.ssa', '.aqt', '.jss', '.ass', '.rt']
 subtitles_exts_all = subtitles_exts + subtitles_exts_secondary
 
 def __download(core, filepath, request):
+    """
+    Downloads a file from a given request.
+
+    Args:
+        core (module): The core module.
+        filepath (str): The path to save the downloaded file.
+        request (dict): The request to execute.
+    """
     request['stream'] = True
     response = core.request.execute(core, request)
     if response.status_code >= 400:
@@ -14,6 +22,17 @@ def __download(core, filepath, request):
             core.shutil.copyfileobj(r.raw, f)
 
 def __extract_gzip(core, archivepath, filename):
+    """
+    Extracts a gzipped file.
+
+    Args:
+        core (module): The core module.
+        archivepath (str): The path to the gzipped file.
+        filename (str): The name of the file to extract.
+
+    Returns:
+        str: The path to the extracted file.
+    """
     if not any(filename.lower().endswith(ext) for ext in subtitles_exts_all):
         # For now, we will use 'srt' to mark unknown file extensions as subtitles.
         filename = filename + ".srt"
@@ -36,6 +55,18 @@ def __extract_gzip(core, archivepath, filename):
     return filepath
 
 def __extract_zip(core, archivepath, filename, episodeid):
+    """
+    Extracts a zip archive.
+
+    Args:
+        core (module): The core module.
+        archivepath (str): The path to the zip archive.
+        filename (str): The name of the file to extract.
+        episodeid (str): The episode ID to look for in the archive.
+
+    Returns:
+        str: The path to the extracted file.
+    """
     sub_exts = subtitles_exts
     sub_exts_secondary = subtitles_exts_secondary
 
@@ -82,6 +113,17 @@ def __extract_zip(core, archivepath, filename, episodeid):
     return dest
 
 def __insert_lang_code_in_filename(core, filename, lang_code):
+    """
+    Inserts a language code into a filename.
+
+    Args:
+        core (module): The core module.
+        filename (str): The filename to modify.
+        lang_code (str): The language code to insert.
+
+    Returns:
+        str: The modified filename.
+    """
     name = core.utils.strip_non_ascii_and_unprintable(filename)
     nameparts = name.rsplit(".", 1)
 
@@ -93,6 +135,16 @@ def __insert_lang_code_in_filename(core, filename, lang_code):
     return "{0}.{1}".format(name, lang_code)
 
 def __postprocess(core, filepath, lang_code):
+    """
+    Post-processes a subtitle file.
+
+    This includes fixing encoding issues and cleaning up the subtitle text.
+
+    Args:
+        core (module): The core module.
+        filepath (str): The path to the subtitle file.
+        lang_code (str): The language code of the subtitle.
+    """
     try:
         with open(filepath, 'rb', encoding=core.utils.default_encoding) as f:
             text_bytes = f.read()
@@ -133,6 +185,13 @@ def __postprocess(core, filepath, lang_code):
     except: pass
 
 def __copy_sub_local(core, subfile):
+    """
+    Copies the subtitle file to a local directory.
+
+    Args:
+        core (module): The core module.
+        subfile (str): The path to the subtitle file.
+    """
     # Copy the subfile to local.
     if core.os.getenv('A4KSUBTITLES_TESTRUN') == 'true':
         return

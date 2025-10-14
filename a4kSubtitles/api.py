@@ -12,13 +12,19 @@ class A4kSubtitlesApi(object):
     A4kSubtitlesApi provides a Pythonic interface to the a4kSubtitles addon.
 
     It allows for searching and downloading subtitles, as well as mocking settings and video metadata for testing purposes.
+
+    Attributes:
+        core (module): The core module of the a4kSubtitles addon.
     """
     def __init__(self, mocks=None):
         """
         Initializes the A4kSubtitlesApi.
 
         Args:
-            mocks (dict, optional): A dictionary of mocks to use. Defaults to None.
+            mocks (dict, optional): A dictionary of mocks to use for testing.
+                The keys should be the names of the modules to mock (e.g., 'kodi', 'xbmc'),
+                and the values should be boolean flags indicating whether to use the mock.
+                Defaults to None.
         """
         if mocks is None:
             mocks = {}
@@ -40,13 +46,18 @@ class A4kSubtitlesApi(object):
 
     def __mock_video_meta(self, meta):
         """
-        Mocks the video metadata.
+        Mocks the video metadata for testing purposes.
+
+        This method temporarily overrides the functions that provide video metadata to Kodi,
+        allowing tests to simulate different video playback scenarios.
 
         Args:
-            meta (dict): A dictionary of video metadata.
+            meta (dict): A dictionary of video metadata to mock. The keys can include:
+                'version', 'year', 'season', 'episode', 'tvshow', 'title', '_title',
+                'imdb_id', 'url', 'filename', 'filesize', 'filehash'.
 
         Returns:
-            function: A function to restore the original video metadata.
+            function: A function that can be called to restore the original video metadata functions.
         """
         def get_info_label(label):
             if label == 'System.BuildVersionCode':
@@ -88,13 +99,17 @@ class A4kSubtitlesApi(object):
 
     def mock_settings(self, settings):
         """
-        Mocks the addon settings.
+        Mocks the addon settings for testing purposes.
+
+        This method temporarily overrides the function that provides addon settings,
+        allowing tests to simulate different user configurations.
 
         Args:
-            settings (dict): A dictionary of settings to mock.
+            settings (dict): A dictionary of settings to mock. The keys should be the setting IDs,
+                and the values should be the desired setting values.
 
         Returns:
-            function: A function to restore the original settings.
+            function: A function that can be called to restore the original settings function.
         """
         default = self.core.kodi.addon.getSetting
 
@@ -112,15 +127,18 @@ class A4kSubtitlesApi(object):
 
     def search(self, params, settings=None, video_meta=None):
         """
-        Searches for subtitles.
+        Searches for subtitles for a given video.
 
         Args:
-            params (dict): A dictionary of search parameters.
-            settings (dict, optional): A dictionary of settings to mock. Defaults to None.
-            video_meta (dict, optional): A dictionary of video metadata to mock. Defaults to None.
+            params (dict): A dictionary of search parameters. This should include keys like
+                'languages' and 'preferredlanguage'.
+            settings (dict, optional): A dictionary of settings to mock for the search.
+                Defaults to None.
+            video_meta (dict, optional): A dictionary of video metadata to mock for the search.
+                Defaults to None.
 
         Returns:
-            list: A list of subtitle results.
+            list: A list of subtitle results, where each result is a dictionary.
         """
         restore_settings = None
         restore_video_meta = None
@@ -141,11 +159,13 @@ class A4kSubtitlesApi(object):
 
     def download(self, params, settings=None):
         """
-        Downloads a subtitle.
+        Downloads a subtitle file.
 
         Args:
-            params (dict): A dictionary of download parameters.
-            settings (dict, optional): A dictionary of settings to mock. Defaults to None.
+            params (dict): A dictionary of download parameters, typically a single result
+                from the `search` method.
+            settings (dict, optional): A dictionary of settings to mock for the download.
+                Defaults to None.
 
         Returns:
             str: The path to the downloaded subtitle file.
@@ -163,10 +183,11 @@ class A4kSubtitlesApi(object):
 
     def auto_load_enabled(self, settings=None):
         """
-        Checks if auto-loading of subtitles is enabled.
+        Checks if auto-loading of subtitles is enabled in the addon settings.
 
         Args:
-            settings (dict, optional): A dictionary of settings to mock. Defaults to None.
+            settings (dict, optional): A dictionary of settings to mock for the check.
+                Defaults to None.
 
         Returns:
             bool: True if auto-loading is enabled, False otherwise.

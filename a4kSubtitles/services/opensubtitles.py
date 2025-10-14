@@ -8,6 +8,18 @@ __content_type = 'application/json'
 __date_format = '%Y-%m-%d %H:%M:%S'
 
 def __set_api_headers(core, service_name, request, token_cache=None):
+    """
+    Sets the required API headers for opensubtitles requests.
+
+    It sets the User-Agent, Api-Key, Accept, and Content-Type headers.
+    If a token is available in the cache, it also sets the Authorization header.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        request (dict): The request to set the headers for.
+        token_cache (dict, optional): The token cache. Defaults to None.
+    """
     if core.os.getenv('A4KSUBTITLES_TESTRUN') != 'true' and token_cache is None:
         cache = core.cache.get_tokens_cache()
         token_cache = cache.get(service_name, None)

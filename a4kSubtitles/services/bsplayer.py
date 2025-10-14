@@ -22,6 +22,18 @@ __headers = {
 __subdomains = [1, 2, 3, 4, 5, 6, 7, 8, 101, 102, 103, 104, 105, 106, 107, 108, 109]
 
 def __get_url(core, service_name):
+    """
+    Gets the API URL for the bsplayer service.
+
+    It rotates through a list of subdomains to distribute the load.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+
+    Returns:
+        str: The API URL.
+    """
     context = core.services[service_name].context
     if not context.subdomain:
         time_seconds = core.datetime.now().second
@@ -30,6 +42,21 @@ def __get_url(core, service_name):
     return "http://s%s.api.bsplayer-subtitles.com/v1.php" % context.subdomain
 
 def __validate_response(core, service_name, request, response, retry=True):
+    """
+    Validates the response from the bsplayer service.
+
+    If the response is not valid, it will retry the request once.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        request (dict): The request that was sent.
+        response (requests.Response): The response from the service.
+        retry (bool, optional): Whether to retry the request if it fails. Defaults to True.
+
+    Returns:
+        dict: The request to retry, or None if the response is valid.
+    """
     if not retry:
         return None
 
@@ -65,6 +92,18 @@ def __validate_response(core, service_name, request, response, retry=True):
     return None
 
 def __get_request(core, service_name, action, params):
+    """
+    Creates a SOAP request for the bsplayer service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        action (str): The SOAP action to perform.
+        params (str): The parameters for the action.
+
+    Returns:
+        dict: The SOAP request.
+    """
     url = __get_url(core, service_name)
     headers = __headers.copy()
     headers['SOAPAction'] = '"%s#%s"' % (url, action)
@@ -78,6 +117,17 @@ def __get_request(core, service_name, action, params):
     return request
 
 def __parse_response(core, service_name, response):
+    """
+    Parses a SOAP response from the bsplayer service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+        response (str): The SOAP response to parse.
+
+    Returns:
+        xml.etree.ElementTree.Element: The parsed response, or None if an error occurred.
+    """
     try:
         tree = core.ElementTree.fromstring(response.strip())
         return tree.find('.//return')
@@ -86,6 +136,13 @@ def __parse_response(core, service_name, response):
         return None
 
 def __logout(core, service_name):
+    """
+    Logs out from the bsplayer service.
+
+    Args:
+        core (module): The core module.
+        service_name (str): The name of the service.
+    """
     context = core.services[service_name].context
     if not context.token:
         return

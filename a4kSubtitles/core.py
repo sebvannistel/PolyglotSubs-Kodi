@@ -43,13 +43,15 @@ from .data import data
 
 def main(handle, paramstring):  # pragma: no cover
     """
-    The main entry point for the addon.
+    The main entry point for the addon when called by Kodi.
 
-    It parses the parameters and calls the appropriate function.
+    This function is responsible for parsing the input parameters from Kodi
+    and routing the request to the appropriate function (e.g., search, download).
 
     Args:
-        handle (int): The handle of the plugin.
-        paramstring (str): The parameter string.
+        handle (int): The handle of the plugin, provided by Kodi.
+        paramstring (str): A URL-encoded string of parameters, provided by Kodi.
+                           Example: '?action=search&languages=en&preferredlanguage=en'
     """
     core.api_mode_enabled = False
     core.handle = handle

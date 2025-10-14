@@ -35,6 +35,20 @@ class TLSAdapter(adapters.HTTPAdapter):
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def __retry(core, request, response, next, cfscrape, retry=0):
+    """
+    Retries a request if it fails with a retryable status code.
+
+    Args:
+        core (module): The core module.
+        request (dict): The request that was executed.
+        response (requests.Response): The response from the request.
+        next (function): The next function to call if the request is successful.
+        cfscrape (bool): Whether to use cfscrape for the request.
+        retry (int, optional): The number of retries. Defaults to 0.
+
+    Returns:
+        dict: The request to retry, or None if the maximum number of retries has been reached.
+    """
     if retry > 5:
         return None
 

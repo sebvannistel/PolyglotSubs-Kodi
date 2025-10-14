@@ -4,6 +4,12 @@ from .kodi import xbmc, addon_id, get_kodi_setting
 
 __get_debug_logenabled_err = False
 def __get_debug_logenabled():
+    """
+    Checks if debug logging is enabled in Kodi.
+
+    Returns:
+        bool: True if debug logging is enabled, False otherwise.
+    """
     global __get_debug_logenabled_err
     if __get_debug_logenabled_err:
         return False
@@ -21,6 +27,13 @@ except:
     notice_type = xbmc.LOGINFO
 
 def __log(message, level):
+    """
+    Logs a message to the Kodi log.
+
+    Args:
+        message (str or function): The message to log. If it's a function, it will be called to get the message.
+        level (int): The log level.
+    """
     if level == notice_type and not __get_debug_logenabled():
         return
 

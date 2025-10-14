@@ -26,7 +26,7 @@ a4kSubtitles is a subtitle addon for KODI. It supports multiple subtitle service
 *   **Subtitle Post-Processing:** Cleans up and formats subtitles for optimal viewing.
 *   **API for Developers:** Provides a simple API for developers to integrate subtitle functionality into their own addons.
 
-## Installation
+## Installation (for Users)
 
 1.  **Download the Addon:**
     *   Go to the [releases page](https://github.com/a4k-openproject/a4kSubtitles/releases).
@@ -39,7 +39,7 @@ a4kSubtitles is a subtitle addon for KODI. It supports multiple subtitle service
     *   Browse to the location where you downloaded the `.zip` file and select it.
     *   Wait for the "Add-on installed" notification.
 
-## Usage
+## Usage (for Users)
 
 ### Subtitle Search
 
@@ -141,31 +141,29 @@ Some subtitle services require you to have an account (and sometimes API keys) t
 **Note on Languages and Providers:**
 Remember to set your preferred languages in Kodi's main settings. a4kSubtitles uses these preferences to search across all enabled providers. The availability and quality of subtitles can vary greatly between providers and languages. If you're not finding subtitles for specific content, try enabling more providers or checking their individual websites.
 
-## API
+## For Developers
 
-a4kSubtitles provides a simple API for developers to integrate subtitle functionality into their own addons.
+This section provides information for developers who want to contribute to a4kSubtitles or use its API.
 
-### Example
+### Getting Started
 
-```python
-from a4kSubtitles import api
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/a4k-openproject/a4kSubtitles.git
+    cd a4kSubtitles
+    ```
+2.  **Set up a virtual environment:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    pip install -r requirements-dev.txt
+    ```
 
-# Initialize the API
-a4k = api.A4kSubtitlesApi()
-
-# Search for subtitles
-results = a4k.search({
-    'languages': 'en',
-    'preferredlanguage': 'en',
-})
-
-# Download a subtitle
-if results:
-    subfile = a4k.download(results[0])
-    print("Subtitle downloaded to:", subfile)
-```
-
-## Testing
+### Running Tests
 
 Run unit tests with:
 
@@ -179,10 +177,6 @@ Integration tests are skipped by default. Include them with:
 pytest --run-integration
 ```
 
-## Contributing
-
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests.
-
 Before committing or pushing changes, run the preflight script to execute the linters and tests:
 
 ```bash
@@ -190,6 +184,105 @@ scripts/preflight.sh
 ```
 
 This script runs `pre-commit run --all-files` and `pytest` to catch formatting problems and failing tests early.
+
+### Project Structure
+
+*   `a4kSubtitles/`: Main addon source code.
+    *   `api.py`: The public API for other addons to consume.
+    *   `core.py`: Core logic for searching, downloading, and managing services.
+    *   `lib/`: Utility functions, libraries, and helpers (e.g., Kodi wrappers, caching, request handling).
+    *   `services/`: Implementations for each individual subtitle provider.
+    *   `main.py`: The main entry point for the addon when called by Kodi.
+    *   `main_service.py`: The entry point for the background service (for automatic downloads).
+*   `tests/`: Unit and integration tests.
+*   `resources/`: Addon resources like settings definitions (`settings.xml`) and language files.
+
+### How It Works
+
+1.  A user action (e.g., "Download Subtitles") or the background service triggers the `search` function in `a4kSubtitles/core.py`.
+2.  The `search` function gets video metadata (IMDb ID, title, season, episode) using helpers in `a4kSubtitles/lib/video.py`.
+3.  It then iterates through all enabled services defined in `a4kSubtitles/services/`.
+4.  For each service, it calls `build_search_requests` to get the necessary HTTP request details.
+5.  It executes these requests in parallel threads.
+6.  As responses arrive, `parse_search_response` is called for each service to transform the service-specific response into a standardized list of subtitle results.
+7.  All results are collected, sorted, and ranked in `__prepare_results`.
+8.  The final list is presented to the user or, if auto-download is enabled, the top result is passed to the `download` function.
+9.  The `download` function calls `build_download_request` for the selected service and handles the file download and extraction.
+
+### Adding a New Service
+
+To add a new subtitle provider, you need to create a new service file and implement a set of functions.
+
+1.  **Create a new file** in `a4kSubtitles/services/`, e.g., `newservice.py`.
+2.  **Implement the service functions** in this file. See existing services for examples.
+    *   `build_search_requests(core, service_name, meta)`: Should return a list of request dictionaries for searching.
+    *   `parse_search_response(core, service_name, meta, response)`: Should parse the HTTP response and return a list of standardized subtitle result dictionaries.
+    *   `build_download_request(core, service_name, action_args)`: Should return a request dictionary for downloading the selected subtitle file.
+    *   (Optional) `build_auth_request` and `parse_auth_response` if the service requires authentication.
+3.  **Register the service** in `a4kSubtitles/services/__init__.py`. Add your new service to the `services` dictionary. The key should be the service name (e.g., `newservice`), and the value should be a dictionary containing its display name and a reference to your implemented functions.
+4.  **Add settings** for your service in `resources/settings.xml` so users can enable/disable it and configure any necessary settings (like username/password).
+
+### API Reference
+
+a4kSubtitles provides a simple API for developers to integrate subtitle functionality into their own addons.
+
+**`A4kSubtitlesApi` Class**
+
+This is the main class for interacting with the addon.
+
+```python
+from a4kSubtitles import api
+
+# Initialize the API
+# In a real addon, you would not pass mocks.
+a4k = api.A4kSubtitlesApi()
+```
+
+**Methods:**
+
+*   **`search(params, settings=None, video_meta=None)`**: Searches for subtitles.
+    *   `params` (dict): A dictionary of search parameters. Required keys: `languages` (comma-separated list) and `preferredlanguage`.
+    *   `settings` (dict, optional): Mock addon settings for testing.
+    *   `video_meta` (dict, optional): Mock video metadata for testing.
+    *   **Returns**: A list of subtitle result dictionaries.
+
+*   **`download(params, settings=None)`**: Downloads a subtitle.
+    *   `params` (dict): A subtitle result dictionary obtained from `search()`.
+    *   `settings` (dict, optional): Mock addon settings for testing.
+    *   **Returns**: The local path to the downloaded subtitle file.
+
+*   **`mock_settings(settings)`**: Temporarily overrides addon settings. Useful for testing.
+    *   `settings` (dict): A dictionary of settings to mock.
+    *   **Returns**: A function to restore the original settings.
+
+*   **`auto_load_enabled(settings=None)`**: Checks if auto-loading of subtitles is enabled.
+    *   `settings` (dict, optional): Mock addon settings for testing.
+    *   **Returns**: `True` if auto-loading is enabled, `False` otherwise.
+
+**Example:**
+
+```python
+from a4kSubtitles import api
+
+# Initialize the API
+a4k = api.A4kSubtitlesApi()
+
+# Search for subtitles
+# In a real addon, params would be provided by Kodi.
+results = a4k.search({
+    'languages': 'en',
+    'preferredlanguage': 'en',
+})
+
+# Download a subtitle
+if results:
+    subfile = a4k.download(results[0])
+    print("Subtitle downloaded to:", subfile)
+```
+
+## Contributing
+
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to report issues, suggest features, and submit pull requests.
 
 ## License
 
