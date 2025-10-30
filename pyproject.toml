@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "polyglotsubs-kodi"
-version = "0.1.0"
+version = "3.20.0-scmod.71"
 description = "PolyglotSubs Kodi addon with Subtitlecat provider"
 authors = [{name="Sebastian Vannistel"}]
 readme = "README.md"
@@ -25,4 +25,9 @@ dependencies = [
     "js2py>=0.74",
     "brotli>=1.1.0",
     "certifi>=2024.2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "commitizen>=3.18,<4",
 ]

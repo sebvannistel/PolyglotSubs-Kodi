@@ -29,11 +29,11 @@ We welcome pull requests for bug fixes and improvements.
     source .venv/bin/activate  # On Windows use `source .venv\Scripts\activate`
     ```
 4.  **Dependencies for Linting/Testing:**
-    Install development dependencies (linters, test runners):
+    Install development dependencies (linters, Commitizen, test runners):
     ```bash
-    pip install -r requirements-dev.txt 
+    pip install -r requirements-dev.txt
     ```
-    The project uses `.flake8` for linting.
+    The project uses `.flake8` for linting and [Commitizen](https://commitizen-tools.github.io/commitizen/) for conventional commit automation.
 
 #### Running Linters and Tests
 
@@ -71,6 +71,26 @@ It executes `pre-commit run --all-files` and `pytest` to catch formatting issues
     pytest --run-integration
     ```
 
+#### Commit Message Guidelines
+
+PolyglotSubs-Kodi enforces a very small conventional commit surface. All commits
+must use one of the following types:
+
+* `release` – version bumps and packaging automation
+* `test` – additions or fixes to automated tests
+* `chore` – repository maintenance, tooling, or documentation updates
+
+Commitizen is included in the development requirements to help you prepare and
+validate commit messages:
+
+```bash
+cz check --rev-range origin/main..HEAD
+```
+
+The CI workflow runs the same command and annotates failures directly in the
+pull request checks. You can also run `cz commit` to walk through an
+interactive prompt that produces a valid commit message.
+
 #### Coding Standards
 *   Please follow the existing code style.
 
@@ -93,6 +113,20 @@ It executes `pre-commit run --all-files` and `pytest` to catch formatting issues
     ```
 4.  Open a pull request from your fork to the main `PolyglotSubs-Kodi` repository.
 5.  Provide a clear description of the changes in your pull request. Explain the problem you're solving or the feature you're adding.
+
+#### Releasing the Addon
+
+Repository maintainers can cut a release with Commitizen and the release helper
+script. The script will bump the version everywhere (including `addon.xml`),
+refresh the `<news>` entries from the generated changelog, create the release
+commit/tag, and optionally publish a GitHub release:
+
+```bash
+scripts/release.sh <github-token> <major|minor|patch|prerelease> [--no-release]
+```
+
+Running with `--no-release` skips the GitHub API call and is useful when you
+want to review the generated commit locally before pushing.
 
 ### Considering Upstream Contributions
 While this is a fork with specific modifications (like Subtitlecat.com integration), if you develop a general improvement or bug fix that could benefit the original [a4kSubtitles](https://github.com/a4k-openproject/a4kSubtitles) project, please consider opening an issue or pull request there as well. Collaborative efforts benefit the entire community.

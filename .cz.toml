@@ -1,0 +1,26 @@
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "3.20.0-scmod.71"
+tag_format = "service.subtitles.polyglotsubs-kodi/service.subtitles.polyglotsubs-kodi-$version"
+version_files = [
+  "addon.xml:version=\"",
+  "pyproject.toml:version = \"",
+]
+changelog_file = "CHANGELOG.md"
+update_changelog_on_bump = true
+changelog_incremental = true
+schema_pattern = "(?s)^(release|test|chore)(\\([^)]+\\))?!?: .+"
+bump_message = "release: v$new_version"
+changelog_pattern = "^(release|test|chore)"
+
+[[tool.commitizen.commit_types]]
+type = "release"
+description = "Release coordination and packaging"
+
+[[tool.commitizen.commit_types]]
+type = "test"
+description = "Add, update, or fix automated tests"
+
+[[tool.commitizen.commit_types]]
+type = "chore"
+description = "Repository maintenance and tooling"

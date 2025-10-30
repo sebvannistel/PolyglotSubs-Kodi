@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch base branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -27,8 +32,40 @@ jobs:
       - name: Integration Tests
         run: |
           pytest --run-integration -q
-      - name: Validate commit
-        run: |
-          python scripts/validate_commit.py
+      - name: Check conventional commits
+        shell: bash
         env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || '' }}
+          BEFORE_SHA: ${{ github.event.before || '' }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          set -eo pipefail
+
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            REV_RANGE="${BASE_SHA}..${HEAD_SHA}"
+          else
+            if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "0000000000000000000000000000000000000000" ]; then
+              FIRST_COMMIT=$(git rev-list --max-parents=0 HEAD | tail -n 1)
+              REV_RANGE="${FIRST_COMMIT}..${CURRENT_SHA}"
+            else
+              REV_RANGE="${BEFORE_SHA}..${CURRENT_SHA}"
+            fi
+          fi
+
+          echo "Checking commits in range: ${REV_RANGE}"
+
+          set +e
+          OUTPUT=$(cz check --rev-range "${REV_RANGE}" 2>&1)
+          STATUS=$?
+          echo "$OUTPUT"
+
+          if [ $STATUS -ne 0 ]; then
+            while IFS= read -r line; do
+              if [ -n "$line" ]; then
+                echo "::error::${line}"
+              fi
+            done <<< "$OUTPUT"
+            exit $STATUS
+          fi
