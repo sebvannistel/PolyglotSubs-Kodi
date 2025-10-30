@@ -14,6 +14,7 @@
         <setting id="subtitlecat_notify_upload" label="33210" type="bool" default="true"/>
         <setting id="subtitlecat_include_shared" label="33211" type="bool" default="true"/>
         <setting id="subtitlecat.node_path" label="33212" type="file" option="writeable" default=""/>
+        <setting id="subtitlecat.use_subget_helper" label="33213" type="bool" default="true"/>
     </category>
     <!-- Services -->
     <category label="33002">

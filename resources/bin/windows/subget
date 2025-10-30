@@ -1,0 +1,3 @@
+This placeholder exists because the Kodi packaging rules expect a file
+named ``subget`` in ``resources/bin/windows``. The actual executable is
+``subget.bat`` which prints a JSON error payload in development builds.

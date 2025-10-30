@@ -109,3 +109,7 @@ msgstr ""
 msgctxt "#33212"
 msgid "Node.js executable (Subtitlecat headless helper)"
 msgstr ""
+
+msgctxt "#33213"
+msgid "Use Subget helper for Subtitlecat"
+msgstr ""

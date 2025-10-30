@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+"""See ``resources/bin/linux/subget`` for details."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+
+
+def _handle_search(query: str) -> int:
+    payload = {
+        "ok": False,
+        "error": "subget stub binary – real helper missing",
+        "query": query,
+    }
+    json.dump(payload, sys.stdout)
+    sys.stdout.write("\n")
+    return 1
+
+
+def _handle_download(detail: str, lang: str, use_stdout: bool) -> int:
+    sys.stderr.write(
+        "subget stub binary – download helper is not available in development builds\n"
+    )
+    return 1
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="subget-stub")
+    parser.add_argument("--json-search", dest="json_search")
+    parser.add_argument("--download", dest="download")
+    parser.add_argument("--lang", dest="lang")
+    parser.add_argument("--stdout", action="store_true")
+    args = parser.parse_args(argv)
+
+    if args.json_search:
+        return _handle_search(args.json_search)
+    if args.download:
+        return _handle_download(args.download, args.lang or "", args.stdout)
+
+    parser.print_usage()
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

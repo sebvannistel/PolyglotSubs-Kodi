@@ -9,7 +9,7 @@ from urllib.parse import urljoin
 import srt
 from bs4 import BeautifulSoup
 
-from . import headless_bridge
+from . import headless_bridge, subget_bridge
 from .translation import (
     _AIOHTTP_AVAILABLE,
     _CHUNK_SEP,
@@ -38,6 +38,10 @@ from .utils import (
     SCRAPER_REQUEST_EXCEPTION,
     SCRAPER_TIMEOUT_EXCEPTION,
 )
+
+
+def _subget_setting_enabled(core) -> bool:
+    return bool(_get_setting(core, "subtitlecat_use_subget_helper", True))
 
 
 def build_search_requests(core, service_name, meta):
@@ -115,6 +119,32 @@ def parse_search_response(core, service_name, meta, response):
     core.logger.debug(
         f"[{service_name}] Parsing search response. Status: {response.status_code}, URL: {response.url if response else 'N/A'}"
     )
+
+    if _subget_setting_enabled(core):
+        try:
+            if subget_bridge.is_available(core):
+                bridge_results = subget_bridge.search(core, service_name, meta)
+                if bridge_results:
+                    core.logger.debug(
+                        f"[{service_name}] Subget bridge returned {len(bridge_results)} results."
+                    )
+                    return bridge_results
+                core.logger.debug(
+                    f"[{service_name}] Subget bridge returned no results, falling back to legacy parser."
+                )
+            else:
+                core.logger.debug(
+                    f"[{service_name}] Subget helper unavailable, using legacy parser."
+                )
+        except subget_bridge.SubgetError as exc:
+            core.logger.error(
+                f"[{service_name}] Subget bridge error: {exc}. Falling back to legacy parser."
+            )
+        except Exception as exc:  # pragma: no cover - defensive logging
+            core.logger.exception(
+                f"[{service_name}] Unexpected Subget bridge failure: {exc}. Falling back to legacy parser."
+            )
+
     results = []
     if response.status_code != 200:
         core.logger.error(
@@ -735,6 +765,41 @@ def build_download_request(core, service_name, args):
         finally:
             if resp_for_save:
                 resp_for_save.close()
+
+    if args.get("subget"):
+        detail_url = args.get("detail_url")
+        lang_code = args.get("lang_code")
+
+        def _save_via_subget(path_from_core):
+            if not subget_bridge.is_available(core):
+                core.logger.warning(
+                    f"[{service_name}] Subget helper requested but unavailable."
+                )
+                if args.get("url"):
+                    return _save_from_subtitlecat_url(path_from_core, args["url"])
+                return False
+            try:
+                return subget_bridge.download(
+                    core,
+                    service_name,
+                    detail_url,
+                    lang_code,
+                    path_from_core,
+                    args.get("filename"),
+                )
+            except subget_bridge.SubgetError as exc:
+                core.logger.error(
+                    f"[{service_name}] Subget download failed: {exc}."
+                )
+                if args.get("url"):
+                    return _save_from_subtitlecat_url(path_from_core, args["url"])
+                return False
+
+        return {
+            "method": "REQUEST_CALLBACK",
+            "save_callback": _save_via_subget,
+            "filename": _filename_from_args,
+        }
 
     if args.get("needs_client_side_translation"):
         core.logger.debug(
