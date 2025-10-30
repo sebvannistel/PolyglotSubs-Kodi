@@ -43,6 +43,22 @@ To run all linters and the test suite in one step before committing or pushing, 
 scripts/preflight.sh
 ```
 
+### Monitoring Subtitlecat layout changes
+
+The repository vendors a lightweight build of the
+[`subtitle-find`](https://github.com/Witten1997/subtitle-find) crawler under
+`tools/subtitlecat-layout-watch/`. Run the watcher before touching the
+Subtitlecat parser to make sure our selectors still match the live site:
+
+```bash
+scripts/watch_subtitlecat.sh
+```
+
+The watcher requires Java 17 and Maven (the CI workflow provisions both). On
+failure it stores HTML snapshots in `tests/services/subtitlecat/watch_snapshots/`
+so you can update the parser and extend the regression suite. Once your parser
+changes pass `pytest`, commit the new snapshot(s) alongside the code fix.
+
 It executes `pre-commit run --all-files` and `pytest` to catch formatting issues and failing tests early.
 
 *   **Install pre-commit hooks:**

@@ -1,0 +1,20 @@
+[
+  {
+    "label": "aquaman_search",
+    "query": "Aquaman Rage of Atlantis 2018 720p WEB-DL H264 AC3-EVO",
+    "expected_selector": ".sub-table tbody tr",
+    "expected_min_results": 5,
+    "check_download": true,
+    "expected_download_selector": "#download_zh-CN, #download_zh, .download-link",
+    "expected_download_url_fragment": ".srt"
+  },
+  {
+    "label": "silo_s01e01",
+    "query": "Silo S01E01 Freedom Day 1080p",
+    "expected_selector": ".sub-table tbody tr",
+    "expected_min_results": 5,
+    "check_download": true,
+    "expected_download_selector": "#download_zh-CN, #download_zh, .download-link",
+    "expected_download_url_fragment": ".srt"
+  }
+]
