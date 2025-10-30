@@ -21,7 +21,7 @@ from .lib import (
     cache,
     kodi,
     logger,
-    num2ordinal,
+    ordinal,
     request,
     utils,
     video,
@@ -29,6 +29,8 @@ from .lib import (
 
 core = sys.modules[__name__]
 utils.core = core
+core.ordinal = ordinal
+core.num2ordinal = ordinal  # Backwards compatibility for legacy callers
 
 api_mode_enabled = True
 handle = None

@@ -25,6 +25,7 @@ dependencies = [
     "js2py>=0.74",
     "brotli>=1.1.0",
     "certifi>=2024.2.2",
+    "num2words>=0.5.14,<0.6",
 ]
 
 [project.optional-dependencies]
