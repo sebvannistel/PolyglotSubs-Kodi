@@ -1,9 +1,9 @@
-from a4kSubtitles.services.subtitlecat.utils import SimpleLRUCache
+from a4kSubtitles.services.subtitlecat.utils import LRUCache
 from a4kSubtitles.services.subtitlecat.translation import _protect_subtitle_tags, _restore_subtitle_tags
 
 
-def test_simple_lru_cache_eviction():
-    cache = SimpleLRUCache(maxsize=2)
+def test_lru_cache_eviction():
+    cache = LRUCache(maxsize=2)
     cache['a'] = 1
     cache['b'] = 2
     cache['c'] = 3

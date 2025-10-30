@@ -1,6 +1,7 @@
 * Unreleased:
   * Normalize line endings and add linguist hints in `.gitattributes`.
   * Introduce `.editorconfig` for consistent formatting across editors.
+  * Depend on `cachetools>=5.5` and replace the custom Subtitlecat LRU cache with the cachetools implementation.
 
 * PolyglotSubs-Kodi:
   * Forked from [a4kSubtitles](https://github.com/a4k-openproject/a4kSubtitles) and maintained separately.

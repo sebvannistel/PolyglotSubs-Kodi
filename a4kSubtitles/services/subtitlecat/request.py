@@ -485,7 +485,7 @@ def parse_search_response(core, service_name, meta, response):
             )
             cached_url = _TRANSLATED_CACHE.get(
                 cache_key
-            )  # Using .get() from SimpleLRUCache
+            )  # Using thread-safe LRUCache.get
             if cached_url:
                 patch_determined_href = cached_url
                 core.logger.debug(
@@ -1108,7 +1108,6 @@ def build_download_request(core, service_name, args):
                     f"[{service_name}] Upload successful. Callback will download from: {new_url_from_sc}"
                 )
                 cache_key_lang = args.get("lang_code", target_gtranslate_lang).lower()
-                # Using __setitem__ from SimpleLRUCache for _TRANSLATED_CACHE
                 _TRANSLATED_CACHE[(args.get("detail_url"), cache_key_lang)] = (
                     new_url_from_sc
                 )

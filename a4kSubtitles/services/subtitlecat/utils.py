@@ -2,7 +2,7 @@ import threading
 import re
 import requests as system_requests
 from rapidfuzz import fuzz
-from collections import OrderedDict
+from cachetools import LRUCache as _CachetoolsLRUCache
 
 SC_BASE_URL = "https://www.subtitlecat.com"
 SC_USER_AGENT = (
@@ -13,6 +13,7 @@ SC_USER_AGENT = (
 
 _thread_local_session_storage = threading.local()
 
+
 def _get_session():
     """Return a thread-local requests.Session with default headers."""
     if not hasattr(_thread_local_session_storage, 'session'):
@@ -21,85 +22,51 @@ def _get_session():
         _thread_local_session_storage.session = session
     return _thread_local_session_storage.session
 
-class SimpleLRUCache:
-    """
-    A simple thread-safe LRU cache.
-    """
-    def __init__(self, maxsize=128):
-        """
-        Initializes the cache.
 
-        Args:
-            maxsize (int, optional): The maximum size of the cache. Defaults to 128.
-        """
+class LRUCache(_CachetoolsLRUCache):
+    """Thread-safe wrapper around :class:`cachetools.LRUCache`."""
+
+    _MISSING = object()
+
+    def __init__(self, maxsize=128, getsizeof=None):
         if not isinstance(maxsize, int) or maxsize <= 0:
             raise ValueError("maxsize must be a positive integer")
-        self._cache = OrderedDict()
-        self._maxsize = maxsize
-        self._lock = threading.Lock()
-
-    def get(self, key, default=None):
-        """
-        Gets an item from the cache.
-
-        Args:
-            key: The key of the item to get.
-            default: The default value to return if the key is not in the cache.
-
-        Returns:
-            The value of the item, or the default value if the key is not in the cache.
-        """
-        with self._lock:
-            if key not in self._cache:
-                return default
-            value = self._cache.pop(key)
-            self._cache[key] = value
-            return value
-
-    def __setitem__(self, key, value):
-        """
-        Sets an item in the cache.
-
-        Args:
-            key: The key of the item to set.
-            value: The value of the item to set.
-        """
-        with self._lock:
-            if key in self._cache:
-                self._cache.pop(key)
-            elif len(self._cache) >= self._maxsize:
-                self._cache.popitem(last=False)
-            self._cache[key] = value
+        super().__init__(maxsize=maxsize, getsizeof=getsizeof)
+        self._lock = threading.RLock()
 
     def __getitem__(self, key):
-        """
-        Gets an item from the cache.
-
-        Args:
-            key: The key of the item to get.
-
-        Returns:
-            The value of the item.
-        """
         with self._lock:
-            if key not in self._cache:
-                raise KeyError(key)
-            value = self._cache.pop(key)
-            self._cache[key] = value
-            return value
+            return super().__getitem__(key)
+
+    def __setitem__(self, key, value):
+        with self._lock:
+            return super().__setitem__(key, value)
 
     def __contains__(self, key):
-        """
-        Checks if an item is in the cache.
-
-        Args:
-            key: The key of the item to check.
-
-        Returns:
-            True if the item is in the cache, False otherwise.
-        """
         with self._lock:
-            return key in self._cache
+            return super().__contains__(key)
+
+    def get(self, key, default=None):
+        with self._lock:
+            return super().get(key, default)
+
+    def pop(self, key, default=_MISSING):
+        with self._lock:
+            if default is self._MISSING:
+                return super().pop(key)
+            return super().pop(key, default)
+
+    def popitem(self):
+        with self._lock:
+            return super().popitem()
+
+    def clear(self):
+        with self._lock:
+            return super().clear()
+
+    def __delitem__(self, key):
+        with self._lock:
+            return super().__delitem__(key)
 
 _CLEAN_PUNC = re.compile(r"[._-]")
 _CLEAN_CAMEL = re.compile(r"(?<=[a-z])(?=[A-Z])")

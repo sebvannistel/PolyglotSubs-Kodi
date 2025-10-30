@@ -3,13 +3,14 @@ from .request import (
     build_search_requests,
     parse_search_response,
 )
-from .translation import _CHUNK_SEP, _CLIENT_TRANSLATED_CONTENT_CACHE, SimpleLRUCache
+from .translation import _CHUNK_SEP, _CLIENT_TRANSLATED_CONTENT_CACHE
+from .utils import LRUCache
 
 __all__ = [
     "build_search_requests",
     "parse_search_response",
     "build_download_request",
-    "SimpleLRUCache",
+    "LRUCache",
     "_CLIENT_TRANSLATED_CONTENT_CACHE",
     "_CHUNK_SEP",
 ]

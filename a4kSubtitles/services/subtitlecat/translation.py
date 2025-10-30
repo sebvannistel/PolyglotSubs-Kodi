@@ -10,7 +10,7 @@ import requests as system_requests
 from .utils import (
     SC_BASE_URL,
     SC_USER_AGENT,
-    SimpleLRUCache,
+    LRUCache,
     _get_session,
     _get_setting,
 )
@@ -26,8 +26,8 @@ except ImportError:
     asyncio = None
     aiohttp = None
 
-_TRANSLATED_CACHE = SimpleLRUCache(maxsize=64)
-_CLIENT_TRANSLATED_CONTENT_CACHE = SimpleLRUCache(maxsize=128)
+_TRANSLATED_CACHE = LRUCache(maxsize=64)
+_CLIENT_TRANSLATED_CONTENT_CACHE = LRUCache(maxsize=128)
 _CHUNK_SEP = "\u241e"
 
 GOOGLE_TRANSLATE_URL = "https://translate.googleapis.com/translate_a/single"
