@@ -163,6 +163,12 @@ This section provides information for developers who want to contribute to a4kSu
     pip install -r requirements-dev.txt
     ```
 
+### Dependencies
+
+The addon relies on the Python packages listed in `requirements.txt` for runtime operation. Subtitlecat translation caching now
+uses [`cachetools`](https://cachetools.readthedocs.io/) to provide a robust LRU implementation, so downstream packagers should
+ensure that `cachetools>=5.5` is available when building or distributing PolyglotSubs-Kodi.
+
 ### Running Tests
 
 Run unit tests with:

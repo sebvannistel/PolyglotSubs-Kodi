@@ -34,7 +34,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         self.base_action_args = self.args
         # Clear any cached translations between tests
         subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = (
-            subtitlecat_module.SimpleLRUCache(maxsize=128)
+            subtitlecat_module.LRUCache(maxsize=128)
         )
         subtitlecat_module.request._CLIENT_TRANSLATED_CONTENT_CACHE = (
             subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE
@@ -563,7 +563,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         mock_protect_tags.reset_mock()
         mock_srt_parse.reset_mock()  # Clean slate
         subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = (
-            subtitlecat_module.SimpleLRUCache(maxsize=128)
+            subtitlecat_module.LRUCache(maxsize=128)
         )
         subtitlecat_module.request._CLIENT_TRANSLATED_CONTENT_CACHE = (
             subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE
@@ -591,7 +591,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         mock_protect_tags.reset_mock()
         mock_srt_parse.reset_mock()
         subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = (
-            subtitlecat_module.SimpleLRUCache(maxsize=128)
+            subtitlecat_module.LRUCache(maxsize=128)
         )
         subtitlecat_module.request._CLIENT_TRANSLATED_CONTENT_CACHE = (
             subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE
@@ -618,7 +618,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         mock_protect_tags.reset_mock()
         mock_srt_parse.reset_mock()
         subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE = (
-            subtitlecat_module.SimpleLRUCache(maxsize=128)
+            subtitlecat_module.LRUCache(maxsize=128)
         )
         subtitlecat_module.request._CLIENT_TRANSLATED_CONTENT_CACHE = (
             subtitlecat_module._CLIENT_TRANSLATED_CONTENT_CACHE
