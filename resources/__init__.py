@@ -1,0 +1,1 @@
+"""Kodi resource package."""

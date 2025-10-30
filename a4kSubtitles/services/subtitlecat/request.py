@@ -18,9 +18,9 @@ from .translation import (
     _TRANSLATED_CACHE,
     DEFAULT_BATCH_DELAY_SECONDS,
     DEFAULT_TRANSLATION_FAILED_PLACEHOLDER,
-    GOOGLE_API_Q_PARAM_CHAR_LIMIT,
+    GEMINI_MAX_JOINED_CHAR_COUNT,
     MAX_LINES_PER_API_CALL_CONFIG,
-    _gtranslate_text_chunk,
+    _gemini_translate_text_chunk,
     _protect_subtitle_tags,
     _restore_subtitle_tags,
     _upload_translation_to_subtitlecat,
@@ -741,7 +741,7 @@ def build_download_request(core, service_name, args):
             f"[{service_name}] Starting client-side translation for '{_filename_from_args}'"
         )
         original_srt_url = args["original_srt_url"]
-        target_gtranslate_lang = args["target_translation_lang"]
+        target_translation_lang = args["target_translation_lang"]
 
         final_translated_srt_str = None
         overall_detected_source_lang = "auto"
@@ -785,13 +785,13 @@ def build_download_request(core, service_name, args):
 
         # REMOVED: Event loop management (event_loop_for_this_job, loop_created_by_bdr) as it's no longer used here.
 
-        cache_key_content = (original_srt_url, target_gtranslate_lang)
+        cache_key_content = (original_srt_url, target_translation_lang)
         cached_content_data = _CLIENT_TRANSLATED_CONTENT_CACHE.get(cache_key_content)
 
         try:  # This try block no longer needs a finally for loop cleanup
             if cached_content_data:
                 core.logger.debug(
-                    f"[{service_name}] Using cached client-translated SRT content for {original_srt_url} to {target_gtranslate_lang}."
+                    f"[{service_name}] Using cached client-translated SRT content for {original_srt_url} to {target_translation_lang}."
                 )
                 final_translated_srt_str = cached_content_data["srt_content"]
                 overall_detected_source_lang = cached_content_data[
@@ -862,13 +862,13 @@ def build_download_request(core, service_name, args):
                     f"[{service_name}] Found {len(texts_to_translate_for_api)} actual text lines requiring translation API calls (after cleaning and tag filtering)."
                 )
 
-                all_translated_pure_text_lines_from_google = []
+                all_translated_pure_text_lines_from_gemini = []
                 all_detected_source_langs_overall = []
 
-                current_api_batch_lines_for_google = []
+                current_api_batch_lines_for_gemini = []
                 current_api_batch_char_count = 0
 
-                api_char_limit = GOOGLE_API_Q_PARAM_CHAR_LIMIT
+                api_char_limit = GEMINI_MAX_JOINED_CHAR_COUNT
                 api_line_limit = MAX_LINES_PER_API_CALL_CONFIG
                 batch_delay_setting = _get_setting(
                     core,
@@ -881,27 +881,27 @@ def build_download_request(core, service_name, args):
                         f"[{service_name}] No text lines to translate after filtering. Skipping API calls."
                     )
                 else:
-                    for i, protected_text_line_for_google in enumerate(
+                    for i, protected_text_line_for_gemini in enumerate(
                         texts_to_translate_for_api
                     ):
-                        line_char_count = len(protected_text_line_for_google)
+                        line_char_count = len(protected_text_line_for_gemini)
                         potential_new_char_count = (
                             current_api_batch_char_count
                             + line_char_count
-                            + (1 if current_api_batch_lines_for_google else 0)
+                            + (1 if current_api_batch_lines_for_gemini else 0)
                         )
 
-                        if current_api_batch_lines_for_google and (
+                        if current_api_batch_lines_for_gemini and (
                             potential_new_char_count > api_char_limit
-                            or len(current_api_batch_lines_for_google) >= api_line_limit
+                            or len(current_api_batch_lines_for_gemini) >= api_line_limit
                         ):
                             core.logger.debug(
-                                f"[{service_name}] Processing API batch of {len(current_api_batch_lines_for_google)} lines, {current_api_batch_char_count} chars."
+                                f"[{service_name}] Processing API batch of {len(current_api_batch_lines_for_gemini)} lines, {current_api_batch_char_count} chars."
                             )
 
-                            result = _gtranslate_text_chunk(
-                                current_api_batch_lines_for_google,
-                                target_gtranslate_lang,
+                            result = _gemini_translate_text_chunk(
+                                current_api_batch_lines_for_gemini,
+                                target_translation_lang,
                                 core,
                                 service_name,
                                 0,
@@ -913,16 +913,16 @@ def build_download_request(core, service_name, args):
                                 detected_lang_from_chunk = "auto"
 
                             if len(translated_segments) != len(
-                                current_api_batch_lines_for_google
+                                current_api_batch_lines_for_gemini
                             ):
                                 core.logger.error(
-                                    f"[{service_name}] CRITICAL MISMATCH: _gtranslate_text_chunk returned "
-                                    f"{len(translated_segments)}, expected {len(current_api_batch_lines_for_google)}. "
+                                    f"[{service_name}] CRITICAL MISMATCH: _gemini_translate_text_chunk returned "
+                                    f"{len(translated_segments)}, expected {len(current_api_batch_lines_for_gemini)}. "
                                     f"Correcting."
                                 )
                                 corrected_segments = [
                                     placeholder_str if line.strip() else ""
-                                    for line in current_api_batch_lines_for_google
+                                    for line in current_api_batch_lines_for_gemini
                                 ]
                                 for k_idx in range(
                                     min(
@@ -933,11 +933,11 @@ def build_download_request(core, service_name, args):
                                     corrected_segments[k_idx] = translated_segments[
                                         k_idx
                                     ]
-                                all_translated_pure_text_lines_from_google.extend(
+                                all_translated_pure_text_lines_from_gemini.extend(
                                     corrected_segments
                                 )
                             else:
-                                all_translated_pure_text_lines_from_google.extend(
+                                all_translated_pure_text_lines_from_gemini.extend(
                                     translated_segments
                                 )
 
@@ -949,7 +949,7 @@ def build_download_request(core, service_name, args):
                                     detected_lang_from_chunk
                                 )
 
-                            current_api_batch_lines_for_google = []
+                            current_api_batch_lines_for_gemini = []
                             current_api_batch_char_count = 0
 
                             if batch_delay_setting > 0 and i < len(
@@ -957,20 +957,20 @@ def build_download_request(core, service_name, args):
                             ):
                                 time.sleep(batch_delay_setting)
 
-                        current_api_batch_lines_for_google.append(
-                            protected_text_line_for_google
+                        current_api_batch_lines_for_gemini.append(
+                            protected_text_line_for_gemini
                         )
                         current_api_batch_char_count += line_char_count
-                        if len(current_api_batch_lines_for_google) > 1:
+                        if len(current_api_batch_lines_for_gemini) > 1:
                             current_api_batch_char_count += 1
 
-                    if current_api_batch_lines_for_google:
+                    if current_api_batch_lines_for_gemini:
                         core.logger.debug(
-                            f"[{service_name}] Processing final API batch of {len(current_api_batch_lines_for_google)} lines, {current_api_batch_char_count} chars."
+                            f"[{service_name}] Processing final API batch of {len(current_api_batch_lines_for_gemini)} lines, {current_api_batch_char_count} chars."
                         )
-                        result = _gtranslate_text_chunk(
-                            current_api_batch_lines_for_google,
-                            target_gtranslate_lang,
+                        result = _gemini_translate_text_chunk(
+                            current_api_batch_lines_for_gemini,
+                            target_translation_lang,
                             core,
                             service_name,
                             0,
@@ -982,26 +982,26 @@ def build_download_request(core, service_name, args):
                             detected_lang_from_chunk = "auto"
 
                         if len(translated_segments) != len(
-                            current_api_batch_lines_for_google
+                            current_api_batch_lines_for_gemini
                         ):
                             core.logger.error(
-                                f"[{service_name}] CRITICAL MISMATCH (final batch): _gtranslate_text_chunk returned "
-                                f"{len(translated_segments)}, expected {len(current_api_batch_lines_for_google)}. "
+                                f"[{service_name}] CRITICAL MISMATCH (final batch): _gemini_translate_text_chunk returned "
+                                f"{len(translated_segments)}, expected {len(current_api_batch_lines_for_gemini)}. "
                                 f"Correcting."
                             )
                             corrected_segments = [
                                 placeholder_str if line.strip() else ""
-                                for line in current_api_batch_lines_for_google
+                                for line in current_api_batch_lines_for_gemini
                             ]
                             for k_idx in range(
                                 min(len(translated_segments), len(corrected_segments))
                             ):
                                 corrected_segments[k_idx] = translated_segments[k_idx]
-                            all_translated_pure_text_lines_from_google.extend(
+                            all_translated_pure_text_lines_from_gemini.extend(
                                 corrected_segments
                             )
                         else:
-                            all_translated_pure_text_lines_from_google.extend(
+                            all_translated_pure_text_lines_from_gemini.extend(
                                 translated_segments
                             )
 
@@ -1028,26 +1028,26 @@ def build_download_request(core, service_name, args):
                         )
                     else:
                         if current_translated_text_idx < len(
-                            all_translated_pure_text_lines_from_google
+                            all_translated_pure_text_lines_from_gemini
                         ):
-                            translated_line_from_google = (
-                                all_translated_pure_text_lines_from_google[
+                            translated_line_from_gemini = (
+                                all_translated_pure_text_lines_from_gemini[
                                     current_translated_text_idx
                                 ]
                             )
 
-                            if translated_line_from_google == placeholder_str:
+                            if translated_line_from_gemini == placeholder_str:
                                 final_flat_processed_logical_lines[original_idx] = (
                                     placeholder_str
                                 )
                             else:
-                                restored_line = translated_line_from_google
+                                restored_line = translated_line_from_gemini
                                 if (
                                     contains_any_tags_globally
                                     and meta_for_line["tags_map_for_this_logical_line"]
                                 ):
                                     restored_line = _restore_subtitle_tags(
-                                        translated_line_from_google,
+                                        translated_line_from_gemini,
                                         meta_for_line["tags_map_for_this_logical_line"],
                                     )
                                 final_flat_processed_logical_lines[original_idx] = (
@@ -1067,11 +1067,11 @@ def build_download_request(core, service_name, args):
                             )
 
                 if current_translated_text_idx != len(
-                    all_translated_pure_text_lines_from_google
+                    all_translated_pure_text_lines_from_gemini
                 ):
                     core.logger.error(
-                        f"[{service_name}] Mismatch: Processed {current_translated_text_idx} translated lines from google, "
-                        f"but API processing yielded {len(all_translated_pure_text_lines_from_google)} lines for "
+                        f"[{service_name}] Mismatch: Processed {current_translated_text_idx} translated lines from gemini, "
+                        f"but API processing yielded {len(all_translated_pure_text_lines_from_gemini)} lines for "
                         f"{len(texts_to_translate_for_api)} inputs."
                     )
 
@@ -1196,7 +1196,7 @@ def build_download_request(core, service_name, args):
                 core.logger.debug(
                     f"[{service_name}] Upload successful. Callback will download from: {new_url_from_sc}"
                 )
-                cache_key_lang = args.get("lang_code", target_gtranslate_lang).lower()
+                cache_key_lang = args.get("lang_code", target_translation_lang).lower()
                 _TRANSLATED_CACHE[(args.get("detail_url"), cache_key_lang)] = (
                     new_url_from_sc
                 )

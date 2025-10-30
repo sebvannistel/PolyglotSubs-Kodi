@@ -11,7 +11,7 @@ from a4kSubtitles.services import subtitlecat as subtitlecat_module
 api_instance.core.services['subtitlecat'] = subtitlecat_module
 
 @patch('a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat')
-@patch('a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk')
+@patch('a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk')
 @patch('a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags')
 @patch('a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags', side_effect=lambda text, _map: text)
 @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
@@ -67,7 +67,7 @@ def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, m
     notify_spy.restore()
 
 @patch('a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat')
-@patch('a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk', return_value=(['Bonjour'], 'en'))
+@patch('a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk', return_value=(['Bonjour'], 'en'))
 @patch('a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags', return_value=('Hello', {}, False))
 @patch('a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags', side_effect=lambda text, _map: text)
 @patch('a4kSubtitles.services.subtitlecat.request.srt.parse')

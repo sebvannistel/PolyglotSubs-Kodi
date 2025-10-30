@@ -90,7 +90,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -152,7 +152,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -220,7 +220,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -279,7 +279,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -345,7 +345,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -398,7 +398,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -454,7 +454,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -496,7 +496,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
 
     @patch("a4kSubtitles.services.subtitlecat.request.time.sleep")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.compose")
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -542,7 +542,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -651,7 +651,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")
@@ -751,7 +751,7 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
         side_effect=lambda text, tag_map: text,
     )
-    @patch("a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk")
+    @patch("a4kSubtitles.services.subtitlecat.request._gemini_translate_text_chunk")
     @patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
     @patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
     @patch("a4kSubtitles.services.subtitlecat.request._get_session")

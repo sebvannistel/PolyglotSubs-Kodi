@@ -11,6 +11,7 @@ websocket-client>=1.7.0
 js2py>=0.74
 brotli>=1.1.0
 certifi>=2024.2.2
+google-genai>=1.39.0
 pytest>=7,<9
 flake8>=6,<7
 coverage>=7,<8

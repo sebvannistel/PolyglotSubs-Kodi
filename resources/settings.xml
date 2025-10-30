@@ -14,6 +14,12 @@
         <setting id="subtitlecat_notify_upload" label="33210" type="bool" default="true"/>
         <setting id="subtitlecat_include_shared" label="33211" type="bool" default="true"/>
         <setting id="subtitlecat.node_path" label="33212" type="file" option="writeable" default=""/>
+        <setting type="lsep" label="33213"/>
+        <setting type="sep"/>
+        <setting id="subtitlecat_gemini_api_keys" label="33214" type="text" option="hidden" default=""/>
+        <setting id="subtitlecat_gemini_model" label="33215" type="text" default="gemini-2.0-flash"/>
+        <setting id="subtitlecat_gemini_api_request_limit" label="33216" type="slider" default="90" option="int" range="0,200"/>
+        <setting id="subtitlecat_gemini_api_throttle_sleep" label="33217" type="slider" default="60" option="int" range="0,300"/>
     </category>
     <!-- Services -->
     <category label="33002">

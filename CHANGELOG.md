@@ -2,6 +2,10 @@
   * Normalize line endings and add linguist hints in `.gitattributes`.
   * Introduce `.editorconfig` for consistent formatting across editors.
   * Depend on `cachetools>=5.5` and replace the custom Subtitlecat LRU cache with the cachetools implementation.
+  * Vendor the SubtitleCAT Gemini translation helpers and expose them under `resources/vendor/subtitlecat_translator/` (MIT licensed).
+  * Replace the Google Translate client with a Gemini-backed translator and update Subtitlecat request handling to use the new wrapper and caching logic.
+  * Add Kodi settings for Gemini API keys, model selection, and throttling along with documentation for the new dependency and environment variables.
+  * Extend the Subtitlecat test suite with Gemini translator stubs to maintain translation pathway coverage.
 
 * PolyglotSubs-Kodi:
   * Forked from [a4kSubtitles](https://github.com/a4k-openproject/a4kSubtitles) and maintained separately.

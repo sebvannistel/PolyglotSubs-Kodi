@@ -109,3 +109,23 @@ msgstr ""
 msgctxt "#33212"
 msgid "Node.js executable (Subtitlecat headless helper)"
 msgstr ""
+
+msgctxt "#33213"
+msgid "Gemini translator"
+msgstr ""
+
+msgctxt "#33214"
+msgid "Gemini API keys (comma or newline separated)"
+msgstr ""
+
+msgctxt "#33215"
+msgid "Gemini model name"
+msgstr ""
+
+msgctxt "#33216"
+msgid "Requests per Gemini key before throttling"
+msgstr ""
+
+msgctxt "#33217"
+msgid "Throttle sleep between Gemini batches (seconds)"
+msgstr ""

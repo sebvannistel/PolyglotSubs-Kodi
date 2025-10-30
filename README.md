@@ -113,6 +113,9 @@ This section covers the main behavior of the addon.
 *   **Include Server-Shared Translations (ID: `subtitlecat_include_shared`):**
     *   **What it does:** Controls whether Subtitlecat results from its shared translation system (shown with "[Shared]") appear in your search results.
     *   **Default:** True (Enabled).
+*   **Gemini Translator (IDs: `subtitlecat_gemini_*`):**
+    *   **What it does:** Configures the built-in Gemini-powered translator used when Subtitlecat cannot supply a ready-made translation. Add one or more API keys (comma or newline separated) that the addon can rotate through when making Gemini requests. You can also pick a custom Gemini model, set how many requests are allowed per key before throttling, and control how long the addon sleeps between throttled batches.
+    *   **Defaults:** Empty API key list (must be provided), model `gemini-2.0-flash`, request limit `90`, throttle sleep `60` seconds. Keys can also be read from the environment variables `GEMINI_API_KEY` or `GOOGLE_API_KEY` if you prefer not to store them in the Kodi settings dialog.
 *   **Enable/Disable Embedded Subtitles:**
     *   **Note:** a4kSubtitles primarily focuses on downloading external subtitle files. The handling of embedded subtitles (those already within your video file) is usually controlled by Kodi's main player settings, not this addon's settings specifically. Check under **Settings -> Player -> Language -> Enable parsing for closed captions / Teletext**.
 

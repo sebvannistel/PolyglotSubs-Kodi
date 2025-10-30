@@ -1,4 +1,22 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
+
+
+@pytest.fixture
+def stub_gemini_translator():
+    """Provide a stub Gemini translator for tests that inspect translation flows."""
+
+    translator = MagicMock()
+    translator.translate_lines.return_value = []
+    translator.config = MagicMock(model="test-model")
+
+    with patch(
+        "a4kSubtitles.services.subtitlecat.translation._get_gemini_translator",
+        return_value=translator,
+    ) as patched:
+        yield translator
+
 
 
 def pytest_addoption(parser):
