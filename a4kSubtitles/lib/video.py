@@ -7,13 +7,19 @@ import hashlib
 import re
 import threading
 
-from .kodi import xbmc, xbmcvfs, get_bool_setting
-from . import logger, cache, utils, request
+from imdb import IMDb, IMDbError
+
+from .kodi import xbmc, xbmcvfs, get_bool_setting, get_int_setting, addon_profile
+from . import logger, cache, utils
 
 __64k = 65536
 __longlong_format_char = 'q'
 __byte_size = struct.calcsize(__longlong_format_char)
 __imdb_id_prefix = 'tt'
+__cinemagoer_cache_dir = os.path.join(addon_profile, 'cinemagoer-cache')
+__imdb_client = None
+__imdb_client_lock = threading.Lock()
+__tv_kinds = {'tv series', 'tv mini series', 'tv mini-series', 'tv show'}
 
 def __sum_64k_bytes(file, result):
     """
@@ -98,247 +104,266 @@ def __get_filename(title):
 
     return filename
 
-def __scrape_tvshow_year(core, meta):
-    """
-    Scrapes the year of a TV show from IMDb.
+def __ensure_cinemagoer_cache_dir():
+    try:
+        xbmcvfs.mkdirs(__cinemagoer_cache_dir)
+    except:  # pragma: no cover - safe guard for environments without xbmcvfs.mkdirs
+        pass
 
-    Args:
-        core (module): The core module.
-        meta (DictAsObject): The metadata of the video.
-    """
-    imdb_response = request.execute(core, {
-        'method': 'GET',
-        'url': 'https://www.imdb.com/title/' + meta.imdb_id,
-        'timeout': 10,
-    })
+    try:
+        os.makedirs(__cinemagoer_cache_dir, exist_ok=True)
+    except:  # pragma: no cover - best effort, ignore if we cannot ensure the cache directory
+        pass
 
-    if imdb_response.status_code != 200:
-        return
+def __get_timeout():
+    try:
+        return get_int_setting('general.timeout')
+    except:
+        return 10
 
-    show_year_match = re.search(r' %s \((.*?)\)"' % meta.tvshow, imdb_response.text)
-    if not show_year_match:
-        show_year_match = re.search(r'<title>.*?\(TV (?:Mini-)?Series (\d\d\d\d).*?</title>', imdb_response.text)
-    if not show_year_match:
-        show_year_match = re.search(r'<span class="parentDate">\((\d\d\d\d).*?\)</span>', imdb_response.text)
+def __get_imdb_client(_core):
+    global __imdb_client
+    if __imdb_client is not None:
+        return __imdb_client
 
-    if show_year_match:
-        meta.tvshow_year = show_year_match.group(1).strip()
+    with __imdb_client_lock:
+        if __imdb_client is not None:
+            return __imdb_client
 
-        tvshow_years_cache = cache.get_tvshow_years_cache()
-        tvshow_years_cache[meta.imdb_id] = meta.tvshow_year
-        cache.save_tvshow_years_cache(tvshow_years_cache)
+        __ensure_cinemagoer_cache_dir()
+        try:
+            os.environ.setdefault('IMDBPY_CACHE_DIR', __cinemagoer_cache_dir)
+        except Exception:
+            pass
 
-def __scrape_imdb_id(core, meta):
-    """
-    Scrapes the IMDb ID of a video.
+        client = IMDb()
+        try:
+            client.set_timeout(__get_timeout())
+        except Exception:
+            pass
 
-    Args:
-        core (module): The core module.
-        meta (DictAsObject): The metadata of the video.
-    """
-    if meta.title == '' or meta.year == '':
-        return
+        __imdb_client = client
+        return __imdb_client
 
-    is_movie = meta.season == '' and meta.episode == ''
+def __format_imdb_id(movie_id):
+    movie_id = str(movie_id)
+    if movie_id.startswith(__imdb_id_prefix):
+        return movie_id
+    return __imdb_id_prefix + movie_id.zfill(7)
 
-    title = (meta.title if is_movie else meta.tvshow).lower()
-    year = '_%s' % meta.year if is_movie else ''
-    query = '%s%s' % (title.lower().replace(' ', '_'), year)
-    query = query[:20]
+def __normalize_imdb_id(imdb_id):
+    return imdb_id[2:] if imdb_id.startswith(__imdb_id_prefix) else imdb_id
 
-    request = {
-        'method': 'GET',
-        'url': 'https://v2.sg.media-imdb.com/suggestion/%s/%s.json' % (query[:1], query),
-        'timeout': 10
-    }
+def __extract_year(value):
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, str):
+        match = re.search(r'\d{4}', value)
+        if match:
+            return match.group(0)
+    return ''
 
-    response = core.request.execute(core, request)
-    if response.status_code != 200:
-        return
-
-    results = core.json.loads(response.text)
-    if len(results['d']) == 0:
-        return
-
-    def filter_movie_results(result):
-        year_start = result.get('y', None)
-        result_type = result.get('q', None)
-        return (
-            result_type is not None and result_type in ['feature', 'TV movie'] and
-            result['l'].lower() == title and
-            (year_start is not None and year_start == year)
-        )
-
-    if is_movie:
-        year = int(meta.year)
-        results = list(filter(filter_movie_results, results['d']))
-        if len(results) > 0:
-            meta.imdb_id = results[0]['id']
-        return
-
-    show_title = title.lower()
-    episode_title = meta.title.lower()
-    episode_year = int(meta.year)
-
-    def filter_tvshow_results(result):
-        year_start = result.get('y', None)
-        year_end = result.get('yr', '-').split('-')[1]
-        result_type = result.get('q', None)
-        return (
-            result_type is not None and result_type in ['TV series', 'TV mini-series'] and
-            result['l'].lower() == show_title and
-            (year_start is not None and year_start <= episode_year) and
-            (year_end == '' or int(year_end) >= episode_year)
-        )
-
-    results = list(filter(filter_tvshow_results, results['d']))
-    if len(results) == 0:
-        return
-
-    if len(results) == 1:
-        meta.tvshow_year = str(results[0]['y'])
-        meta.imdb_id = results[0]['id']
-        return
-
-    episode_title_pattern = r'title=\"' + re.escape(episode_title) + r'\"'
-    for result in results:
-        episodes_response = core.request.execute(core, {
-            'method': 'GET',
-            'url': 'https://www.imdb.com/title/%s/episodes/_ajax?season=%s' % (result['id'], meta.season),
-            'timeout': 10
-        })
-
-        if episodes_response.status_code != 200:
-            continue
-
-        if re.search(episode_title_pattern, episodes_response.text, re.IGNORECASE):
-            meta.tvshow_year = str(result['y'])
-            meta.imdb_id = result['id']
-            return
-
-def __update_info_from_imdb(core, meta, pagination_token=''):
-    """
-    Updates the metadata of a video from IMDb's GraphQL API.
-
-    Args:
-        core (module): The core module.
-        meta (DictAsObject): The metadata of the video.
-        pagination_token (str, optional): The pagination token to use. Defaults to ''.
-    """
-    request = {
-        'method': 'POST',
-        'url': 'https://graphql.imdb.com',
-        'data': core.json.dumps({
-            'query': '''
-                query TitlesList($idArray: [ID!]!, $paginationToken: ID) {
-                    titles(ids: $idArray) {
-                        id
-                        titleText {
-                            text
-                        }
-                        releaseDate {
-                            year
-                        }
-                        series {
-                            series {
-                                id,
-                                titleText {
-                                    text
-                                }
-                                releaseDate {
-                                    year
-                                }
-                            }
-                            episodeNumber {
-                                episodeNumber
-                                seasonNumber
-                            }
-                        }
-                        episodes {
-                            ...TMD_Episodes_EpisodesCardContainer
-                        }
-                    }
-                }
-
-                fragment TMD_Episodes_EpisodesCardContainer on Episodes {
-                    result: episodes(first: 250, after: $paginationToken) {
-                        edges {
-                            node {
-                                ...TMD_Episodes_EpisodeCard
-                            }
-                        }
-                        pageInfo {
-                            hasNextPage
-                            endCursor
-                        }
-                    }
-                }
-
-                fragment TMD_Episodes_EpisodeCard on Title {
-                    id
-                    titleText {
-                        text
-                    }
-                    releaseDate {
-                        year
-                    }
-                    series {
-                        episodeNumber {
-                            episodeNumber
-                            seasonNumber
-                        }
-                    }
-                }
-            ''',
-            'operationName': 'TitlesList',
-            'variables': {
-                'idArray': [meta.imdb_id],
-                'paginationToken': pagination_token
-            },
-        }),
-        'headers': {
-            'content-type': 'application/json',
-        },
-        'timeout': 10
-    }
-
-    response = core.request.execute(core, request)
-    if response.status_code != 200:
+def __store_tvshow_year(imdb_id, year):
+    if not imdb_id or not year:
         return
 
     try:
-        result = json.loads(response.text)
-        result = result['data']['titles'][0]
+        tvshow_years_cache = cache.get_tvshow_years_cache()
+        tvshow_years_cache[imdb_id] = str(year)
+        cache.save_tvshow_years_cache(tvshow_years_cache)
+    except Exception:
+        pass
 
-        if result['episodes'] is None:
-            meta.title = result['titleText']['text']
-            meta.year = str(result['releaseDate']['year'])
-            if result['series'] is not None:
-                meta.tvshow = result['series']['series']['titleText']['text']
-                meta.tvshow_year = str(result['series']['series']['releaseDate']['year'])
-                meta.season = str(result['series']['episodeNumber']['seasonNumber'])
-                meta.episode = str(result['series']['episodeNumber']['episodeNumber'])
-        else:
-            meta.tvshow = result['titleText']['text']
-            if meta.tvshow_year == '':
-                meta.tvshow_year = str(result['releaseDate']['year'])
+def __apply_movie_details(meta, movie):
+    title = movie.get('title') or movie.get('canonical title')
+    year = __extract_year(movie.get('year') or movie.get('original air date'))
 
-            episodes = result['episodes']['result']['edges']
-            s_number = int(meta.season)
-            ep_number = int(meta.episode)
-            found = False
-            for episode in episodes:
-                ep = episode['node']
-                series = ep['series']['episodeNumber']
-                if series['episodeNumber'] == ep_number and series['seasonNumber'] == s_number:
-                    meta.title = ep['titleText']['text']
-                    meta.year = str(ep['releaseDate']['year'])
-                    meta.imdb_id = ep['id']
-                    found = True
-            if not found and result['episodes']['result']['pageInfo']['hasNextPage']:
-                return __update_info_from_imdb(core, meta, result['episodes']['result']['pageInfo']['endCursor'])
-    except:
+    if title:
+        meta.title = title
+    if year:
+        meta.year = year
+
+def __apply_series_details(meta, series_movie):
+    series_title = series_movie.get('title') or series_movie.get('canonical title')
+    series_year = __extract_year(series_movie.get('year') or series_movie.get('series years'))
+
+    if series_title:
+        meta.tvshow = series_title
+    if series_year:
+        meta.tvshow_year = series_year
+        __store_tvshow_year(__format_imdb_id(series_movie.movieID), series_year)
+
+def __apply_episode_details(meta, episode_movie, series_movie=None):
+    title = episode_movie.get('title') or episode_movie.get('canonical title')
+    year = __extract_year(episode_movie.get('year') or episode_movie.get('original air date'))
+    season = episode_movie.get('season')
+    episode_number = episode_movie.get('episode')
+    series_title = episode_movie.get('tv series title') or (
+        series_movie.get('title') if series_movie else None
+    )
+
+    if title:
+        meta.title = title
+    if year:
+        meta.year = year
+    if season not in (None, '', 'unknown'):
+        meta.season = str(season)
+    if episode_number not in (None, '', 'unknown'):
+        meta.episode = str(episode_number)
+    if series_title:
+        meta.tvshow = series_title
+
+    meta.imdb_id = __format_imdb_id(episode_movie.movieID)
+    if meta.tvshow_year:
+        __store_tvshow_year(meta.imdb_id, meta.tvshow_year)
+
+def __select_best_result(results, expected_title, expected_year, allowed_kinds=None):
+    expected_title = (expected_title or '').lower()
+    allowed_kinds = {kind.lower() for kind in (allowed_kinds or [])}
+    expected_year_int = None
+    try:
+        expected_year_int = int(expected_year)
+    except Exception:
+        expected_year_int = None
+
+    best_match = None
+    fallback = None
+    for candidate in results or []:
+        kind = (candidate.get('kind') or '').lower()
+        if allowed_kinds and kind not in allowed_kinds:
+            continue
+
+        candidate_title = (candidate.get('title') or '').lower()
+        candidate_year = candidate.get('year')
+
+        if candidate_title == expected_title:
+            if expected_year_int is None or candidate_year == expected_year_int:
+                return candidate
+            if best_match is None:
+                best_match = candidate
+        if fallback is None:
+            fallback = candidate
+
+    return best_match or fallback
+
+def __populate_episode_from_series(imdb_client, meta, series_movie):
+    try:
+        season = int(meta.season)
+        episode_number = int(meta.episode)
+    except Exception:
         return
+
+    try:
+        episodes_data = imdb_client.get_movie_episodes(series_movie.movieID, season_nums=[season])
+    except IMDbError as exc:
+        logger.error(lambda: 'Failed to fetch episode listing via Cinemagoer: %s' % exc)
+        return
+    except Exception:
+        return
+
+    episodes = ((episodes_data or {}).get('data') or {}).get('episodes') or {}
+    season_data = episodes.get(season) or episodes.get(str(season)) or {}
+    episode_movie = season_data.get(episode_number) or season_data.get(str(episode_number))
+    if not episode_movie:
+        return
+
+    __apply_episode_details(meta, episode_movie, series_movie)
+
+def __scrape_tvshow_year(core, meta):
+    if not meta.tvshow and not meta.imdb_id:
+        return
+
+    imdb_client = __get_imdb_client(core)
+
+    try:
+        lookup = None
+        if meta.imdb_id:
+            try:
+                lookup = imdb_client.get_movie(__normalize_imdb_id(meta.imdb_id))
+            except IMDbError as exc:
+                logger.error(lambda: 'Failed to resolve IMDb title %s: %s' % (meta.imdb_id, exc))
+        if lookup is None and meta.tvshow:
+            search_results = imdb_client.search_movie(meta.tvshow)
+            lookup = __select_best_result(search_results, meta.tvshow, meta.tvshow_year, __tv_kinds)
+
+        if lookup is None:
+            return
+
+        if (lookup.get('kind') or '').lower() == 'episode' and meta.tvshow:
+            search_results = imdb_client.search_movie(meta.tvshow)
+            lookup = __select_best_result(search_results, meta.tvshow, meta.tvshow_year, __tv_kinds)
+
+        if lookup is None:
+            return
+
+        __apply_series_details(meta, lookup)
+        if meta.tvshow_year:
+            __store_tvshow_year(meta.imdb_id or __format_imdb_id(lookup.movieID), meta.tvshow_year)
+    except IMDbError as exc:
+        logger.error(lambda: 'Cinemagoer failed to determine tv show year: %s' % exc)
+
+def __scrape_imdb_id(core, meta):
+    if meta.title == '' and meta.tvshow == '':
+        return
+
+    imdb_client = __get_imdb_client(core)
+    is_movie = meta.season == '' and meta.episode == ''
+
+    try:
+        if is_movie:
+            results = imdb_client.search_movie(meta.title)
+            movie = __select_best_result(results, meta.title, meta.year)
+            if not movie:
+                return
+
+            meta.imdb_id = __format_imdb_id(movie.movieID)
+            __apply_movie_details(meta, movie)
+            return
+
+        show_title = meta.tvshow or meta.title
+        if not show_title:
+            return
+
+        results = imdb_client.search_movie(show_title)
+        series_movie = __select_best_result(results, show_title, meta.tvshow_year or meta.year, __tv_kinds)
+        if not series_movie:
+            return
+
+        meta.imdb_id = __format_imdb_id(series_movie.movieID)
+        __apply_series_details(meta, series_movie)
+
+        if meta.season and meta.episode:
+            __populate_episode_from_series(imdb_client, meta, series_movie)
+    except IMDbError as exc:
+        logger.error(lambda: 'Cinemagoer failed to resolve IMDb id: %s' % exc)
+
+def __update_info_from_imdb(core, meta):
+    if meta.imdb_id == '':
+        return
+
+    imdb_client = __get_imdb_client(core)
+    try:
+        movie = imdb_client.get_movie(__normalize_imdb_id(meta.imdb_id))
+    except IMDbError as exc:
+        logger.error(lambda: 'Cinemagoer failed to fetch title %s: %s' % (meta.imdb_id, exc))
+        return
+    except Exception:
+        return
+
+    kind = (movie.get('kind') or '').lower()
+
+    if kind in __tv_kinds:
+        __apply_series_details(meta, movie)
+        if meta.season and meta.episode:
+            __populate_episode_from_series(imdb_client, meta, movie)
+    elif kind == 'episode':
+        if not meta.tvshow and movie.get('tv series title'):
+            meta.tvshow = movie.get('tv series title')
+        if not meta.tvshow_year and meta.tvshow:
+            __scrape_tvshow_year(core, meta)
+        __apply_episode_details(meta, movie)
+    else:
+        __apply_movie_details(meta, movie)
 
 def __get_basic_info(core):
     """

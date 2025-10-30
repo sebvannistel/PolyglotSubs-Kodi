@@ -3,3 +3,4 @@ urllib3>=1.26,<2
 charset-normalizer>=3,<4
 chardet>=5,<6
 beautifulsoup4>=4.12,<5
+cinemagoer>=2023.5.1,<2024
