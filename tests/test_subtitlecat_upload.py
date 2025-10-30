@@ -10,6 +10,7 @@ core.settings = MagicMock()
 from a4kSubtitles.services import subtitlecat as subtitlecat_module
 api_instance.core.services['subtitlecat'] = subtitlecat_module
 
+@patch('a4kSubtitles.services.subtitlecat.translation._get_session')
 @patch('a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat')
 @patch('a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk')
 @patch('a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags')
@@ -18,7 +19,7 @@ api_instance.core.services['subtitlecat'] = subtitlecat_module
 @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda items: '1\nBonjour\n')
 @patch('a4kSubtitles.services.subtitlecat.request._get_session')
 def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, mock_restore, mock_protect,
-                                   mock_gtranslate, mock_upload):
+                                   mock_gtranslate, mock_upload, mock_translation_get_session):
     # Mock HTTP get for original subtitle
     session = MagicMock()
     response = MagicMock()
@@ -26,6 +27,7 @@ def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, m
     response.raise_for_status.return_value = None
     session.get.return_value = response
     mock_get_session.return_value = session
+    mock_translation_get_session.return_value = session
 
     # Mock subtitle items
     item = MagicMock()
@@ -66,6 +68,7 @@ def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, m
     assert cache_key in sc_translation._TRANSLATED_CACHE
     notify_spy.restore()
 
+@patch('a4kSubtitles.services.subtitlecat.translation._get_session')
 @patch('a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat')
 @patch('a4kSubtitles.services.subtitlecat.request._gtranslate_text_chunk', return_value=(['Bonjour'], 'en'))
 @patch('a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags', return_value=('Hello', {}, False))
@@ -74,13 +77,14 @@ def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, m
 @patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda items: '1\nBonjour\n')
 @patch('a4kSubtitles.services.subtitlecat.request._get_session')
 def test_client_translation_no_upload(mock_get_session, mock_compose, mock_parse, mock_restore, mock_protect,
-                                      mock_gtranslate, mock_upload):
+                                      mock_gtranslate, mock_upload, mock_translation_get_session):
     session = MagicMock()
     response = MagicMock()
     response.text = '1\nHello\n'
     response.raise_for_status.return_value = None
     session.get.return_value = response
     mock_get_session.return_value = session
+    mock_translation_get_session.return_value = session
 
     item = MagicMock()
     item.content = 'Hello'

@@ -20,6 +20,7 @@ xbmc.getInfoLabel = lambda t: ''
 xbmc.executeJSONRPC = lambda _: '{ "result": { "value": [] } }'
 xbmc.executebuiltin = lambda _: None
 xbmc.getCleanMovieTitle = lambda t: t
+xbmc.getLanguage = lambda *_, **__: 'English'
 xbmc.getCondVisibility = lambda _: False
 
 xbmc.convertLanguage = lambda l, f: iso639.Lang(l).asdict()[f]
