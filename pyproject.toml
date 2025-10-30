@@ -16,6 +16,7 @@ dependencies = [
     "chardet>=5,<6",
     "beautifulsoup4>=4.12,<5",
     "cachetools>=5.5",
+    "cinemagoer>=2023.5.1",
     "cloudscraper @ git+https://github.com/VeNoMouS/cloudscraper@3.0.0",
     "requests-toolbelt>=1.0.0",
     "pyparsing>=3.1.0",
