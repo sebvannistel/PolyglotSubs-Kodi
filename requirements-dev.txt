@@ -2,6 +2,7 @@ requests>=2.32,<3
 urllib3>=1.26,<3
 charset-normalizer>=3,<4
 beautifulsoup4>=4.12,<5
+num2words>=0.5,<0.6
 pytest>=7,<9
 flake8>=6,<7
 coverage>=7,<8

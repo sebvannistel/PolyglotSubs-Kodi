@@ -163,6 +163,10 @@ This section provides information for developers who want to contribute to a4kSu
     pip install -r requirements-dev.txt
     ```
 
+    The addon now relies on [`num2words`](https://pypi.org/project/num2words/)
+    for ordinal formatting. Installing the standard requirements ensures the
+    library is available in development environments.
+
 ### Running Tests
 
 Run unit tests with:
@@ -184,6 +188,24 @@ scripts/preflight.sh
 ```
 
 This script runs `pre-commit run --all-files` and `pytest` to catch formatting problems and failing tests early.
+
+### Locale-aware ordinals
+
+Ordinal strings are generated through `num2words`, using the active Kodi
+language when possible. Kodi language identifiers (for example `en_US`,
+`Portuguese (Brazil)`, or `es-VE`) are mapped to the closest matching
+`num2words` locale before formatting. The following locales are currently
+supported:
+
+```
+am, ar, az, be, bn, ca, ce, cs, cy, da, de, en, en_IN, en_NG, eo, es, es_CO,
+es_CR, es_GT, es_NI, es_VE, fa, fi, fr, fr_BE, fr_CH, fr_DZ, he, hu, id, is,
+it, ja, kn, ko, kz, lt, lv, nl, no, pl, pt, pt_BR, ro, ru, sk, sl, sr, sv, te,
+tet, tg, th, tr, uk, vi
+```
+
+Refer to the [`num2words` documentation](https://github.com/savoirfairelinux/num2words)
+for details on locale-specific behaviour.
 
 ### Project Structure
 

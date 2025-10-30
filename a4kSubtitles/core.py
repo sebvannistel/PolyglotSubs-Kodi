@@ -21,7 +21,7 @@ from .lib import (
     cache,
     kodi,
     logger,
-    num2ordinal,
+    ordinals,
     request,
     utils,
     video,
