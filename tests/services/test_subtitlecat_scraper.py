@@ -113,3 +113,68 @@ def test_direct_download_streams_challenge_payload(tmp_path):
     session.get.assert_called_with(
         args["url"], timeout=core.settings.get("http_timeout", 15), stream=True
     )
+
+
+def test_parse_search_response_prefers_subget():
+    core = types.SimpleNamespace()
+    core.logger = MagicMock()
+    core.settings = MagicMock()
+    core.settings.get.side_effect = lambda key, default=None: default
+    core.services = {"subtitlecat": types.SimpleNamespace(display_name="Subtitlecat.com")}
+    core.utils = MagicMock()
+    core.kodi = types.SimpleNamespace(xbmc=types.SimpleNamespace())
+    meta = types.SimpleNamespace(title="Example", languages=["English"], is_tvshow=False, year=2024)
+    response = types.SimpleNamespace(status_code=200, url="https://example.com", text="unused")
+    fake_results = [
+        {
+            "service_name": "subtitlecat",
+            "service": "Subtitlecat.com",
+            "lang": "English",
+            "name": "Example (English)",
+            "rating": 0,
+            "lang_code": "en",
+            "sync": "false",
+            "impaired": "false",
+            "color": "white",
+            "action_args": {"subget": True},
+        }
+    ]
+    with patch.object(subtitlecat_request, "_subget_setting_enabled", return_value=True):
+        with patch.object(
+            subtitlecat_request.subget_bridge, "is_available", return_value=True
+        ):
+            with patch.object(
+                subtitlecat_request.subget_bridge, "search", return_value=fake_results
+            ) as search:
+                results = subtitlecat_request.parse_search_response(
+                    core, "subtitlecat", meta, response
+                )
+    search.assert_called_once_with(core, "subtitlecat", meta)
+    assert results == fake_results
+
+
+def test_subget_download_branch(tmp_path):
+    core = _build_core_mock()
+    args = {
+        "detail_url": "https://www.subtitlecat.com/subs/foo/detail.html",
+        "lang_code": "en",
+        "filename": "foo-en.srt",
+        "subget": True,
+    }
+    with patch.object(subtitlecat_request.subget_bridge, "is_available", return_value=True):
+        with patch.object(
+            subtitlecat_request.subget_bridge,
+            "download",
+            return_value=True,
+        ) as download:
+            request = subtitlecat_request.build_download_request(core, "subtitlecat", args)
+            target = tmp_path / "via-subget.srt"
+            assert request["save_callback"](target.as_posix()) is True
+    download.assert_called_once_with(
+        core,
+        "subtitlecat",
+        args["detail_url"],
+        args["lang_code"],
+        target.as_posix(),
+        args["filename"],
+    )
