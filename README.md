@@ -169,6 +169,8 @@ The addon relies on the Python packages listed in `requirements.txt` for runtime
 uses [`cachetools`](https://cachetools.readthedocs.io/) to provide a robust LRU implementation, so downstream packagers should
 ensure that `cachetools>=5.5` is available when building or distributing PolyglotSubs-Kodi.
 
+For environments that need to bypass Cloudflare or otherwise rely on the Subtitlecat headless bridge, install [Node.js 18 or newer](https://nodejs.org/) (or provide another compatible runtime) and set the **Node.js executable (Subtitlecat headless helper)** path in the addon settings. When no path is configured the addon falls back to searching for `node` on `PATH`; if the runtime cannot be located the traditional scraper continues to operate and detailed errors are logged to help with troubleshooting.
+
 ### Running Tests
 
 Run unit tests with:
