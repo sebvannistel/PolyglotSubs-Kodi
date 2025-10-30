@@ -106,6 +106,22 @@ msgctxt "#33211"
 msgid "Include server-shared translations from Subtitlecat"
 msgstr ""
 
+msgctxt "#33214"
+msgid "Gemini API keys (comma or newline separated)"
+msgstr ""
+
+msgctxt "#33215"
+msgid "Gemini model"
+msgstr ""
+
+msgctxt "#33216"
+msgid "Gemini requests before cooldown"
+msgstr ""
+
+msgctxt "#33217"
+msgid "Gemini cooldown (seconds)"
+msgstr ""
+
 msgctxt "#33212"
 msgid "Node.js executable (Subtitlecat headless helper)"
 msgstr ""

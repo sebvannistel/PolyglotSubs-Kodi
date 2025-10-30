@@ -13,6 +13,10 @@
         <setting id="subtitlecat_upload_translations" label="33209" type="bool" default="true"/>
         <setting id="subtitlecat_notify_upload" label="33210" type="bool" default="true"/>
         <setting id="subtitlecat_include_shared" label="33211" type="bool" default="true"/>
+        <setting id="subtitlecat_gemini_api_keys" label="33214" type="text" default=""/>
+        <setting id="subtitlecat_gemini_model" label="33215" type="text" default="gemini-2.5-flash"/>
+        <setting id="subtitlecat_gemini_request_limit" label="33216" type="slider" option="int" range="0,120" default="90"/>
+        <setting id="subtitlecat_gemini_throttle_sleep" label="33217" type="slider" option="int" range="0,180" default="60"/>
         <setting id="subtitlecat.node_path" label="33212" type="file" option="writeable" default=""/>
         <setting id="subtitlecat.use_subget_helper" label="33213" type="bool" default="true"/>
     </category>

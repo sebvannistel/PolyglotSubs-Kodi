@@ -1,4 +1,22 @@
 import pytest
+from unittest.mock import Mock
+
+
+@pytest.fixture
+def gemini_translator_stub(monkeypatch):
+    """Provide a deterministic Gemini translator stub for unit tests."""
+
+    stub = Mock()
+
+    def _translate(texts, *, target_language, start_index=1):
+        return [f"{target_language}:{text}" if text else "" for text in texts]
+
+    stub.translate.side_effect = _translate
+    monkeypatch.setattr(
+        "a4kSubtitles.services.subtitlecat.translation._get_gemini_translator",
+        lambda core, service_name: stub,
+    )
+    return stub
 
 
 def pytest_addoption(parser):
