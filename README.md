@@ -113,6 +113,18 @@ This section covers the main behavior of the addon.
 *   **Include Server-Shared Translations (ID: `subtitlecat_include_shared`):**
     *   **What it does:** Controls whether Subtitlecat results from its shared translation system (shown with "[Shared]") appear in your search results.
     *   **Default:** True (Enabled).
+*   **Gemini API keys (ID: `subtitlecat_gemini_api_keys`):**
+    *   **What it does:** Stores one or more Gemini API keys (comma or newline separated) used for client-side translations. Multiple keys are cycled automatically when rate limits are encountered.
+    *   **Default:** Empty. **You must configure at least one key from [Google AI Studio](https://aistudio.google.com/app/apikey) to use Gemini translations.**
+*   **Gemini model (ID: `subtitlecat_gemini_model`):**
+    *   **What it does:** Overrides the Gemini model name. The default `gemini-2.5-flash` matches the upstream SubtitleCAT behaviour.
+    *   **Default:** `gemini-2.5-flash`.
+*   **Gemini requests before cooldown (ID: `subtitlecat_gemini_request_limit`):**
+    *   **What it does:** Limits how many translation batches are issued before the addon pauses to respect rate limits.
+    *   **Default:** 90 requests.
+*   **Gemini cooldown (seconds) (ID: `subtitlecat_gemini_throttle_sleep`):**
+    *   **What it does:** How long to sleep after the above limit is reached.
+    *   **Default:** 60 seconds.
 *   **Enable/Disable Embedded Subtitles:**
     *   **Note:** a4kSubtitles primarily focuses on downloading external subtitle files. The handling of embedded subtitles (those already within your video file) is usually controlled by Kodi's main player settings, not this addon's settings specifically. Check under **Settings -> Player -> Language -> Enable parsing for closed captions / Teletext**.
 
@@ -168,6 +180,10 @@ This section provides information for developers who want to contribute to a4kSu
 The addon relies on the Python packages listed in `requirements.txt` for runtime operation. Subtitlecat translation caching now
 uses [`cachetools`](https://cachetools.readthedocs.io/) to provide a robust LRU implementation, so downstream packagers should
 ensure that `cachetools>=5.5` is available when building or distributing PolyglotSubs-Kodi.
+
+Client-side translations depend on the Gemini-powered translator from [SubtitleCAT](https://github.com/TestersNightmare/SubtitleCAT).
+The non-GUI modules are vendored under `resources/vendor/subtitlecat_translator/` together with the upstream MIT license.
+Runtime environments must provide [`google-genai`](https://pypi.org/project/google-genai/) and at least one valid Gemini API key.
 
 Episode ordinals are generated with [`num2words`](https://pypi.org/project/num2words/). The helper respects Kodi's interface language for locales supported by the library (English, French, Spanish, German, Italian, Portuguese including pt-BR, Dutch, Polish, Russian, Turkish, Ukrainian, and more) and gracefully falls back to English when the UI language has no ordinal implementation.
 

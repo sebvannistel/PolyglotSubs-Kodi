@@ -20,7 +20,7 @@ from .translation import (
     DEFAULT_TRANSLATION_FAILED_PLACEHOLDER,
     GOOGLE_API_Q_PARAM_CHAR_LIMIT,
     MAX_LINES_PER_API_CALL_CONFIG,
-    _gtranslate_text_chunk,
+    _translate_text_chunk,
     _protect_subtitle_tags,
     _restore_subtitle_tags,
     _upload_translation_to_subtitlecat,
@@ -964,7 +964,7 @@ def build_download_request(core, service_name, args):
                                 f"[{service_name}] Processing API batch of {len(current_api_batch_lines_for_google)} lines, {current_api_batch_char_count} chars."
                             )
 
-                            result = _gtranslate_text_chunk(
+                            result = _translate_text_chunk(
                                 current_api_batch_lines_for_google,
                                 target_gtranslate_lang,
                                 core,
@@ -981,7 +981,7 @@ def build_download_request(core, service_name, args):
                                 current_api_batch_lines_for_google
                             ):
                                 core.logger.error(
-                                    f"[{service_name}] CRITICAL MISMATCH: _gtranslate_text_chunk returned "
+                                    f"[{service_name}] CRITICAL MISMATCH: _translate_text_chunk returned "
                                     f"{len(translated_segments)}, expected {len(current_api_batch_lines_for_google)}. "
                                     f"Correcting."
                                 )
@@ -1033,7 +1033,7 @@ def build_download_request(core, service_name, args):
                         core.logger.debug(
                             f"[{service_name}] Processing final API batch of {len(current_api_batch_lines_for_google)} lines, {current_api_batch_char_count} chars."
                         )
-                        result = _gtranslate_text_chunk(
+                        result = _translate_text_chunk(
                             current_api_batch_lines_for_google,
                             target_gtranslate_lang,
                             core,
@@ -1050,7 +1050,7 @@ def build_download_request(core, service_name, args):
                             current_api_batch_lines_for_google
                         ):
                             core.logger.error(
-                                f"[{service_name}] CRITICAL MISMATCH (final batch): _gtranslate_text_chunk returned "
+                                f"[{service_name}] CRITICAL MISMATCH (final batch): _translate_text_chunk returned "
                                 f"{len(translated_segments)}, expected {len(current_api_batch_lines_for_google)}. "
                                 f"Correcting."
                             )
