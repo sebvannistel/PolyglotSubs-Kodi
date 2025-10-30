@@ -71,6 +71,37 @@ It executes `pre-commit run --all-files` and `pytest` to catch formatting issues
     pytest --run-integration
     ```
 
+#### Subtitlecat layout watcher
+
+The repository ships a minimal build of [`Witten1997/subtitle-find`](https://github.com/Witten1997/subtitle-find) so we can
+catch subtitlecat.com layout regressions quickly.
+
+* Build and run the watcher locally with:
+
+  ```bash
+  scripts/watch_subtitlecat.sh
+  ```
+
+  The helper builds the Java jar on demand (requires **JDK 17+**) and invokes
+  `tools/subtitlecat-layout-watch/watch_subtitlecat.py` against a set of
+  representative titles.
+
+* The Python wrapper exits non-zero when selectors stop matching. Review the
+  diagnostics printed on failure — they include attempted CSS selectors, a
+  clipped HTML response, and the path to the stored DOM snapshot.
+
+* When the watcher highlights a change, refresh the parser fixtures by copying
+  the snapshots into the test suite and rerunning the targeted tests:
+
+  ```bash
+  tools/subtitlecat-layout-watch/watch_subtitlecat.py --update-test-fixtures
+  pytest tests/services/test_subtitlecat_layout_watch.py
+  ```
+
+  The fixtures live under `tests/data/subtitlecat_watch/` and power
+  `tests/services/test_subtitlecat_layout_watch.py`, ensuring parser changes are
+  validated against the captured HTML.
+
 #### Coding Standards
 *   Please follow the existing code style.
 
