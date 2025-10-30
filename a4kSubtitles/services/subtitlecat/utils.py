@@ -11,6 +11,12 @@ SC_USER_AGENT = (
     "Safari/537.36 a4kSubtitles-SubtitlecatMod/1.0.1"
 )
 
+KODI_REGIONAL_LANG_MAP = {
+    "pt-br": ("Portuguese (Brazil)", "pt"),
+    "es-419": ("Spanish", "es"),
+    "sr-me": ("Serbian", "sr"),
+}
+
 _thread_local_session_storage = threading.local()
 
 

@@ -10,6 +10,7 @@ import requests as system_requests
 import srt
 from bs4 import BeautifulSoup
 
+from . import headless_bridge
 from .translation import (
     _AIOHTTP_AVAILABLE,
     _CHUNK_SEP,
@@ -27,6 +28,7 @@ from .translation import (
     asyncio,
 )
 from .utils import (
+    KODI_REGIONAL_LANG_MAP,
     SC_BASE_URL,
     SC_USER_AGENT,
     _get_session,
@@ -34,12 +36,6 @@ from .utils import (
     _is_title_close,
     _post_download_fix_encoding,
 )
-
-__kodi_regional_lang_map = {
-    "pt-br": ("Portuguese (Brazil)", "pt"),
-    "es-419": ("Spanish", "es"),
-    "sr-me": ("Serbian", "sr"),
-}
 
 
 def build_search_requests(core, service_name, meta):
@@ -64,7 +60,7 @@ def build_search_requests(core, service_name, meta):
     if meta.languages:
         normalized_kodi_langs = []
         for kodi_lang in meta.languages:
-            sc_lang = __kodi_regional_lang_map.get(
+            sc_lang = KODI_REGIONAL_LANG_MAP.get(
                 kodi_lang.lower(), (None, kodi_lang)
             )[1]
             normalized_kodi_langs.append(sc_lang)
@@ -315,8 +311,8 @@ def parse_search_response(core, service_name, meta, response):
             if sc_lang_code.lower().startswith("zh-"):
                 kodi_target_lang_full = "Chinese"
                 kodi_target_lang_2_letter = "zh"
-            elif sc_lang_code_lower in __kodi_regional_lang_map:
-                map_full_name, map_iso_code = __kodi_regional_lang_map[
+            elif sc_lang_code_lower in KODI_REGIONAL_LANG_MAP:
+                map_full_name, map_iso_code = KODI_REGIONAL_LANG_MAP[
                     sc_lang_code_lower
                 ]
                 kodi_target_lang_full = map_full_name
@@ -475,7 +471,7 @@ def parse_search_response(core, service_name, meta, response):
 
             normalized_sc_lang_for_cache_lookup = sc_lang_code
             if sc_lang_code:
-                normalized_sc_lang_for_cache_lookup = __kodi_regional_lang_map.get(
+                normalized_sc_lang_for_cache_lookup = KODI_REGIONAL_LANG_MAP.get(
                     sc_lang_code.lower(), (None, sc_lang_code)
                 )[1]
 
@@ -558,8 +554,46 @@ def parse_search_response(core, service_name, meta, response):
                 f"URL: {action_args['url']})"
             )
 
+    if results:
+        core.logger.debug(
+            f"[{service_name}] Returning {len(results)} results after parsing."
+        )
+        return results
+
+    fallback_reason = None
+    try:
+        if response is None:
+            fallback_reason = "no response"
+        elif response.status_code >= 400:
+            fallback_reason = f"HTTP {response.status_code}"
+        else:
+            response_text_preview = response.text[:4000] if response.text else ""
+            lowered = response_text_preview.lower()
+            if "cloudflare" in lowered or "just a moment" in lowered:
+                fallback_reason = "Cloudflare challenge"
+    except Exception as resp_exc:
+        fallback_reason = f"response inspection failed: {resp_exc}"
+
     core.logger.debug(
-        f"[{service_name}] Returning {len(results)} results after parsing."
+        f"[{service_name}] Primary scraper returned no results. Fallback reason: {fallback_reason or 'empty result set'}"
+    )
+
+    try:
+        fallback_results = headless_bridge.search(core, service_name, meta)
+    except Exception as headless_exc:
+        core.logger.error(
+            f"[{service_name}] Headless bridge search failed: {headless_exc}"
+        )
+        fallback_results = []
+
+    if fallback_results:
+        core.logger.warning(
+            f"[{service_name}] Headless bridge returned {len(fallback_results)} results after primary scraper failed ({fallback_reason or 'no specific reason'})."
+        )
+        return fallback_results
+
+    core.logger.debug(
+        f"[{service_name}] Headless bridge unavailable or returned no results."
     )
     return results
 
@@ -604,6 +638,49 @@ def build_download_request(core, service_name, args):
                 f"[{service_name}] Client-side translation: Using automatic source language detection (sl=auto)."
             )
 
+    headless_attempted = False
+
+    def _attempt_headless_download(path_from_core_local):
+        nonlocal headless_attempted
+        if headless_attempted:
+            return False
+        headless_attempted = True
+        if args.get("needs_client_side_translation"):
+            core.logger.debug(
+                f"[{service_name}] Skipping headless download fallback because client-side translation is required."
+            )
+            return False
+        detail_url = args.get("detail_url")
+        lang_code = args.get("lang_code")
+        if not detail_url or not lang_code:
+            core.logger.debug(
+                f"[{service_name}] Headless download fallback skipped – missing detail_url/lang_code in action args."
+            )
+            return False
+        try:
+            success = headless_bridge.download(
+                core,
+                service_name,
+                detail_url,
+                lang_code,
+                path_from_core_local,
+                args.get("filename"),
+            )
+            if success:
+                core.logger.warning(
+                    f"[{service_name}] Headless bridge download succeeded for {detail_url} ({lang_code})."
+                )
+            else:
+                core.logger.error(
+                    f"[{service_name}] Headless bridge download failed for {detail_url} ({lang_code})."
+                )
+            return success
+        except Exception as headless_exc:
+            core.logger.error(
+                f"[{service_name}] Headless bridge download raised error for {detail_url} ({lang_code}): {headless_exc}"
+            )
+            return False
+
     def _save_from_subtitlecat_url(path_from_core, url_to_download):
         _timeout = _get_setting(core, "http_timeout", 15)
         resp_for_save = None
@@ -632,16 +709,22 @@ def build_download_request(core, service_name, args):
             core.logger.error(
                 f"[{service_name}] _save_from_subtitlecat_url: Timeout during download from {url_to_download} for {repr(path_from_core)}"
             )
+            if _attempt_headless_download(path_from_core):
+                return True
             return False
         except system_requests.exceptions.RequestException as e_req:
             core.logger.error(
                 f"[{service_name}] _save_from_subtitlecat_url: RequestException for {url_to_download}: {e_req}"
             )
+            if _attempt_headless_download(path_from_core):
+                return True
             return False
         except Exception as e_proc:
             core.logger.error(
                 f"[{service_name}] _save_from_subtitlecat_url: Error processing {url_to_download}: {e_proc}"
             )
+            if _attempt_headless_download(path_from_core):
+                return True
             return False
         finally:
             if resp_for_save:
