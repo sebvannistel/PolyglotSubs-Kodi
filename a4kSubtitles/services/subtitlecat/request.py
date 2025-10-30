@@ -6,7 +6,6 @@ import urllib.parse
 from collections import Counter
 from urllib.parse import urljoin
 
-import requests as system_requests
 import srt
 from bs4 import BeautifulSoup
 
@@ -24,6 +23,7 @@ from .translation import (
     _protect_subtitle_tags,
     _restore_subtitle_tags,
     _upload_translation_to_subtitlecat,
+    warm_translation_cache,
     asyncio,
 )
 from .utils import (
@@ -33,6 +33,8 @@ from .utils import (
     _get_setting,
     _is_title_close,
     _post_download_fix_encoding,
+    SCRAPER_REQUEST_EXCEPTION,
+    SCRAPER_TIMEOUT_EXCEPTION,
 )
 
 __kodi_regional_lang_map = {
@@ -221,7 +223,7 @@ def parse_search_response(core, service_name, meta, response):
                             f"'{movie_title_on_page}'. Proceeding with this row."
                         )
                         year_guard_fetched_soup = temp_detail_soup_for_year_check
-                except system_requests.exceptions.RequestException as e_req_fallback:
+                except SCRAPER_REQUEST_EXCEPTION as e_req_fallback:
                     core.logger.debug(
                         f"[{service_name}] Fallback year check: Request error for {movie_page_full_url}: {e_req_fallback}. Skipping row for '{movie_title_on_page}'."
                     )
@@ -433,7 +435,7 @@ def parse_search_response(core, service_name, meta, response):
                         f"[{service_name}] Failed to fetch shared translation for '{constructed_filename}'. Status: {shared_response.status_code}, Body: {shared_response.text[:200]}"
                     )
 
-            except system_requests.exceptions.RequestException as req_exc_shared:
+            except SCRAPER_REQUEST_EXCEPTION as req_exc_shared:
                 core.logger.error(
                     f"[{service_name}] RequestException fetching shared translation for '{constructed_filename}': {req_exc_shared}"
                 )
@@ -618,7 +620,11 @@ def build_download_request(core, service_name, args):
                 url_to_download, timeout=_timeout, stream=True
             )
             resp_for_save.raise_for_status()
-            raw_bytes = resp_for_save.content
+            raw_chunks = []
+            for chunk in resp_for_save.iter_content(chunk_size=65536):
+                if chunk:
+                    raw_chunks.append(chunk)
+            raw_bytes = b"".join(raw_chunks)
             core.logger.debug(
                 f"[{service_name}] _save_from_subtitlecat_url: Download successful, {len(raw_bytes)} bytes received."
             )
@@ -628,12 +634,12 @@ def build_download_request(core, service_name, args):
                 f"[{service_name}] _save_from_subtitlecat_url: Processing complete for {repr(path_from_core)}"
             )
             return True
-        except system_requests.exceptions.Timeout:
+        except SCRAPER_TIMEOUT_EXCEPTION:
             core.logger.error(
                 f"[{service_name}] _save_from_subtitlecat_url: Timeout during download from {url_to_download} for {repr(path_from_core)}"
             )
             return False
-        except system_requests.exceptions.RequestException as e_req:
+        except SCRAPER_REQUEST_EXCEPTION as e_req:
             core.logger.error(
                 f"[{service_name}] _save_from_subtitlecat_url: RequestException for {url_to_download}: {e_req}"
             )
@@ -1114,6 +1120,17 @@ def build_download_request(core, service_name, args):
                 core.logger.debug(
                     f"[{service_name}] Stored translated URL in _TRANSLATED_CACHE for key ({args.get('detail_url')}, {cache_key_lang})"
                 )
+                warmed = warm_translation_cache(
+                    core, service_name, new_url_from_sc
+                )
+                if warmed:
+                    core.logger.debug(
+                        f"[{service_name}] Warmed translated cache entry for {new_url_from_sc}"
+                    )
+                else:
+                    core.logger.debug(
+                        f"[{service_name}] Warm-up skipped or failed for {new_url_from_sc}"
+                    )
                 if _get_setting(core, "subtitlecat_notify_upload", True):
                     try:
                         core.kodi.notification("Subtitle uploaded to Subtitlecat.")
@@ -1158,7 +1175,7 @@ def build_download_request(core, service_name, args):
                     "filename": _filename_from_args,
                 }
 
-        except system_requests.exceptions.RequestException as e_req:
+        except SCRAPER_REQUEST_EXCEPTION as e_req:
             core.logger.error(
                 f"[{service_name}] Client-side translation: Network error downloading original SRT {original_srt_url}: {e_req}"
             )

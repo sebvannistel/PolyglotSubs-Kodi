@@ -1,6 +1,33 @@
+import importlib
+import sys
 import threading
 import re
-import requests as system_requests
+from pathlib import Path
+
+import requests
+
+
+def _load_cloudscraper():
+    module = importlib.import_module("cloudscraper")
+    if not hasattr(module, "create_scraper"):
+        package_dir = (
+            Path(__file__).resolve().parents[3] / "packages" / "cloudscraper-3.0.0"
+        )
+        if package_dir.exists():
+            package_path = str(package_dir)
+            if package_path not in sys.path:
+                sys.path.insert(0, package_path)
+            sys.modules.pop("cloudscraper", None)
+            module = importlib.import_module("cloudscraper")
+    return module
+
+
+cloudscraper = _load_cloudscraper()
+
+from cloudscraper.exceptions import (
+    CloudflareChallengeError as _CloudflareChallengeError,
+    CloudflareException as _CloudflareException,
+)
 from rapidfuzz import fuzz
 from cachetools import LRUCache as _CachetoolsLRUCache
 
@@ -10,17 +37,40 @@ SC_USER_AGENT = (
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 "
     "Safari/537.36 a4kSubtitles-SubtitlecatMod/1.0.1"
 )
+SC_SCRAPER_DELAY_SECONDS = 4.0
+_SCRAPER_DEFAULT_HEADERS = {
+    "User-Agent": SC_USER_AGENT,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Cache-Control": "no-cache",
+}
 
 _thread_local_session_storage = threading.local()
 
+CLOUDFLARE_EXCEPTION = _CloudflareException
+CLOUDFLARE_CHALLENGE_EXCEPTION = _CloudflareChallengeError
+SCRAPER_REQUEST_EXCEPTION = requests.exceptions.RequestException
+SCRAPER_TIMEOUT_EXCEPTION = requests.exceptions.Timeout
+SCRAPER_HTTP_ERROR = requests.exceptions.HTTPError
+SCRAPER_CONNECTION_ERROR = requests.exceptions.ConnectionError
+
+
+def _create_scraper():
+    scraper = cloudscraper.create_scraper(
+        browser="firefox",
+        delay=SC_SCRAPER_DELAY_SECONDS,
+    )
+    scraper.headers.update(_SCRAPER_DEFAULT_HEADERS)
+    return scraper
+
 
 def _get_session():
-    """Return a thread-local requests.Session with default headers."""
-    if not hasattr(_thread_local_session_storage, 'session'):
-        session = system_requests.Session()
-        session.headers.update({'User-Agent': SC_USER_AGENT})
+    """Return a thread-local CloudScraper session with default headers."""
+    session = getattr(_thread_local_session_storage, "session", None)
+    if session is None:
+        session = _create_scraper()
         _thread_local_session_storage.session = session
-    return _thread_local_session_storage.session
+    return session
 
 
 class LRUCache(_CachetoolsLRUCache):

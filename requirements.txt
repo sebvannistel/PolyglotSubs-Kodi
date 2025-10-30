@@ -4,3 +4,12 @@ charset-normalizer>=3,<4
 chardet>=5,<6
 beautifulsoup4>=4.12,<5
 cachetools>=5.5
+cloudscraper @ git+https://github.com/VeNoMouS/cloudscraper@3.0.0
+requests-toolbelt>=1.0.0
+pyparsing>=3.1.0
+pyOpenSSL>=24.0.0
+pycryptodome>=3.20.0
+websocket-client>=1.7.0
+js2py>=0.74
+brotli>=1.1.0
+certifi>=2024.2.2
