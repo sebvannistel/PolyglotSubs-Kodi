@@ -3,9 +3,8 @@ import re
 import threading
 import time
 import urllib.parse
+from typing import Optional
 from urllib.parse import urljoin
-
-import requests as system_requests
 
 from .utils import (
     SC_BASE_URL,
@@ -13,6 +12,11 @@ from .utils import (
     LRUCache,
     _get_session,
     _get_setting,
+    SCRAPER_HTTP_ERROR,
+    SCRAPER_REQUEST_EXCEPTION,
+    SCRAPER_TIMEOUT_EXCEPTION,
+    CLOUDFLARE_CHALLENGE_EXCEPTION,
+    CLOUDFLARE_EXCEPTION,
 )
 
 _AIOHTTP_AVAILABLE = False
@@ -175,7 +179,7 @@ def _gtranslate_single_line_sync(
                 raise ValueError(
                     f"Unexpected response format: {response_json[:3] if isinstance(response_json, list) else response_json}"
                 )
-        except system_requests.exceptions.Timeout:
+        except SCRAPER_TIMEOUT_EXCEPTION:
             if attempt < MAX_RETRIES_HTTP_SINGLE:
                 time.sleep(RETRY_DELAY_BASE_SECONDS_SINGLE * (2**attempt))
                 continue
@@ -337,7 +341,7 @@ def _gtranslate_text_chunk(
                 response_json[2] if len(response_json) > 2 else "auto"
             )
             break
-        except system_requests.exceptions.HTTPError as http_err:
+        except SCRAPER_HTTP_ERROR as http_err:
             status_code = getattr(http_err.response, "status_code", None)
             if (
                 status_code == 503
@@ -401,7 +405,7 @@ def _gtranslate_text_chunk(
                     for line in lines_to_translate
                 ]
                 break
-        except system_requests.exceptions.Timeout as e_timeout:
+        except SCRAPER_TIMEOUT_EXCEPTION as e_timeout:
             core.logger.debug(
                 f"[{service_name}] gtranslate: {log_prefix}Timeout: {e_timeout}"
             )
@@ -624,12 +628,12 @@ def _upload_translation_to_subtitlecat(
                 f"Message: {json_response.get('message')}"
             )
             return None
-    except system_requests.exceptions.Timeout:
+    except SCRAPER_TIMEOUT_EXCEPTION:
         core.logger.error(
             f"[{service_name}] Timeout during subtitle upload to {upload_url}."
         )
         return None
-    except system_requests.exceptions.RequestException as e:
+    except SCRAPER_REQUEST_EXCEPTION as e:
         core.logger.error(
             f"[{service_name}] RequestException during subtitle upload: {e}"
         )
@@ -649,3 +653,124 @@ def _upload_translation_to_subtitlecat(
             f"[{service_name}] Unexpected error during subtitle upload: {e_unexp}"
         )
         return None
+
+
+def _notify_rate_limit(core, message: str) -> None:
+    notifier = None
+    kodi = getattr(core, "kodi", None)
+    if kodi is not None:
+        notifier = getattr(kodi, "notification", None)
+    if callable(notifier):
+        try:
+            notifier(message)
+        except Exception as notify_error:  # pragma: no cover - defensive logging only
+            if getattr(core, "logger", None):
+                core.logger.debug(
+                    f"[subtitlecat] Failed to send Kodi notification: {notify_error}"
+                )
+
+
+def warm_translation_cache(
+    core,
+    service_name: str,
+    translation_url: str,
+    *,
+    timeout: Optional[float] = None,
+    chunk_size: int = 2048,
+) -> bool:
+    """Prime Subtitlecat's translation cache using the shared scraper session.
+
+    The warm-up fetches a small chunk of the translated subtitle to reduce the
+    chance of subsequent requests triggering Cloudflare rate limits. Any
+    rate-limiting responses (HTTP 403/503) surface a Kodi notification so users
+    receive actionable feedback instead of silent failures.
+
+    Args:
+        core: Kodi core adapter providing logging and notifications.
+        service_name: Provider name for logging context.
+        translation_url: Fully qualified URL to the translated subtitle.
+        timeout: Optional per-request timeout override.
+        chunk_size: Size of the first chunk to read from the response stream.
+
+    Returns:
+        bool: ``True`` if the warm-up succeeded, otherwise ``False``.
+    """
+
+    if not translation_url:
+        return False
+
+    response = None
+    session = _get_session()
+    effective_timeout = (
+        timeout
+        if timeout is not None
+        else _get_setting(core, "http_timeout", 15)
+    )
+
+    def _handle_rate_limited(status_code: int) -> None:
+        if getattr(core, "logger", None):
+            core.logger.warning(
+                f"[{service_name}] Warm-up request returned HTTP {status_code} for {translation_url}."
+            )
+        if status_code == 403:
+            message = "Subtitlecat blocked the request (HTTP 403). Please try again later."
+        else:
+            message = "Subtitlecat is temporarily unavailable (HTTP 503). Please try again soon."
+        _notify_rate_limit(core, message)
+
+    try:
+        response = session.get(
+            translation_url,
+            stream=True,
+            timeout=effective_timeout,
+        )
+        status_code = getattr(response, "status_code", None)
+        if status_code in (403, 503):
+            _handle_rate_limited(status_code)
+            return False
+        response.raise_for_status()
+
+        for chunk in response.iter_content(chunk_size=chunk_size):
+            if chunk:
+                break
+        if getattr(core, "logger", None):
+            core.logger.debug(
+                f"[{service_name}] Warmed translation cache for {translation_url}."
+            )
+        return True
+    except SCRAPER_TIMEOUT_EXCEPTION as timeout_exc:
+        if getattr(core, "logger", None):
+            core.logger.warning(
+                f"[{service_name}] Timeout warming translation cache for {translation_url}: {timeout_exc}"
+            )
+        return False
+    except CLOUDFLARE_CHALLENGE_EXCEPTION as challenge_exc:
+        if getattr(core, "logger", None):
+            core.logger.warning(
+                f"[{service_name}] Cloudflare challenge during cache warm-up: {challenge_exc}"
+            )
+        return False
+    except CLOUDFLARE_EXCEPTION as cf_exc:
+        if getattr(core, "logger", None):
+            core.logger.warning(
+                f"[{service_name}] Cloudflare error during cache warm-up: {cf_exc}"
+            )
+        return False
+    except SCRAPER_HTTP_ERROR as http_err:
+        status_code = getattr(http_err.response, "status_code", None)
+        if status_code in (403, 503):
+            _handle_rate_limited(status_code)
+        if getattr(core, "logger", None):
+            core.logger.error(
+                f"[{service_name}] HTTP error warming translation cache for {translation_url}: {http_err}"
+            )
+        return False
+    except SCRAPER_REQUEST_EXCEPTION as req_exc:
+        if getattr(core, "logger", None):
+            core.logger.error(
+                f"[{service_name}] Request error warming translation cache for {translation_url}: {req_exc}"
+            )
+        return False
+    finally:
+        if response is not None:
+            response.close()
