@@ -105,3 +105,7 @@ msgstr ""
 msgctxt "#33211"
 msgid "Include server-shared translations from Subtitlecat"
 msgstr ""
+
+msgctxt "#33212"
+msgid "Use subget helper when available"
+msgstr ""

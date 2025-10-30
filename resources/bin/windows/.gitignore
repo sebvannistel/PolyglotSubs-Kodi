@@ -1,0 +1,3 @@
+# Binary helper artifacts are distributed outside of git history.
+*
+!.gitignore

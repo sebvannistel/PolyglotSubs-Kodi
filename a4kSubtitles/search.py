@@ -26,6 +26,18 @@ def __query_service(core, service_name, meta, request, results):
     """
     try:
         service = core.services[service_name]
+
+        if request.get('bridge'):
+            service_results = service.parse_search_response(core, service_name, meta, request)
+            bridge_status = request.get('bridge_status_code', 200 if service_results else 'N/A')
+            results.extend(service_results)
+            core.logger.debug(lambda: core.json.dumps({
+                'url': request.get('url', 'bridge://unknown'),
+                'count': len(service_results),
+                'status_code': bridge_status
+            }, indent=2))
+            return
+
         response = core.request.execute(core, request)
 
         if response and response.status_code == 200 and response.text:

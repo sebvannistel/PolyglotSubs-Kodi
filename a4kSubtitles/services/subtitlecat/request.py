@@ -34,6 +34,137 @@ from .utils import (
     _is_title_close,
     _post_download_fix_encoding,
 )
+from . import subget_bridge
+
+_BRIDGE_REQUEST_SENTINEL = "subtitlecat_subget_bridge"
+_BRIDGE_REQUEST_URL = "bridge://subtitlecat/search"
+
+
+def _normalize_meta_languages(core, service_name, meta):
+    if meta.languages:
+        normalized_kodi_langs = []
+        for kodi_lang in meta.languages:
+            sc_lang = __kodi_regional_lang_map.get(
+                kodi_lang.lower(), (None, kodi_lang)
+            )[1]
+            normalized_kodi_langs.append(sc_lang)
+        meta.languages = normalized_kodi_langs
+        core.logger.debug(
+            f"[{service_name}] Normalized meta.languages for search: {meta.languages}"
+        )
+    return meta
+
+
+def _should_use_bridge(core):
+    if not _get_setting(core, "subtitlecat_use_subget_helper", False):
+        return False
+    if not subget_bridge.is_available(core):
+        if _get_setting(core, "debug", False):
+            core.logger.debug(
+                "[subtitlecat] subget helper requested but not available. Falling back to legacy parser."
+            )
+        return False
+    return True
+
+
+def _build_bridge_request(meta):
+    return {
+        "bridge": _BRIDGE_REQUEST_SENTINEL,
+        "url": _BRIDGE_REQUEST_URL,
+        "meta": meta,
+    }
+
+
+def _legacy_search_and_parse(core, service_name, meta):
+    results = []
+    for request in _legacy_build_search_requests(core, service_name, meta):
+        try:
+            response = core.request.execute(core, request)
+        except Exception as exc:  # pragma: no cover - defensive guard
+            core.logger.error(
+                f"[{service_name}] Legacy search execution failed for {request.get('url')}: {exc}"
+            )
+            continue
+        if not response:
+            continue
+        if response.status_code != 200 or not getattr(response, "text", ""):
+            core.logger.debug(
+                f"[{service_name}] Legacy response skipped (status={getattr(response, 'status_code', 'N/A')})."
+            )
+            continue
+        results.extend(
+            _legacy_parse_search_response(core, service_name, meta, response)
+        )
+    return results
+
+
+def _sanitize_bridge_result(core, service_name, item):
+    sanitized = dict(item or {})
+    sanitized.setdefault("service_name", service_name)
+    display_name = getattr(
+        core.services.get(service_name), "display_name", service_name
+    )
+    sanitized.setdefault("service", display_name)
+    sanitized.setdefault("rating", 0)
+    sanitized.setdefault("sync", "false")
+    sanitized.setdefault("impaired", "false")
+    sanitized.setdefault("color", "white")
+    sanitized.setdefault("lang", "Unknown")
+    lang_code = sanitized.get("lang_code") or ""
+    sanitized["lang_code"] = lang_code.lower()
+    action_args = sanitized.get("action_args") or {}
+    sanitized["action_args"] = action_args
+    action_args.setdefault("lang", sanitized.get("lang", "Unknown"))
+    action_args.setdefault("service_name", service_name)
+    action_args.setdefault("filename", "subtitle.srt")
+    return sanitized
+
+
+def _parse_bridge_response(core, service_name, meta, request):
+    try:
+        outcome = subget_bridge.search(core, meta)
+    except subget_bridge.SubgetBridgeError as exc:
+        core.logger.error(
+            f"[{service_name}] subget bridge failed: {exc}. Falling back to legacy parser."
+        )
+        request["bridge_status_code"] = getattr(exc, "returncode", 1)
+        return _legacy_search_and_parse(core, service_name, meta)
+
+    request["bridge_status_code"] = outcome.status_code
+    if outcome.results:
+        sanitized = [
+            _sanitize_bridge_result(core, service_name, item)
+            for item in outcome.results
+        ]
+        core.logger.debug(
+            f"[{service_name}] subget bridge returned {len(sanitized)} results."
+        )
+        return sanitized
+
+    if not outcome.used_bridge or outcome.status_code != 0:
+        log_msg = (
+            f"[{service_name}] subget bridge unavailable (used={outcome.used_bridge}, "
+            f"status={outcome.status_code}). Switching to legacy parser."
+        )
+        if outcome.stderr:
+            log_msg += f" stderr={outcome.stderr.strip()[:200]}"
+        core.logger.warning(log_msg)
+        return _legacy_search_and_parse(core, service_name, meta)
+
+    if outcome.stderr:
+        core.logger.debug(
+            f"[{service_name}] subget bridge emitted diagnostics: {outcome.stderr.strip()[:200]}"
+        )
+
+    return []
+
+
+def build_search_requests(core, service_name, meta):
+    meta = _normalize_meta_languages(core, service_name, meta)
+    if _should_use_bridge(core):
+        return [_build_bridge_request(meta)]
+    return _legacy_build_search_requests(core, service_name, meta)
+
 
 __kodi_regional_lang_map = {
     "pt-br": ("Portuguese (Brazil)", "pt"),
@@ -42,7 +173,13 @@ __kodi_regional_lang_map = {
 }
 
 
-def build_search_requests(core, service_name, meta):
+def parse_search_response(core, service_name, meta, response):
+    if isinstance(response, dict) and response.get("bridge") == _BRIDGE_REQUEST_SENTINEL:
+        return _parse_bridge_response(core, service_name, meta, response)
+    return _legacy_parse_search_response(core, service_name, meta, response)
+
+
+def _legacy_build_search_requests(core, service_name, meta):
     """
     Builds the search requests for the subtitlecat service.
 
@@ -59,18 +196,6 @@ def build_search_requests(core, service_name, meta):
     ):  # Log aiohttp fallback if debug is on
         core.logger.debug(
             f"[{service_name}] aiohttp library not available. Async translation features will use synchronous fallbacks."
-        )
-
-    if meta.languages:
-        normalized_kodi_langs = []
-        for kodi_lang in meta.languages:
-            sc_lang = __kodi_regional_lang_map.get(
-                kodi_lang.lower(), (None, kodi_lang)
-            )[1]
-            normalized_kodi_langs.append(sc_lang)
-        meta.languages = normalized_kodi_langs
-        core.logger.debug(
-            f"[{service_name}] Normalized meta.languages for search: {meta.languages}"
         )
 
     core.logger.debug(f"[{service_name}] Building search requests for: {meta}")
@@ -101,7 +226,7 @@ def build_search_requests(core, service_name, meta):
 # ---------------------------------------------------------------------------
 # SEARCH RESPONSE PARSER
 # ---------------------------------------------------------------------------
-def parse_search_response(core, service_name, meta, response):
+def _legacy_parse_search_response(core, service_name, meta, response):
     """
     Parses the search response from the subtitlecat service.
 
@@ -582,6 +707,29 @@ def build_download_request(core, service_name, args):
     core.logger.debug(
         f"[{service_name}] Building download request for: {_filename_from_args}, Args: {str(args)[:500]}"
     )
+
+    bridge_payload = args.get("bridge_download")
+    if bridge_payload:
+        core.logger.debug(
+            f"[{service_name}] Using subget bridge for download of '{_filename_from_args}'."
+        )
+
+        def _save_with_bridge(path_from_core):
+            try:
+                return subget_bridge.download(
+                    core, service_name, bridge_payload, path_from_core
+                )
+            except subget_bridge.SubgetBridgeError as exc:
+                core.logger.error(
+                    f"[{service_name}] subget bridge download failed: {exc}"
+                )
+                return False
+
+        return {
+            "method": "REQUEST_CALLBACK",
+            "save_callback": _save_with_bridge,
+            "filename": _filename_from_args,
+        }
 
     placeholder_str = _get_setting(
         core,

@@ -787,6 +787,105 @@ class TestSubtitlecatClientTranslation(unittest.TestCase):
         )
 
 
+class TestSubtitlecatBridgeIntegration(unittest.TestCase):
+    def setUp(self):
+        self.core = MagicMock()
+        self.core.logger = MagicMock()
+        self.core.settings = MagicMock()
+        self.core.settings.get.side_effect = (
+            lambda key, default=None: True if key == "subtitlecat_use_subget_helper" else default
+        )
+        service = MagicMock()
+        service.display_name = "Subtitlecat"
+        self.core.services = {"subtitlecat": service}
+        self.meta = MagicMock()
+        self.meta.languages = ["en"]
+        self.meta.title = "Example"
+        self.meta.is_tvshow = False
+
+    @patch("a4kSubtitles.services.subtitlecat.request.subget_bridge.is_available", return_value=True)
+    def test_build_search_requests_uses_bridge(self, _mock_available):
+        requests_list = subtitlecat_module.build_search_requests(
+            self.core, "subtitlecat", self.meta
+        )
+        self.assertEqual(len(requests_list), 1)
+        request_entry = requests_list[0]
+        self.assertEqual(
+            request_entry["bridge"],
+            subtitlecat_module.request._BRIDGE_REQUEST_SENTINEL,
+        )
+        self.assertEqual(request_entry["url"], "bridge://subtitlecat/search")
+
+    @patch("a4kSubtitles.services.subtitlecat.request._legacy_search_and_parse")
+    @patch("a4kSubtitles.services.subtitlecat.request.subget_bridge.search")
+    @patch("a4kSubtitles.services.subtitlecat.request.subget_bridge.is_available", return_value=True)
+    def test_parse_search_response_bridge_results(
+        self, _mock_available, mock_search, mock_legacy
+    ):
+        mock_legacy.return_value = []
+        outcome = subtitlecat_module.request.subget_bridge.BridgeSearchOutcome(
+            used_bridge=True,
+            results=[
+                {
+                    "lang": "English",
+                    "lang_code": "en",
+                    "name": "Example",
+                    "rating": 0,
+                    "action_args": {
+                        "filename": "example.srt",
+                        "bridge_download": {"args": ["--download", "42"]},
+                    },
+                }
+            ],
+            status_code=0,
+        )
+        mock_search.return_value = outcome
+
+        request_obj = {
+            "bridge": subtitlecat_module.request._BRIDGE_REQUEST_SENTINEL,
+            "url": "bridge://subtitlecat/search",
+        }
+
+        results = subtitlecat_module.parse_search_response(
+            self.core, "subtitlecat", self.meta, request_obj
+        )
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["action_args"]["bridge_download"], {"args": ["--download", "42"]})
+        mock_legacy.assert_not_called()
+
+    @patch("a4kSubtitles.services.subtitlecat.request._legacy_search_and_parse")
+    @patch("a4kSubtitles.services.subtitlecat.request.subget_bridge.search")
+    @patch("a4kSubtitles.services.subtitlecat.request.subget_bridge.is_available", return_value=True)
+    def test_parse_search_response_bridge_unavailable_falls_back(
+        self, _mock_available, mock_search, mock_legacy
+    ):
+        expected = [
+            {
+                "service_name": "subtitlecat",
+                "lang": "English",
+                "action_args": {"filename": "legacy.srt"},
+            }
+        ]
+        mock_legacy.return_value = expected
+        mock_search.return_value = subtitlecat_module.request.subget_bridge.BridgeSearchOutcome(
+            used_bridge=False,
+            results=[],
+            status_code=0,
+            stderr="missing",
+        )
+
+        request_obj = {
+            "bridge": subtitlecat_module.request._BRIDGE_REQUEST_SENTINEL,
+            "url": "bridge://subtitlecat/search",
+        }
+
+        results = subtitlecat_module.parse_search_response(
+            self.core, "subtitlecat", self.meta, request_obj
+        )
+        self.assertEqual(results, expected)
+        mock_legacy.assert_called_once()
+
+
 if __name__ == "__main__":
 
     unittest.main()
