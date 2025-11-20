@@ -6,7 +6,7 @@ import shutil
 from xml.etree import ElementTree
 from zipfile import ZipFile
 
-from .third_party import iso639
+import iso639
 
 try:  # pragma: no cover
     from urlparse import unquote

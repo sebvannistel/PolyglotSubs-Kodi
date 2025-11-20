@@ -15,11 +15,12 @@ except AttributeError:  # pragma: no cover
 from . import kodi, logger
 
 try:
-    from .third_party import chardet, iso639
-    from .third_party.iso639.exceptions import (
+    import iso639
+    from iso639.exceptions import (
         DeprecatedLanguageValue,
         InvalidLanguageValue,
     )
+    from .third_party import chardet
 except ImportError as e:
     logger.error("Failed to import third-party libraries: %s" % e)
 
