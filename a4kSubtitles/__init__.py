@@ -111,6 +111,21 @@ def initialize() -> bool:
                     "a4kSubtitles/__init__.py: Already in sys.path: %s"
                     % _THIRD_PARTY_LIBS_PATH
                 )
+
+            # Also add the zip file containing guessit to sys.path
+            _GUESSIT_ZIP_PATH = os.path.join(_THIRD_PARTY_LIBS_PATH, "guessit_vendor.zip")
+            if os.path.isfile(_GUESSIT_ZIP_PATH):
+                if _GUESSIT_ZIP_PATH not in sys.path:
+                    sys.path.insert(0, _GUESSIT_ZIP_PATH)
+                    logger.debug(
+                        "a4kSubtitles/__init__.py: Added to sys.path: %s"
+                        % _GUESSIT_ZIP_PATH
+                    )
+            else:
+                logger.warning(
+                    "a4kSubtitles/__init__.py: guessit_vendor.zip not found: %s"
+                    % _GUESSIT_ZIP_PATH
+                )
         else:
             logger.warning(
                 "a4kSubtitles/__init__.py: third_party path not found or not a directory: %s"
