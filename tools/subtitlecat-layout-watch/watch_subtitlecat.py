@@ -17,10 +17,26 @@ WATCH_ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = WATCH_ROOT / "subtitle-find"
 REPO_ROOT = WATCH_ROOT.parents[1]
 DEFAULT_CONFIG = WATCH_ROOT / "watch_targets.json"
-DEFAULT_JAR = PROJECT_ROOT / "target" / "subtitlecat-layout-watch-jar-with-dependencies.jar"
+DEFAULT_JAR = (
+    PROJECT_ROOT / "target" / "subtitlecat-layout-watch-jar-with-dependencies.jar"
+)
 WATCH_SNAPSHOT_DIR = WATCH_ROOT / "snapshots"
-TEST_SNAPSHOT_SEARCH_DIR = WATCH_ROOT.parents[2] / "tests" / "services" / "subtitlecat" / "watch_snapshots" / "search"
-TEST_SNAPSHOT_DETAIL_DIR = WATCH_ROOT.parents[2] / "tests" / "services" / "subtitlecat" / "watch_snapshots" / "detail"
+TEST_SNAPSHOT_SEARCH_DIR = (
+    WATCH_ROOT.parents[2]
+    / "tests"
+    / "services"
+    / "subtitlecat"
+    / "watch_snapshots"
+    / "search"
+)
+TEST_SNAPSHOT_DETAIL_DIR = (
+    WATCH_ROOT.parents[2]
+    / "tests"
+    / "services"
+    / "subtitlecat"
+    / "watch_snapshots"
+    / "detail"
+)
 
 
 class WatchError(Exception):
@@ -92,10 +108,14 @@ def load_config(config_path: Path) -> List[Dict[str, object]]:
     except FileNotFoundError as exc:
         raise WatchError(f"Configuration file not found: {config_path}") from exc
     except json.JSONDecodeError as exc:
-        raise WatchError(f"Invalid JSON in configuration file {config_path}: {exc}") from exc
+        raise WatchError(
+            f"Invalid JSON in configuration file {config_path}: {exc}"
+        ) from exc
 
     if not isinstance(raw, list):
-        raise WatchError("Configuration file must contain a JSON list of target definitions.")
+        raise WatchError(
+            "Configuration file must contain a JSON list of target definitions."
+        )
     return raw
 
 
@@ -132,7 +152,9 @@ def write_snapshot(html: str, target_label: str, kind: str) -> Tuple[Path, Path]
     return watch_path, test_path
 
 
-def run_cli(jar_path: Path, java_bin: str, query: str, check_download: bool, max_results: int) -> Dict[str, object]:
+def run_cli(
+    jar_path: Path, java_bin: str, query: str, check_download: bool, max_results: int
+) -> Dict[str, object]:
     cmd = [java_bin, "-jar", str(jar_path), "--query", query]
     if check_download:
         cmd.append("--check-download")
@@ -160,7 +182,9 @@ def run_cli(jar_path: Path, java_bin: str, query: str, check_download: bool, max
         ) from exc
 
 
-def evaluate_target(target: Dict[str, object], result: Dict[str, object]) -> Tuple[bool, List[str], List[Tuple[str, Path, Path]]]:
+def evaluate_target(
+    target: Dict[str, object], result: Dict[str, object]
+) -> Tuple[bool, List[str], List[Tuple[str, Path, Path]]]:
     issues: List[str] = []
     snapshots: List[Tuple[str, Path, Path]] = []
 
@@ -194,7 +218,9 @@ def evaluate_target(target: Dict[str, object], result: Dict[str, object]) -> Tup
         snapshots.append(("search", watch_path, test_path))
 
     download_expectations = target.get("check_download", True)
-    download_info = result.get("download") if isinstance(result.get("download"), dict) else None
+    download_info = (
+        result.get("download") if isinstance(result.get("download"), dict) else None
+    )
 
     if download_expectations and download_info:
         download_status = download_info.get("status")
@@ -204,11 +230,18 @@ def evaluate_target(target: Dict[str, object], result: Dict[str, object]) -> Tup
 
         if download_status != "ok":
             issues.append(f"download status is '{download_status}'")
-        if expected_download_selector and download_selector != expected_download_selector:
+        if (
+            expected_download_selector
+            and download_selector != expected_download_selector
+        ):
             issues.append(
                 f"download selector '{download_selector}' does not equal expected '{expected_download_selector}'"
             )
-        if expected_download_url_fragment and download_url and expected_download_url_fragment not in download_url:
+        if (
+            expected_download_url_fragment
+            and download_url
+            and expected_download_url_fragment not in download_url
+        ):
             issues.append(
                 f"download URL '{download_url}' does not contain '{expected_download_url_fragment}'"
             )
@@ -216,13 +249,13 @@ def evaluate_target(target: Dict[str, object], result: Dict[str, object]) -> Tup
             issues.append(f"download errors reported: {', '.join(download_errors)}")
 
         detail_html = decode_snapshot(download_info.get("detail_html_base64"))
-        if detail_html and any(
-            fragment in issues_text for issues_text in issues if "download" in issues_text
-        ):
+        if detail_html and any("download" in issues_text for issues_text in issues):
             watch_path, test_path = write_snapshot(detail_html, label, "detail")
             snapshots.append(("detail", watch_path, test_path))
     elif download_expectations and not download_info:
-        issues.append("download checks were requested but no download metadata was returned")
+        issues.append(
+            "download checks were requested but no download metadata was returned"
+        )
         if search_html:
             watch_path, test_path = write_snapshot(search_html, label, "search")
             snapshots.append(("search", watch_path, test_path))
@@ -257,7 +290,9 @@ def main() -> int:
         max_results = int(raw_target.get("max_results", 5))
 
         try:
-            result = run_cli(jar_path, args.java_bin, query, check_download, max_results)
+            result = run_cli(
+                jar_path, args.java_bin, query, check_download, max_results
+            )
         except WatchError as exc:
             all_failures.append((label, [str(exc)], []))
             continue

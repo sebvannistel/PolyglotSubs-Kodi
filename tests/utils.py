@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 class Spy(object):
     def __init__(self):
         self.args = []
@@ -10,6 +11,7 @@ class Spy(object):
     def called_with(self, *args, **kwargs):
         assert self.args[0] == args
         assert self.kwargs[0] == kwargs
+
 
 def spy_fn(target, fn_name, return_result=True):
     spy = Spy()

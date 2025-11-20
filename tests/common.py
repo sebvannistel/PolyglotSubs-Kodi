@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import sys
-import os
 import json
+import os
 import re
-import pytest
+import sys
 import time
 
+import pytest
+
 dir_name = os.path.dirname(__file__)
-main = os.path.join(dir_name, '..')
-a4kSubtitles = os.path.join(main, '..', 'a4kSubtitles')
-lib = os.path.join(a4kSubtitles, 'lib')
-services = os.path.join(a4kSubtitles, 'services')
+main = os.path.join(dir_name, "..")
+a4kSubtitles = os.path.join(main, "..", "a4kSubtitles")
+lib = os.path.join(a4kSubtitles, "lib")
+services = os.path.join(a4kSubtitles, "services")
 
 sys.path.append(dir_name)
 sys.path.append(main)

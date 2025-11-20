@@ -13,7 +13,6 @@ import os
 import sys
 from typing import Optional
 
-
 _ADDON_PATH: Optional[str] = None
 _A4KSUBTITLES_DIR: Optional[str] = None
 _THIRD_PARTY_LIBS_PATH: Optional[str] = None
@@ -45,7 +44,9 @@ def initialize() -> bool:
         _ADDON_PATH = addon.getAddonInfo("path")
         if isinstance(_ADDON_PATH, bytes):
             _ADDON_PATH = _ADDON_PATH.decode("utf-8")
-        logger.debug("a4kSubtitles/__init__.py: Addon path from xbmcaddon: %s" % _ADDON_PATH)
+        logger.debug(
+            "a4kSubtitles/__init__.py: Addon path from xbmcaddon: %s" % _ADDON_PATH
+        )
     except ImportError:
         logger.debug(
             "a4kSubtitles/__init__.py: xbmcaddon not found. Falling back to __file__ for path."
@@ -53,7 +54,9 @@ def initialize() -> bool:
         try:
             a4ksubtitles_dir_from_file = os.path.dirname(os.path.abspath(__file__))
             _ADDON_PATH = os.path.dirname(a4ksubtitles_dir_from_file)
-            logger.debug("a4kSubtitles/__init__.py: Addon path from __file__: %s" % _ADDON_PATH)
+            logger.debug(
+                "a4kSubtitles/__init__.py: Addon path from __file__: %s" % _ADDON_PATH
+            )
         except NameError:
             logger.error(
                 "a4kSubtitles/__init__.py: __file__ not defined, cannot determine addon path."
@@ -61,13 +64,15 @@ def initialize() -> bool:
             _ADDON_PATH = None
     except (FileNotFoundError, OSError) as exc:
         logger.error(
-            "a4kSubtitles/__init__.py: Error getting addon path via xbmcaddon: %s. Attempting fallback." % exc
+            "a4kSubtitles/__init__.py: Error getting addon path via xbmcaddon: %s. Attempting fallback."
+            % exc
         )
         try:
             a4ksubtitles_dir_from_file = os.path.dirname(os.path.abspath(__file__))
             _ADDON_PATH = os.path.dirname(a4ksubtitles_dir_from_file)
             logger.debug(
-                "a4kSubtitles/__init__.py: Addon path from __file__ (after xbmcaddon error): %s" % _ADDON_PATH
+                "a4kSubtitles/__init__.py: Addon path from __file__ (after xbmcaddon error): %s"
+                % _ADDON_PATH
             )
         except NameError:
             logger.error(
@@ -76,7 +81,8 @@ def initialize() -> bool:
             _ADDON_PATH = None
         except (FileNotFoundError, OSError) as exc2:
             logger.error(
-                "a4kSubtitles/__init__.py: Error in fallback path determination: %s" % exc2
+                "a4kSubtitles/__init__.py: Error in fallback path determination: %s"
+                % exc2
             )
             _ADDON_PATH = None
 
@@ -97,15 +103,18 @@ def initialize() -> bool:
             if _THIRD_PARTY_LIBS_PATH not in sys.path:
                 sys.path.insert(0, _THIRD_PARTY_LIBS_PATH)
                 logger.debug(
-                    "a4kSubtitles/__init__.py: Added to sys.path: %s" % _THIRD_PARTY_LIBS_PATH
+                    "a4kSubtitles/__init__.py: Added to sys.path: %s"
+                    % _THIRD_PARTY_LIBS_PATH
                 )
             else:
                 logger.debug(
-                    "a4kSubtitles/__init__.py: Already in sys.path: %s" % _THIRD_PARTY_LIBS_PATH
+                    "a4kSubtitles/__init__.py: Already in sys.path: %s"
+                    % _THIRD_PARTY_LIBS_PATH
                 )
         else:
             logger.warning(
-                "a4kSubtitles/__init__.py: third_party path not found or not a directory: %s" % _THIRD_PARTY_LIBS_PATH
+                "a4kSubtitles/__init__.py: third_party path not found or not a directory: %s"
+                % _THIRD_PARTY_LIBS_PATH
             )
     else:
         logger.error(
@@ -122,7 +131,8 @@ def initialize() -> bool:
         )
     except ImportError as exc:
         logger.error(
-            "a4kSubtitles/__init__.py: FAILED to test-import 'attrs'. Check path and vendored files. Error: %s" % exc
+            "a4kSubtitles/__init__.py: FAILED to test-import 'attrs'. Check path and vendored files. Error: %s"
+            % exc
         )
         logger.debug("Current sys.path (condensed for relevant paths):")
         for p_idx, p_val in enumerate(sys.path):
@@ -135,7 +145,8 @@ def initialize() -> bool:
                 logger.debug("  [%d] -> %s" % (p_idx, p_val))
     except Exception as exc_attrs:
         logger.error(
-            "a4kSubtitles/__init__.py: UNEXPECTED ERROR during 'attrs' test-import: %s" % exc_attrs
+            "a4kSubtitles/__init__.py: UNEXPECTED ERROR during 'attrs' test-import: %s"
+            % exc_attrs
         )
 
     logger.debug("a4kSubtitles package initialized.")
@@ -146,4 +157,3 @@ __all__ = ["initialize"]
 
 # Ensure third-party libraries are available when the package is imported.
 initialize()
-

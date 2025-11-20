@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-os.environ.setdefault("A4KSUBTITLES_API_MODE", "{\"kodi\": true}")
+os.environ.setdefault("A4KSUBTITLES_API_MODE", '{"kodi": true}')
 
 from a4kSubtitles.lib import utils, video
 
@@ -36,15 +36,17 @@ def tvshow_year_cache(monkeypatch):
 
 
 def test_scrape_imdb_id_movie(monkeypatch):
-    meta = utils.DictAsObject({
-        "title": "Inception",
-        "year": "2010",
-        "season": "",
-        "episode": "",
-        "tvshow": "",
-        "tvshow_year": "",
-        "imdb_id": "",
-    })
+    meta = utils.DictAsObject(
+        {
+            "title": "Inception",
+            "year": "2010",
+            "season": "",
+            "episode": "",
+            "tvshow": "",
+            "tvshow_year": "",
+            "imdb_id": "",
+        }
+    )
 
     imdb_client = MagicMock()
     imdb_client.search_movie.return_value = [
@@ -60,22 +62,24 @@ def test_scrape_imdb_id_movie(monkeypatch):
 
 
 def test_scrape_imdb_id_tv_episode(monkeypatch, tvshow_year_cache):
-    meta = utils.DictAsObject({
-        "title": "Winter Is Coming",
-        "year": "2011",
-        "season": "1",
-        "episode": "1",
-        "tvshow": "Game of Thrones",
-        "tvshow_year": "",
-        "imdb_id": "",
-    })
+    meta = utils.DictAsObject(
+        {
+            "title": "Winter Is Coming",
+            "year": "2011",
+            "season": "1",
+            "episode": "1",
+            "tvshow": "Game of Thrones",
+            "tvshow_year": "",
+            "imdb_id": "",
+        }
+    )
 
     series = FakeMovie(
         "0944947",
         title="Game of Thrones",
         kind="tv series",
         year=2011,
-        **{"series years": "2011-2019"}
+        **{"series years": "2011-2019"},
     )
     episode = FakeMovie(
         "1480055",
@@ -102,15 +106,17 @@ def test_scrape_imdb_id_tv_episode(monkeypatch, tvshow_year_cache):
 
 
 def test_update_info_from_imdb_movie(monkeypatch):
-    meta = utils.DictAsObject({
-        "title": "",
-        "year": "",
-        "season": "",
-        "episode": "",
-        "tvshow": "",
-        "tvshow_year": "",
-        "imdb_id": "tt1375666",
-    })
+    meta = utils.DictAsObject(
+        {
+            "title": "",
+            "year": "",
+            "season": "",
+            "episode": "",
+            "tvshow": "",
+            "tvshow_year": "",
+            "imdb_id": "tt1375666",
+        }
+    )
 
     imdb_client = MagicMock()
     imdb_client.get_movie.return_value = FakeMovie(
@@ -127,22 +133,24 @@ def test_update_info_from_imdb_movie(monkeypatch):
 
 
 def test_update_info_from_imdb_episode(monkeypatch, tvshow_year_cache):
-    meta = utils.DictAsObject({
-        "title": "Winter Is Coming",
-        "year": "2011",
-        "season": "1",
-        "episode": "1",
-        "tvshow": "Game of Thrones",
-        "tvshow_year": "",
-        "imdb_id": "tt0944947",
-    })
+    meta = utils.DictAsObject(
+        {
+            "title": "Winter Is Coming",
+            "year": "2011",
+            "season": "1",
+            "episode": "1",
+            "tvshow": "Game of Thrones",
+            "tvshow_year": "",
+            "imdb_id": "tt0944947",
+        }
+    )
 
     series = FakeMovie(
         "0944947",
         title="Game of Thrones",
         kind="tv series",
         year=2011,
-        **{"series years": "2011-2019"}
+        **{"series years": "2011-2019"},
     )
     episode = FakeMovie(
         "1480055",
@@ -156,7 +164,9 @@ def test_update_info_from_imdb_episode(monkeypatch, tvshow_year_cache):
 
     imdb_client = MagicMock()
     imdb_client.get_movie.return_value = series
-    imdb_client.get_movie_episodes.return_value = {"data": {"episodes": {1: {1: episode}}}}
+    imdb_client.get_movie_episodes.return_value = {
+        "data": {"episodes": {1: {1: episode}}}
+    }
     imdb_client.update.side_effect = lambda *_: None
 
     monkeypatch.setattr(video, "__get_imdb_client", lambda core: imdb_client)
@@ -172,22 +182,24 @@ def test_update_info_from_imdb_episode(monkeypatch, tvshow_year_cache):
 
 
 def test_scrape_tvshow_year(monkeypatch, tvshow_year_cache):
-    meta = utils.DictAsObject({
-        "title": "",
-        "year": "",
-        "season": "",
-        "episode": "",
-        "tvshow": "Game of Thrones",
-        "tvshow_year": "",
-        "imdb_id": "tt0944947",
-    })
+    meta = utils.DictAsObject(
+        {
+            "title": "",
+            "year": "",
+            "season": "",
+            "episode": "",
+            "tvshow": "Game of Thrones",
+            "tvshow_year": "",
+            "imdb_id": "tt0944947",
+        }
+    )
 
     series = FakeMovie(
         "0944947",
         title="Game of Thrones",
         kind="tv series",
         year=2011,
-        **{"series years": "2011-2019"}
+        **{"series years": "2011-2019"},
     )
 
     imdb_client = MagicMock()

@@ -1,5 +1,6 @@
-import tomllib
 from pathlib import Path
+
+import tomllib
 
 
 def test_project_dependencies_match_requirements():
@@ -9,7 +10,8 @@ def test_project_dependencies_match_requirements():
 
     with (root / "requirements.txt").open() as req_file:
         requirements = {
-            line.strip() for line in req_file
+            line.strip()
+            for line in req_file
             if line.strip() and not line.startswith("#")
         }
 

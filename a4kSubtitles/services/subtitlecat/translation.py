@@ -9,16 +9,16 @@ from typing import Optional, Sequence
 from urllib.parse import urljoin
 
 from .utils import (
+    CLOUDFLARE_CHALLENGE_EXCEPTION,
+    CLOUDFLARE_EXCEPTION,
     SC_BASE_URL,
     SC_USER_AGENT,
-    LRUCache,
-    _get_session,
-    _get_setting,
     SCRAPER_HTTP_ERROR,
     SCRAPER_REQUEST_EXCEPTION,
     SCRAPER_TIMEOUT_EXCEPTION,
-    CLOUDFLARE_CHALLENGE_EXCEPTION,
-    CLOUDFLARE_EXCEPTION,
+    LRUCache,
+    _get_session,
+    _get_setting,
 )
 
 _AIOHTTP_AVAILABLE = False
@@ -89,7 +89,9 @@ def _inc_gemini_counter_with_reset(core, service_name, log_prefix=""):
     global _GEMINI_API_REQUEST_COUNT, _LAST_THROTTLE_RESET_TIME
     with _COUNTER_LOCK:
         now = time.monotonic()
-        if (now - _LAST_THROTTLE_RESET_TIME) > GEMINI_API_COUNTER_RESET_INTERVAL_SECONDS:
+        if (
+            now - _LAST_THROTTLE_RESET_TIME
+        ) > GEMINI_API_COUNTER_RESET_INTERVAL_SECONDS:
             if _GEMINI_API_REQUEST_COUNT > 0 and getattr(core, "logger", None):
                 core.logger.debug(
                     f"[{service_name}] gemini: {log_prefix}Resetting request counter (was {_GEMINI_API_REQUEST_COUNT}) "
@@ -113,7 +115,11 @@ def _inc_gemini_counter_with_reset(core, service_name, log_prefix=""):
                 GEMINI_API_THROTTLE_SLEEP_SECONDS_DEFAULT,
             )
         )
-        if request_limit > 0 and current_count > 0 and current_count % request_limit == 0:
+        if (
+            request_limit > 0
+            and current_count > 0
+            and current_count % request_limit == 0
+        ):
             if getattr(core, "logger", None):
                 core.logger.debug(
                     f"[{service_name}] gemini: {log_prefix}(Throttle, Count: {current_count}) "
@@ -137,7 +143,9 @@ def _parse_api_keys(raw_value: Optional[str]) -> Sequence[str]:
 
 def _collect_gemini_api_keys(core) -> Sequence[str]:
     settings_value = _get_setting(core, "subtitlecat_gemini_api_keys", "") or ""
-    env_keys = os.getenv("SUBTITLECAT_GEMINI_API_KEYS") or os.getenv("SUBTITLECAT_GEMINI_API_KEY", "")
+    env_keys = os.getenv("SUBTITLECAT_GEMINI_API_KEYS") or os.getenv(
+        "SUBTITLECAT_GEMINI_API_KEY", ""
+    )
     combined = list(_parse_api_keys(settings_value))
     for env_key in _parse_api_keys(env_keys):
         if env_key not in combined:
@@ -149,7 +157,10 @@ def _build_translator_config(core) -> TranslatorConfig:
     api_keys = _collect_gemini_api_keys(core)
     if not api_keys:
         raise TranslationError("No Gemini API keys configured")
-    model = _get_setting(core, "subtitlecat_gemini_model", "gemini-2.5-flash") or "gemini-2.5-flash"
+    model = (
+        _get_setting(core, "subtitlecat_gemini_model", "gemini-2.5-flash")
+        or "gemini-2.5-flash"
+    )
     retry_count = int(_get_setting(core, "subtitlecat_gemini_retry_count", 3))
     retry_delay = float(_get_setting(core, "subtitlecat_gemini_retry_delay", 10.0))
     max_rounds = int(_get_setting(core, "subtitlecat_gemini_max_rounds", 3))
@@ -244,7 +255,9 @@ def _translate_text_chunk(
             )
         corrected = []
         for idx in range(len(lines_to_translate)):
-            translated = translated_segments[idx] if idx < len(translated_segments) else None
+            translated = (
+                translated_segments[idx] if idx < len(translated_segments) else None
+            )
             corrected.append(translated)
         translated_segments = corrected
 
@@ -256,6 +269,7 @@ def _translate_text_chunk(
             sanitized_segments.append(placeholder_str if original_line.strip() else "")
 
     return sanitized_segments, "auto"
+
 
 _PLACEHOLDER_SENTINEL_PREFIX = "\u2063@@SCPTAG_hexidx_"
 _PLACEHOLDER_SUFFIX = "_hexidx_SCP@@"
@@ -475,9 +489,7 @@ def warm_translation_cache(
     response = None
     session = _get_session()
     effective_timeout = (
-        timeout
-        if timeout is not None
-        else _get_setting(core, "http_timeout", 15)
+        timeout if timeout is not None else _get_setting(core, "http_timeout", 15)
     )
 
     def _handle_rate_limited(status_code: int) -> None:
@@ -486,7 +498,9 @@ def warm_translation_cache(
                 f"[{service_name}] Warm-up request returned HTTP {status_code} for {translation_url}."
             )
         if status_code == 403:
-            message = "Subtitlecat blocked the request (HTTP 403). Please try again later."
+            message = (
+                "Subtitlecat blocked the request (HTTP 403). Please try again later."
+            )
         else:
             message = "Subtitlecat is temporarily unavailable (HTTP 503). Please try again soon."
         _notify_rate_limit(core, message)

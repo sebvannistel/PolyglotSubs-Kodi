@@ -146,7 +146,9 @@ def _base_name(name: str) -> str:
     return re.split(r"[ (]", name, 1)[0].lower()
 
 
-def _normalize_language(core: Any, sc_lang_code: str, sc_lang_name: str) -> tuple[str, str]:
+def _normalize_language(
+    core: Any, sc_lang_code: str, sc_lang_name: str
+) -> tuple[str, str]:
     kodi_target_lang_full = sc_lang_name or sc_lang_code
     kodi_target_lang_iso2 = sc_lang_code.split("-")[0].lower()
 
@@ -230,8 +232,7 @@ def _convert_items_to_results(
     wanted_iso2 = {
         core.utils.get_lang_id(language, core.kodi.xbmc.ISO_639_1).lower()
         for language in getattr(meta, "languages", [])
-        if language
-        and core.utils.get_lang_id(language, core.kodi.xbmc.ISO_639_1)
+        if language and core.utils.get_lang_id(language, core.kodi.xbmc.ISO_639_1)
     }
     allow_any_language = not wanted_languages_lower and not wanted_iso2
 
@@ -265,9 +266,9 @@ def _convert_items_to_results(
                 ):
                     continue
 
-            constructed_filename = language_entry.get("filename") or _construct_filename(
-                detail_href, sc_lang_code
-            )
+            constructed_filename = language_entry.get(
+                "filename"
+            ) or _construct_filename(detail_href, sc_lang_code)
 
             action_args: Dict[str, Any] = {
                 "url": "",
@@ -294,7 +295,9 @@ def _convert_items_to_results(
                 action_args["url"] = translated_url
                 cache_key_lang = language_entry.get("cacheLangKey") or kodi_lang_iso2
                 if cache_key_lang:
-                    _TRANSLATED_CACHE[(detail_url, cache_key_lang.lower())] = translated_url
+                    _TRANSLATED_CACHE[(detail_url, cache_key_lang.lower())] = (
+                        translated_url
+                    )
 
             if language_entry.get("needsClientTranslation"):
                 action_args.update(

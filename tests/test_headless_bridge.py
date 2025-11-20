@@ -61,13 +61,18 @@ def test_search_converts_node_results(mock_run_node):
             }
         ],
     }
-    mock_run_node.return_value = SimpleNamespace(stdout=json.dumps(payload), stderr="", returncode=0)
+    mock_run_node.return_value = SimpleNamespace(
+        stdout=json.dumps(payload), stderr="", returncode=0
+    )
 
     results = headless_bridge.search(core, "subtitlecat", meta)
 
     assert len(results) == 1
     entry = results[0]
-    assert entry["action_args"]["url"] == "https://www.subtitlecat.com/subs/123/Inception-en.srt"
+    assert (
+        entry["action_args"]["url"]
+        == "https://www.subtitlecat.com/subs/123/Inception-en.srt"
+    )
     assert entry["action_args"]["needs_client_side_translation"] is False
     mock_run_node.assert_called_once()
 
@@ -80,7 +85,9 @@ def test_download_success(mock_run_node, mock_fix_encoding):
         "ok": True,
         "data": base64.b64encode(b"hello world").decode("ascii"),
     }
-    mock_run_node.return_value = SimpleNamespace(stdout=json.dumps(payload), stderr="", returncode=0)
+    mock_run_node.return_value = SimpleNamespace(
+        stdout=json.dumps(payload), stderr="", returncode=0
+    )
 
     result = headless_bridge.download(
         core,

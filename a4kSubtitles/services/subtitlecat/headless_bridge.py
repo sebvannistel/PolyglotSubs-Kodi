@@ -24,7 +24,13 @@ _NODE_SETTING_KEY = "subtitlecat.node_path"
 
 
 def _headless_script_path() -> Path:
-    return Path(__file__).resolve().parents[3] / "resources" / "external" / "subtitlecat-headless" / "index.js"
+    return (
+        Path(__file__).resolve().parents[3]
+        / "resources"
+        / "external"
+        / "subtitlecat-headless"
+        / "index.js"
+    )
 
 
 def _get_node_executable(core: Any) -> str:
@@ -57,13 +63,17 @@ def _subprocess_timeout(core: Any, multiplier: int = 2, minimum: int = 20) -> in
     return max(minimum, configured * multiplier)
 
 
-def _run_node(core: Any, args: Sequence[str], timeout: Optional[int] = None) -> Optional[subprocess.CompletedProcess[str]]:
+def _run_node(
+    core: Any, args: Sequence[str], timeout: Optional[int] = None
+) -> Optional[subprocess.CompletedProcess[str]]:
     script_path = _headless_script_path()
     node_exec = _get_node_executable(core)
 
     if not script_path.exists():
         if core and getattr(core, "logger", None):
-            core.logger.debug("[subtitlecat] Headless helper script missing: %s", script_path)
+            core.logger.debug(
+                "[subtitlecat] Headless helper script missing: %s", script_path
+            )
         return None
 
     if not _node_exists(node_exec):
@@ -101,7 +111,9 @@ def _base_name(name: str) -> str:
     return re.split(r"[ (]", name, 1)[0].lower()
 
 
-def _normalize_language(core: Any, sc_lang_code: str, sc_lang_name: str) -> Tuple[str, str]:
+def _normalize_language(
+    core: Any, sc_lang_code: str, sc_lang_name: str
+) -> Tuple[str, str]:
     kodi_target_lang_full = sc_lang_name or sc_lang_code
     kodi_target_lang_iso2 = sc_lang_code.split("-")[0].lower()
 
@@ -134,7 +146,11 @@ def _normalize_language(core: Any, sc_lang_code: str, sc_lang_name: str) -> Tupl
 def _build_query_from_meta(meta: Any) -> str:
     if not meta:
         return ""
-    query_title = getattr(meta, "tvshow", None) if getattr(meta, "is_tvshow", False) else getattr(meta, "title", None)
+    query_title = (
+        getattr(meta, "tvshow", None)
+        if getattr(meta, "is_tvshow", False)
+        else getattr(meta, "title", None)
+    )
     if not query_title:
         return ""
     parts: List[str] = [str(query_title)]
@@ -169,8 +185,7 @@ def _convert_node_items_to_results(
     wanted_iso2 = {
         core.utils.get_lang_id(language, core.kodi.xbmc.ISO_639_1).lower()
         for language in getattr(meta, "languages", [])
-        if language
-        and core.utils.get_lang_id(language, core.kodi.xbmc.ISO_639_1)
+        if language and core.utils.get_lang_id(language, core.kodi.xbmc.ISO_639_1)
     }
     allow_any_language = not wanted_languages_lower and not wanted_iso2
 
@@ -186,7 +201,11 @@ def _convert_node_items_to_results(
             continue
         try:
             filename_parts = href.split("/")
-            filename_base = unquote(filename_parts[-1]).replace(".html", "") if filename_parts else "subtitle"
+            filename_base = (
+                unquote(filename_parts[-1]).replace(".html", "")
+                if filename_parts
+                else "subtitle"
+            )
             original_id = filename_parts[-2] if len(filename_parts) > 1 else "id"
         except Exception:
             filename_base = "subtitle"
@@ -206,7 +225,9 @@ def _convert_node_items_to_results(
             if not sc_lang_code:
                 continue
             sc_lang_name = language_entry.get("name") or sc_lang_code
-            kodi_lang_full, kodi_lang_iso2 = _normalize_language(core, sc_lang_code, sc_lang_name)
+            kodi_lang_full, kodi_lang_iso2 = _normalize_language(
+                core, sc_lang_code, sc_lang_name
+            )
 
             if not allow_any_language:
                 if (
@@ -240,7 +261,9 @@ def _convert_node_items_to_results(
                     folder = "/" + folder
                 if not folder.endswith("/"):
                     folder = folder + "/"
-                source_file = translate_args.get("sourceFile") or f"{filename_base}-orig.srt"
+                source_file = (
+                    translate_args.get("sourceFile") or f"{filename_base}-orig.srt"
+                )
                 source_url = urljoin(SC_BASE_URL, folder + source_file)
                 target_translation_lang = translate_args.get("target") or sc_lang_code
                 action_args.update(
