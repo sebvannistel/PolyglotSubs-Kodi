@@ -104,12 +104,8 @@ def __save_results(core, meta, results):
         if len(results) == 0:
             return
         meta_hash = core.cache.get_meta_hash(meta)
-        json_data = core.json.dumps(
-            {"hash": meta_hash, "timestamp": core.time.time(), "results": results},
-            indent=2,
-        )
-        with open(core.cache.results_filepath, "w") as f:
-            f.write(json_data)
+        data = {"hash": meta_hash, "timestamp": core.time.time(), "results": results}
+        core.cache.save_last_results(data)
     except:
         import traceback
 
@@ -130,11 +126,10 @@ def __get_last_results(core, meta):
     force_search = []
 
     try:
-        with open(core.cache.results_filepath, "r") as f:
-            last_results = core.json.loads(f.read())
-
         meta_hash = core.cache.get_meta_hash(meta)
-        if last_results["hash"] != meta_hash:
+        last_results = core.cache.get_last_results(meta_hash)
+
+        if not last_results:
             return ([], [])
 
         has_bsplayer_results = __has_results("bsplayer", last_results["results"])
