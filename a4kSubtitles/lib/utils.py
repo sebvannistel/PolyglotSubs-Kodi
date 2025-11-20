@@ -23,6 +23,8 @@ try:
     from .third_party import chardet
     from guessit import guessit
     from .third_party.pathvalidate import sanitize_filename
+    from .third_party import pysrt
+    from .third_party.subscleaner import subscleaner
 except ImportError as e:
     logger.error("Failed to import third-party libraries: %s" % e)
 
@@ -38,6 +40,12 @@ except ImportError:
     from urllib.parse import parse_qsl, quote_plus, unquote
 
     unicode = lambda v: v
+
+# Ensure StringIO is available in module scope, handling Python 2/3 compatibility
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 __url_regex = r"[a-z0-9][a-z0-9-]{0,5}[a-z0-9]\.[a-z0-9]{2,20}\.[a-z]{2,5}"
 __credit_part_regex = r"(sync|synced|fix|fixed|corrected|corrections)"
@@ -249,7 +257,7 @@ def get_any_of_regex(array):
 
 def cleanup_subtitles(core, sub_contents):
     """
-    Cleans up a subtitle file.
+    Cleans up a subtitle file using subscleaner.
 
     Args:
         core (module): The core module.
@@ -258,52 +266,22 @@ def cleanup_subtitles(core, sub_contents):
     Returns:
         str: The cleaned up subtitle file.
     """
-    service_names_regex = get_any_of_regex(core.services.keys())
-    all_lines = sub_contents.split("\n")
-    cleaned_lines = []
-    buffer = []
-    garbage = False
+    try:
+        if not sub_contents:
+            return sub_contents
 
-    if all_lines[0].strip() != "":
-        all_lines.insert(0, "")
-
-    if all_lines[-1].strip() != "":
-        all_lines.append("")
-
-    for line in all_lines:
-        line = line.strip()
-
-        if garbage and line != "":
-            continue
-
-        garbage = False
-
-        if line == "":
-            if len(buffer) > 0:
-                buffer.insert(0, "")
-                cleaned_lines.extend(buffer)
-                buffer = []
-            continue
-
-        line_contains_ad = (
-            re.search(service_names_regex, line, re.IGNORECASE)
-            or re.search(__url_regex, line, re.IGNORECASE)
-            or re.search(__credit_regex, line, re.IGNORECASE)
-        )
-
-        if line_contains_ad:
-            logger.debug("(detected ad) %s" % line.encode("ascii", errors="ignore"))
-            if not re.match(r"^\{\d+\}\{\d+\}", line):
-                garbage = True
-                buffer = []
-            continue
-
-        buffer.append(line)
-
-    if cleaned_lines[0] == "":
-        cleaned_lines.pop(0)
-
-    return "\n".join(cleaned_lines)
+        subs = pysrt.from_string(sub_contents)
+        if subscleaner.remove_ad_lines(subs):
+            logger.debug("Removed ads from subtitle file")
+            output = StringIO()
+            subs.write_into(output)
+            return output.getvalue()
+        else:
+            return sub_contents
+    except Exception as e:
+        logger.error("Error cleaning subtitles with subscleaner: %s" % e)
+        # Fallback to original content on error
+        return sub_contents
 
 
 def open_file_wrapper(file, mode="r", encoding="utf-8"):
