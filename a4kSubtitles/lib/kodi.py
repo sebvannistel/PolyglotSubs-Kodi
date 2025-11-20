@@ -7,37 +7,15 @@ import os
 import re
 import sys
 
+# The mocking is now handled by tests/kodi_mocks.py and injected into sys.modules via tests/conftest.py
+# when running tests. In production (inside Kodi), these imports will succeed.
+import xbmc
+import xbmcaddon
+import xbmcgui
+import xbmcplugin
+import xbmcvfs
+
 kodi = sys.modules[__name__]
-api_mode = os.getenv("A4KSUBTITLES_API_MODE")
-
-if api_mode:
-    try:
-        api_mode = json.loads(api_mode)
-    except ValueError as e:
-        logging.getLogger(__name__).error("Invalid A4KSUBTITLES_API_MODE: %s", e)
-        api_mode = None
-
-if api_mode:
-    if api_mode.get("kodi", False):
-        from .kodi_mock import xbmc, xbmcaddon, xbmcgui, xbmcplugin, xbmcvfs
-    else:
-        from . import kodi_mock
-
-        for target in ["xbmc", "xbmcaddon", "xbmcplugin", "xbmcgui", "xbmcvfs"]:
-            if target == "kodi":
-                continue
-            elif api_mode.get(target, False):
-                mod = getattr(kodi_mock, target)
-            else:
-                mod = importlib.import_module(target)
-            setattr(kodi, target, mod)
-
-else:  # pragma: no cover
-    import xbmc
-    import xbmcaddon
-    import xbmcgui
-    import xbmcplugin
-    import xbmcvfs
 
 addon = xbmcaddon.Addon()
 addon_id = addon.getAddonInfo("id")

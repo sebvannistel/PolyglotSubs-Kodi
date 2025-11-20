@@ -1,7 +1,9 @@
 from unittest.mock import Mock
-
 import pytest
+from tests.kodi_mocks import install_mocks
 
+# Install mocks before any tests run and before application modules are imported
+install_mocks()
 
 @pytest.fixture
 def gemini_translator_stub(monkeypatch):
