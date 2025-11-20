@@ -14,6 +14,9 @@ except AttributeError:  # pragma: no cover
 
 from . import kodi, logger
 
+import ftfy
+from box import Box
+
 try:
     import iso639
     from iso639.exceptions import (
@@ -79,40 +82,6 @@ temp_dir = os.path.join(kodi.addon_profile, "temp")
 data_dir = os.path.join(kodi.addon_profile, "data")
 
 
-class DictAsObject(dict):
-    """
-    A dictionary that allows its keys to be accessed as attributes.
-
-    Example:
-        >>> d = DictAsObject({'a': 1})
-        >>> d.a
-        1
-        >>> d.b = 2
-        >>> d['b']
-        2
-    """
-
-    def __getattr__(self, name):
-        """
-        Retrieves an item as an attribute.
-
-        Args:
-            name (str): The name of the attribute (dictionary key).
-
-        Returns:
-            The value associated with the key, or None if the key does not exist.
-        """
-        return self.get(name, None)
-
-    def __setattr__(self, name, value):
-        """
-        Sets an item as an attribute.
-
-        Args:
-            name (str): The name of the attribute (dictionary key).
-            value: The value to set.
-        """
-        self[name] = value
 
 
 def get_all_relative_entries(relative_file, ext=".py", ignore_private=True):
@@ -137,7 +106,7 @@ def get_all_relative_entries(relative_file, ext=".py", ignore_private=True):
 
 def strip_non_ascii_and_unprintable(text):
     """
-    Strips non-ASCII and unprintable characters from a string.
+    Strips non-ASCII and unprintable characters from a string using ftfy.
 
     Args:
         text (str): The string to strip.
@@ -148,8 +117,7 @@ def strip_non_ascii_and_unprintable(text):
     if not isinstance(text, str) and (not py2 or not isinstance(text, unicode)):
         return str(text)
 
-    result = "".join(char for char in text if char in string.printable)
-    return result.encode("ascii", errors="ignore").decode("ascii", errors="ignore")
+    return ftfy.fix_text(text)
 
 
 def slugify_filename(text):
@@ -436,7 +404,7 @@ def extract_season_episode(filename, episode_fallback=False, zfill=3):
         episode = episode[0]
 
     # Special handling for anime absolute numbers if 'episode' is missing
-    if episode is None and season is None:
+    if episode is None:
         # guessit often puts absolute episode numbers in 'absolute_episode' or just 'episode'
         # If it's in 'absolute_episode', we can use it as episode.
         absolute_episode = guess.get("absolute_episode")
@@ -445,6 +413,12 @@ def extract_season_episode(filename, episode_fallback=False, zfill=3):
                  episode = absolute_episode[0]
              else:
                  episode = absolute_episode
+
+    # If still no episode, check if 'episode_title' looks like a number (anime S2 - 05 case)
+    if episode is None:
+        episode_title = guess.get("episode_title")
+        if episode_title and str(episode_title).isdigit():
+             episode = int(episode_title)
     # If episode is not found but we have logic for ranges in guessit, we might need to check that.
     # But for now, let's map simple S/E.
 
@@ -470,10 +444,12 @@ def extract_season_episode(filename, episode_fallback=False, zfill=3):
             # Assuming the last number in the fallback matches is the episode number
             episode_str = fallback_matches[-1].lstrip("0").zfill(zfill)
 
-    return DictAsObject(
+    return Box(
         {
             "season": season_str.lstrip("0").zfill(zfill) if season_str else "",
             "episode": episode_str.lstrip("0").zfill(zfill) if episode_str else "",
             "episodes_range": episodes_range,
-        }
+        },
+        default_box=True,
+        default_box_attr=None
     )

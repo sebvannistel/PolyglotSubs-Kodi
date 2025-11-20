@@ -27,7 +27,7 @@ for service_name in __all:
         "a4kSubtitles.services.%s" % service_name
     )
 
-    service.context = utils.DictAsObject({})
+    service.context = utils.Box(default_box=True, default_box_attr=None)
     service.display_name = __display_names[service_name]
 
     __set_fn_if_missing(service, "build_auth_request", lambda _, __: None)

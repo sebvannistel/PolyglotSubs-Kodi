@@ -36,7 +36,7 @@ def tvshow_year_cache(monkeypatch):
 
 
 def test_scrape_imdb_id_movie(monkeypatch):
-    meta = utils.DictAsObject(
+    meta = utils.Box(
         {
             "title": "Inception",
             "year": "2010",
@@ -45,7 +45,9 @@ def test_scrape_imdb_id_movie(monkeypatch):
             "tvshow": "",
             "tvshow_year": "",
             "imdb_id": "",
-        }
+        },
+        default_box=True,
+        default_box_attr=None,
     )
 
     imdb_client = MagicMock()
@@ -62,7 +64,7 @@ def test_scrape_imdb_id_movie(monkeypatch):
 
 
 def test_scrape_imdb_id_tv_episode(monkeypatch, tvshow_year_cache):
-    meta = utils.DictAsObject(
+    meta = utils.Box(
         {
             "title": "Winter Is Coming",
             "year": "2011",
@@ -71,7 +73,9 @@ def test_scrape_imdb_id_tv_episode(monkeypatch, tvshow_year_cache):
             "tvshow": "Game of Thrones",
             "tvshow_year": "",
             "imdb_id": "",
-        }
+        },
+        default_box=True,
+        default_box_attr=None,
     )
 
     series = FakeMovie(
@@ -106,7 +110,7 @@ def test_scrape_imdb_id_tv_episode(monkeypatch, tvshow_year_cache):
 
 
 def test_update_info_from_imdb_movie(monkeypatch):
-    meta = utils.DictAsObject(
+    meta = utils.Box(
         {
             "title": "",
             "year": "",
@@ -115,7 +119,9 @@ def test_update_info_from_imdb_movie(monkeypatch):
             "tvshow": "",
             "tvshow_year": "",
             "imdb_id": "tt1375666",
-        }
+        },
+        default_box=True,
+        default_box_attr=None,
     )
 
     imdb_client = MagicMock()
@@ -133,7 +139,7 @@ def test_update_info_from_imdb_movie(monkeypatch):
 
 
 def test_update_info_from_imdb_episode(monkeypatch, tvshow_year_cache):
-    meta = utils.DictAsObject(
+    meta = utils.Box(
         {
             "title": "Winter Is Coming",
             "year": "2011",
@@ -142,7 +148,9 @@ def test_update_info_from_imdb_episode(monkeypatch, tvshow_year_cache):
             "tvshow": "Game of Thrones",
             "tvshow_year": "",
             "imdb_id": "tt0944947",
-        }
+        },
+        default_box=True,
+        default_box_attr=None,
     )
 
     series = FakeMovie(
@@ -182,7 +190,7 @@ def test_update_info_from_imdb_episode(monkeypatch, tvshow_year_cache):
 
 
 def test_scrape_tvshow_year(monkeypatch, tvshow_year_cache):
-    meta = utils.DictAsObject(
+    meta = utils.Box(
         {
             "title": "",
             "year": "",
@@ -191,7 +199,9 @@ def test_scrape_tvshow_year(monkeypatch, tvshow_year_cache):
             "tvshow": "Game of Thrones",
             "tvshow_year": "",
             "imdb_id": "tt0944947",
-        }
+        },
+        default_box=True,
+        default_box_attr=None,
     )
 
     series = FakeMovie(
