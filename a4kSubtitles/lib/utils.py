@@ -22,6 +22,7 @@ try:
     )
     from .third_party import chardet
     from guessit import guessit
+    from .third_party.pathvalidate import sanitize_filename
 except ImportError as e:
     logger.error("Failed to import third-party libraries: %s" % e)
 
@@ -153,7 +154,7 @@ def slugify_filename(text):
     Returns:
         str: The slugified filename.
     """
-    return re.sub(r'[\\/*?:"<>|]', "_", text)
+    return sanitize_filename(text, replacement_text="_")
 
 
 def get_lang_id(language, lang_format):
