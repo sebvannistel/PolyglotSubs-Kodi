@@ -29,6 +29,9 @@ dependencies = [
     "num2words>=0.5.14,<0.6",
     "google-genai>=0.6,<1",
     "iso639-lang>=2.0.0",
+    "tenacity>=9.0.0",
+    "python-box>=7.0.0",
+    "ftfy>=6.0.0",
 ]
 
 [project.optional-dependencies]

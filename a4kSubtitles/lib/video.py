@@ -267,7 +267,7 @@ def __set_size_and_hash(core, meta, filepath):
 
     Args:
         core (module): The core module.
-        meta (DictAsObject): The metadata object to set the size and hash in.
+        meta (Box): The metadata object to set the size and hash in.
         filepath (str): The path to the file.
     """
     if core.progress_dialog and not core.progress_dialog.dialog:
@@ -551,9 +551,9 @@ def __get_basic_info(core):
         core (module): The core module.
 
     Returns:
-        DictAsObject: The basic information about the currently playing video.
+        Box: The basic information about the currently playing video.
     """
-    meta = utils.DictAsObject({})
+    meta = utils.Box(default_box=True, default_box_attr=None)
     filename_and_path = ""
 
     if (
@@ -633,7 +633,7 @@ def get_meta(core):
         core (module): The core module.
 
     Returns:
-        DictAsObject: The metadata of the currently playing video.
+        Box: The metadata of the currently playing video.
     """
     meta = __get_basic_info(core)
 
@@ -686,7 +686,7 @@ def get_meta(core):
         logger.debug(meta_json)
 
         meta = json.loads(meta_json)
-        meta = utils.DictAsObject(meta)
+        meta = utils.Box(meta, default_box=True, default_box_attr=None)
 
         for key in meta.keys():
             value = utils.strip_non_ascii_and_unprintable(meta[key])

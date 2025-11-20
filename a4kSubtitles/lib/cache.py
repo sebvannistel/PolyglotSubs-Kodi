@@ -76,7 +76,7 @@ def get_meta_hash(meta):
 def __get_data(key, default=None):
     if default is None:
         default = {}
-    return utils.DictAsObject(__cache.get(key, default))
+    return utils.Box(__cache.get(key, default), default_box=True, default_box_attr=None)
 
 
 def __save_data(key, data):
@@ -88,7 +88,7 @@ def get_meta_cache():
     Gets the metadata cache.
 
     Returns:
-        DictAsObject: The metadata cache.
+        Box: The metadata cache.
     """
     meta_cache = __get_data(KEY_META)
     meta_cache.setdefault("imdb_id", "")
@@ -111,7 +111,7 @@ def get_tvshow_years_cache():
     Gets the TV show years cache.
 
     Returns:
-        DictAsObject: The TV show years cache.
+        Box: The TV show years cache.
     """
     return __get_data(KEY_TVSHOW_YEARS)
 
@@ -131,7 +131,7 @@ def get_imdb_id_cache():
     Gets the IMDB ID cache.
 
     Returns:
-        DictAsObject: The IMDB ID cache.
+        Box: The IMDB ID cache.
     """
     return __get_data(KEY_IMDB_ID)
 
@@ -151,7 +151,7 @@ def get_tokens_cache():
     Gets the tokens cache.
 
     Returns:
-        DictAsObject: The tokens cache.
+        Box: The tokens cache.
     """
     return __get_data(KEY_TOKENS)
 
