@@ -1,29 +1,45 @@
 from unittest.mock import MagicMock, patch
 
-from tests.common import api
 from tests import utils
+from tests.common import api
 
 # Use the API helper to set up mocked Kodi environment
-api_instance = api.A4kSubtitlesApi({'kodi': True})
+api_instance = api.A4kSubtitlesApi({"kodi": True})
 core = api_instance.core
 core.settings = MagicMock()
 from a4kSubtitles.services import subtitlecat as subtitlecat_module
-api_instance.core.services['subtitlecat'] = subtitlecat_module
 
-@patch('a4kSubtitles.services.subtitlecat.translation._get_session')
-@patch('a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat')
-@patch('a4kSubtitles.services.subtitlecat.request._translate_text_chunk')
-@patch('a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags')
-@patch('a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags', side_effect=lambda text, _map: text)
-@patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
-@patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda items: '1\nBonjour\n')
-@patch('a4kSubtitles.services.subtitlecat.request._get_session')
-def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, mock_restore, mock_protect,
-                                   mock_gtranslate, mock_upload, mock_translation_get_session):
+api_instance.core.services["subtitlecat"] = subtitlecat_module
+
+
+@patch("a4kSubtitles.services.subtitlecat.translation._get_session")
+@patch("a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat")
+@patch("a4kSubtitles.services.subtitlecat.request._translate_text_chunk")
+@patch("a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags")
+@patch(
+    "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
+    side_effect=lambda text, _map: text,
+)
+@patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
+@patch(
+    "a4kSubtitles.services.subtitlecat.request.srt.compose",
+    side_effect=lambda items: "1\nBonjour\n",
+)
+@patch("a4kSubtitles.services.subtitlecat.request._get_session")
+def test_client_translation_upload(
+    mock_get_session,
+    mock_compose,
+    mock_parse,
+    mock_restore,
+    mock_protect,
+    mock_gtranslate,
+    mock_upload,
+    mock_translation_get_session,
+):
     # Mock HTTP get for original subtitle
     session = MagicMock()
     response = MagicMock()
-    response.text = '1\nHello\n'
+    response.text = "1\nHello\n"
     response.raise_for_status.return_value = None
     session.get.return_value = response
     mock_get_session.return_value = session
@@ -31,81 +47,109 @@ def test_client_translation_upload(mock_get_session, mock_compose, mock_parse, m
 
     # Mock subtitle items
     item = MagicMock()
-    item.content = 'Hello'
+    item.content = "Hello"
     mock_parse.return_value = [item]
-    mock_protect.return_value = ('Hello', {}, False)
-    mock_gtranslate.return_value = (['Bonjour'], 'en')
-    mock_upload.return_value = 'http://subtitlecat.com/new.srt'
+    mock_protect.return_value = ("Hello", {}, False)
+    mock_gtranslate.return_value = (["Bonjour"], "en")
+    mock_upload.return_value = "http://subtitlecat.com/new.srt"
 
     # Settings enabling upload
     core.settings.get.side_effect = lambda k, d=None: {
-        'subtitlecat_upload_translations': True,
-        'subtitlecat_notify_upload': True,
-        'force_bom': False,
-        'http_timeout': 20
+        "subtitlecat_upload_translations": True,
+        "subtitlecat_notify_upload": True,
+        "force_bom": False,
+        "http_timeout": 20,
     }.get(k, d)
 
-    notify_spy = utils.spy_fn(core.kodi, 'notification')
+    notify_spy = utils.spy_fn(core.kodi, "notification")
 
     action_args = {
-        'needs_client_side_translation': True,
-        'original_srt_url': 'http://example.com/test.srt',
-        'target_translation_lang': 'fr',
-        'lang_code': 'fr',
-        'filename': 'test.srt',
-        'detail_url': 'http://example.com/detail'
+        "needs_client_side_translation": True,
+        "original_srt_url": "http://example.com/test.srt",
+        "target_translation_lang": "fr",
+        "lang_code": "fr",
+        "filename": "test.srt",
+        "detail_url": "http://example.com/detail",
     }
 
-    result = api_instance.core.services['subtitlecat'].build_download_request(core, 'subtitlecat', action_args)
+    result = api_instance.core.services["subtitlecat"].build_download_request(
+        core, "subtitlecat", action_args
+    )
 
-    assert result['method'] == 'REQUEST_CALLBACK'
-    result['save_callback']('/tmp/out.srt')
+    assert result["method"] == "REQUEST_CALLBACK"
+    result["save_callback"]("/tmp/out.srt")
     mock_upload.assert_called_once()
     assert notify_spy.call_count == 1
-    session.get.assert_called_with('http://subtitlecat.com/new.srt', timeout=20, stream=True)
-    cache_key = (action_args['detail_url'], action_args['lang_code'])
+    session.get.assert_called_with(
+        "http://subtitlecat.com/new.srt", timeout=20, stream=True
+    )
+    cache_key = (action_args["detail_url"], action_args["lang_code"])
     from a4kSubtitles.services.subtitlecat import translation as sc_translation
+
     assert cache_key in sc_translation._TRANSLATED_CACHE
     notify_spy.restore()
 
-@patch('a4kSubtitles.services.subtitlecat.translation._get_session')
-@patch('a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat')
-@patch('a4kSubtitles.services.subtitlecat.request._translate_text_chunk', return_value=(['Bonjour'], 'en'))
-@patch('a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags', return_value=('Hello', {}, False))
-@patch('a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags', side_effect=lambda text, _map: text)
-@patch('a4kSubtitles.services.subtitlecat.request.srt.parse')
-@patch('a4kSubtitles.services.subtitlecat.request.srt.compose', side_effect=lambda items: '1\nBonjour\n')
-@patch('a4kSubtitles.services.subtitlecat.request._get_session')
-def test_client_translation_no_upload(mock_get_session, mock_compose, mock_parse, mock_restore, mock_protect,
-                                      mock_gtranslate, mock_upload, mock_translation_get_session):
+
+@patch("a4kSubtitles.services.subtitlecat.translation._get_session")
+@patch("a4kSubtitles.services.subtitlecat.request._upload_translation_to_subtitlecat")
+@patch(
+    "a4kSubtitles.services.subtitlecat.request._translate_text_chunk",
+    return_value=(["Bonjour"], "en"),
+)
+@patch(
+    "a4kSubtitles.services.subtitlecat.request._protect_subtitle_tags",
+    return_value=("Hello", {}, False),
+)
+@patch(
+    "a4kSubtitles.services.subtitlecat.request._restore_subtitle_tags",
+    side_effect=lambda text, _map: text,
+)
+@patch("a4kSubtitles.services.subtitlecat.request.srt.parse")
+@patch(
+    "a4kSubtitles.services.subtitlecat.request.srt.compose",
+    side_effect=lambda items: "1\nBonjour\n",
+)
+@patch("a4kSubtitles.services.subtitlecat.request._get_session")
+def test_client_translation_no_upload(
+    mock_get_session,
+    mock_compose,
+    mock_parse,
+    mock_restore,
+    mock_protect,
+    mock_gtranslate,
+    mock_upload,
+    mock_translation_get_session,
+):
     session = MagicMock()
     response = MagicMock()
-    response.text = '1\nHello\n'
+    response.text = "1\nHello\n"
     response.raise_for_status.return_value = None
     session.get.return_value = response
     mock_get_session.return_value = session
     mock_translation_get_session.return_value = session
 
     item = MagicMock()
-    item.content = 'Hello'
+    item.content = "Hello"
     mock_parse.return_value = [item]
 
     core.settings.get.side_effect = lambda k, d=None: {
-        'subtitlecat_upload_translations': False,
-        'force_bom': False,
-        'http_timeout': 20
+        "subtitlecat_upload_translations": False,
+        "force_bom": False,
+        "http_timeout": 20,
     }.get(k, d)
 
     action_args = {
-        'needs_client_side_translation': True,
-        'original_srt_url': 'http://example.com/test.srt',
-        'target_translation_lang': 'fr',
-        'lang_code': 'fr',
-        'filename': 'test.srt',
-        'detail_url': 'http://example.com/detail'
+        "needs_client_side_translation": True,
+        "original_srt_url": "http://example.com/test.srt",
+        "target_translation_lang": "fr",
+        "lang_code": "fr",
+        "filename": "test.srt",
+        "detail_url": "http://example.com/detail",
     }
 
-    result = api_instance.core.services['subtitlecat'].build_download_request(core, 'subtitlecat', action_args)
+    result = api_instance.core.services["subtitlecat"].build_download_request(
+        core, "subtitlecat", action_args
+    )
 
-    assert result['method'] == 'CLIENT_SIDE_TRANSLATED'
+    assert result["method"] == "CLIENT_SIDE_TRANSLATED"
     mock_upload.assert_not_called()

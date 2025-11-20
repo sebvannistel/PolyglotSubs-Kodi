@@ -120,11 +120,17 @@ def test_parse_search_response_prefers_subget():
     core.logger = MagicMock()
     core.settings = MagicMock()
     core.settings.get.side_effect = lambda key, default=None: default
-    core.services = {"subtitlecat": types.SimpleNamespace(display_name="Subtitlecat.com")}
+    core.services = {
+        "subtitlecat": types.SimpleNamespace(display_name="Subtitlecat.com")
+    }
     core.utils = MagicMock()
     core.kodi = types.SimpleNamespace(xbmc=types.SimpleNamespace())
-    meta = types.SimpleNamespace(title="Example", languages=["English"], is_tvshow=False, year=2024)
-    response = types.SimpleNamespace(status_code=200, url="https://example.com", text="unused")
+    meta = types.SimpleNamespace(
+        title="Example", languages=["English"], is_tvshow=False, year=2024
+    )
+    response = types.SimpleNamespace(
+        status_code=200, url="https://example.com", text="unused"
+    )
     fake_results = [
         {
             "service_name": "subtitlecat",
@@ -139,7 +145,9 @@ def test_parse_search_response_prefers_subget():
             "action_args": {"subget": True},
         }
     ]
-    with patch.object(subtitlecat_request, "_subget_setting_enabled", return_value=True):
+    with patch.object(
+        subtitlecat_request, "_subget_setting_enabled", return_value=True
+    ):
         with patch.object(
             subtitlecat_request.subget_bridge, "is_available", return_value=True
         ):
@@ -161,13 +169,17 @@ def test_subget_download_branch(tmp_path):
         "filename": "foo-en.srt",
         "subget": True,
     }
-    with patch.object(subtitlecat_request.subget_bridge, "is_available", return_value=True):
+    with patch.object(
+        subtitlecat_request.subget_bridge, "is_available", return_value=True
+    ):
         with patch.object(
             subtitlecat_request.subget_bridge,
             "download",
             return_value=True,
         ) as download:
-            request = subtitlecat_request.build_download_request(core, "subtitlecat", args)
+            request = subtitlecat_request.build_download_request(
+                core, "subtitlecat", args
+            )
             target = tmp_path / "via-subget.srt"
             assert request["save_callback"](target.as_posix()) is True
     download.assert_called_once_with(

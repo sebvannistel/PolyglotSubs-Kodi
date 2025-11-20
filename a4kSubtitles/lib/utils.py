@@ -80,6 +80,7 @@ class DictAsObject(dict):
         >>> d['b']
         2
     """
+
     def __getattr__(self, name):
         """
         Retrieves an item as an attribute.

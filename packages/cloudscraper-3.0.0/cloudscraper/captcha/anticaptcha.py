@@ -8,11 +8,11 @@ except ImportError:
     from urllib.parse import urlparse
 
 from ..exceptions import (
-    CaptchaServiceUnavailable,
     CaptchaAPIError,
-    CaptchaTimeout,
+    CaptchaBadJobID,
     CaptchaParameter,
-    CaptchaBadJobID
+    CaptchaServiceUnavailable,
+    CaptchaTimeout,
 )
 
 try:
@@ -26,13 +26,13 @@ from . import Captcha
 class captchaSolver(Captcha):
 
     def __init__(self):
-        super(captchaSolver, self).__init__('anticaptcha')
-        self.host = 'https://api.anti-captcha.com'
+        super(captchaSolver, self).__init__("anticaptcha")
+        self.host = "https://api.anti-captcha.com"
         self.session = requests.Session()
         self.captchaType = {
-            'reCaptcha': 'NoCaptchaTask',
-            'hCaptcha': 'HCaptchaTask',
-            'turnstile': 'TurnstileTask'
+            "reCaptcha": "NoCaptchaTask",
+            "hCaptcha": "HCaptchaTask",
+            "turnstile": "TurnstileTask",
         }
 
     # ------------------------------------------------------------------------------- #
@@ -41,58 +41,49 @@ class captchaSolver(Captcha):
     def checkErrorStatus(response):
         if response.status_code in [500, 502]:
             raise CaptchaServiceUnavailable(
-                f'anticaptcha: Server Side Error {response.status_code}'
+                f"anticaptcha: Server Side Error {response.status_code}"
             )
 
         payload = response.json()
-        if payload['errorId'] >= 1:
-            if 'errorDescription' in payload:
-                raise CaptchaAPIError(
-                    payload['errorDescription']
-                )
+        if payload["errorId"] >= 1:
+            if "errorDescription" in payload:
+                raise CaptchaAPIError(payload["errorDescription"])
             else:
-                raise CaptchaAPIError(payload['errorCode'])
+                raise CaptchaAPIError(payload["errorCode"])
 
     # ------------------------------------------------------------------------------- #
 
     def requestJob(self, taskID):
         if not taskID:
-            raise CaptchaBadJobID(
-                'anticaptcha: Error bad task id to request Captcha.'
-            )
+            raise CaptchaBadJobID("anticaptcha: Error bad task id to request Captcha.")
 
         def _checkRequest(response):
             self.checkErrorStatus(response)
 
-            if response.ok and response.json()['status'] == 'ready':
+            if response.ok and response.json()["status"] == "ready":
                 return True
 
             return None
 
         response = polling2.poll(
             lambda: self.session.post(
-                f'{self.host}/getTaskResult',
-                json={
-                    'clientKey': self.clientKey,
-                    'taskId': taskID
-                },
-                timeout=30
+                f"{self.host}/getTaskResult",
+                json={"clientKey": self.clientKey, "taskId": taskID},
+                timeout=30,
             ),
             check_success=_checkRequest,
             step=5,
-            timeout=180
+            timeout=180,
         )
 
         if response:
-            payload = response.json()['solution']
-            if 'token' in payload:
-                return payload['token']
+            payload = response.json()["solution"]
+            if "token" in payload:
+                return payload["token"]
             else:
-                return payload['gRecaptchaResponse']
+                return payload["gRecaptchaResponse"]
         else:
-            raise CaptchaTimeout(
-                "anticaptcha: Error failed to solve Captcha."
-            )
+            raise CaptchaTimeout("anticaptcha: Error failed to solve Captcha.")
 
     # ------------------------------------------------------------------------------- #
 
@@ -100,77 +91,71 @@ class captchaSolver(Captcha):
         def _checkRequest(response):
             self.checkErrorStatus(response)
 
-            if response.ok and response.json()['taskId']:
+            if response.ok and response.json()["taskId"]:
                 return True
 
             return None
 
         data = {
-            'clientKey': self.clientKey,
-            'task': {
-                'websiteURL': url,
-                'websiteKey': siteKey,
-                'type': self.captchaType[captchaType]
+            "clientKey": self.clientKey,
+            "task": {
+                "websiteURL": url,
+                "websiteKey": siteKey,
+                "type": self.captchaType[captchaType],
             },
-            'softId': 959
+            "softId": 959,
         }
 
         if self.proxy:
-            data['task'].update(self.proxy)
+            data["task"].update(self.proxy)
         else:
-            data['task']['type'] = f"{data['task']['type']}Proxyless"
+            data["task"]["type"] = f"{data['task']['type']}Proxyless"
 
         response = polling2.poll(
             lambda: self.session.post(
-                f'{self.host}/createTask',
-                json=data,
-                allow_redirects=False,
-                timeout=30
+                f"{self.host}/createTask", json=data, allow_redirects=False, timeout=30
             ),
             check_success=_checkRequest,
             step=5,
-            timeout=180
+            timeout=180,
         )
 
         if response:
-            return response.json()['taskId']
+            return response.json()["taskId"]
         else:
-            raise CaptchaBadJobID(
-                'anticaptcha: Error no task id was returned.'
-            )
+            raise CaptchaBadJobID("anticaptcha: Error no task id was returned.")
 
     # ------------------------------------------------------------------------------- #
 
     def getCaptchaAnswer(self, captchaType, url, siteKey, captchaParams):
         taskID = None
 
-        if not captchaParams.get('clientKey'):
-            raise CaptchaParameter(
-                "anticaptcha: Missing clientKey parameter."
-            )
+        if not captchaParams.get("clientKey"):
+            raise CaptchaParameter("anticaptcha: Missing clientKey parameter.")
 
-        self.clientKey = captchaParams.get('clientKey')
+        self.clientKey = captchaParams.get("clientKey")
 
-        if captchaParams.get('proxy') and not captchaParams.get('no_proxy'):
-            hostParsed = urlparse(captchaParams.get('proxy', {}).get('https'))
+        if captchaParams.get("proxy") and not captchaParams.get("no_proxy"):
+            hostParsed = urlparse(captchaParams.get("proxy", {}).get("https"))
 
             if not hostParsed.scheme:
-                raise CaptchaParameter('Cannot parse proxy correctly, bad scheme')
+                raise CaptchaParameter("Cannot parse proxy correctly, bad scheme")
 
             if not hostParsed.netloc:
-                raise CaptchaParameter('Cannot parse proxy correctly, bad netloc')
+                raise CaptchaParameter("Cannot parse proxy correctly, bad netloc")
 
-            ports = {
-                'http': 80,
-                'https': 443
-            }
+            ports = {"http": 80, "https": 443}
 
             self.proxy = {
-                'proxyType': hostParsed.scheme,
-                'proxyAddress': hostParsed.hostname,
-                'proxyPort': hostParsed.port if hostParsed.port else ports[self.proxy['proxyType']],
-                'proxyLogin': hostParsed.username,
-                'proxyPassword': hostParsed.password,
+                "proxyType": hostParsed.scheme,
+                "proxyAddress": hostParsed.hostname,
+                "proxyPort": (
+                    hostParsed.port
+                    if hostParsed.port
+                    else ports[self.proxy["proxyType"]]
+                ),
+                "proxyLogin": hostParsed.username,
+                "proxyPassword": hostParsed.password,
             }
         else:
             self.proxy = None

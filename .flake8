@@ -20,6 +20,7 @@ ignore =
     W503,
     W504,
     C901,
+    E203,
 
 exclude =
     .git,

@@ -1,31 +1,23 @@
 # -*- coding: utf-8 -*-
 
+import copy
+import difflib
+import gzip
+import hashlib
 import json
 import os
+import re
+import shutil
 import sys
 import threading
-import copy
-import shutil
-import gzip
-import difflib
 import time
-import hashlib
-import re
 import zipfile
-from datetime import datetime, timedelta
 from base64 import b64encode
-from xml.etree import ElementTree
+from datetime import datetime, timedelta
 from io import BytesIO
+from xml.etree import ElementTree
 
-from .lib import (
-    cache,
-    kodi,
-    logger,
-    ordinal,
-    request,
-    utils,
-    video,
-)
+from .lib import cache, kodi, logger, ordinal, request, utils, video
 
 core = sys.modules[__name__]
 utils.core = core
@@ -36,12 +28,13 @@ api_mode_enabled = True
 handle = None
 
 progress_dialog = None
-progress_text = ''
+progress_text = ""
 
-from .services import services
-from .search import search
-from .download import download
 from .data import data
+from .download import download
+from .search import search
+from .services import services
+
 
 def main(handle, paramstring):  # pragma: no cover
     """
@@ -59,10 +52,10 @@ def main(handle, paramstring):  # pragma: no cover
     core.handle = handle
 
     params = dict(utils.parse_qsl(paramstring))
-    if params['action'] == 'manualsearch':
-        kodi.notification('Manual search is not supported')
-    elif params['action'] == 'search':
-        core.progress_text = ''
+    if params["action"] == "manualsearch":
+        kodi.notification("Manual search is not supported")
+    elif params["action"] == "search":
+        core.progress_text = ""
         core.progress_dialog = kodi.get_progress_dialog()
 
         try:
@@ -71,8 +64,8 @@ def main(handle, paramstring):  # pragma: no cover
             core.progress_dialog.close()
             core.progress_dialog = None
 
-    elif params['action'] == 'download':
-        params['action_args'] = json.loads(params['action_args'])
+    elif params["action"] == "download":
+        params["action_args"] = json.loads(params["action_args"])
         download(core, params)
 
     kodi.xbmcplugin.endOfDirectory(handle)

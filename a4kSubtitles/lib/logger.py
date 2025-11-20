@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .kodi import xbmc, addon_id, get_kodi_setting
+from .kodi import addon_id, get_kodi_setting, xbmc
 
 __get_debug_logenabled_err = False
+
+
 def __get_debug_logenabled():
     """
     Checks if debug logging is enabled in Kodi.
@@ -21,10 +23,12 @@ def __get_debug_logenabled():
 
     return False
 
+
 try:
     notice_type = xbmc.LOGNOTICE
 except:
     notice_type = xbmc.LOGINFO
+
 
 def __log(message, level):
     """
@@ -41,7 +45,8 @@ def __log(message, level):
     if is_lazy_msg:
         message = message()
 
-    xbmc.log('{0}: {1}'.format(addon_id, message), level)
+    xbmc.log("{0}: {1}".format(addon_id, message), level)
+
 
 def error(message):
     """
@@ -51,6 +56,7 @@ def error(message):
         message (str or function): The message to log. If it's a function, it will be called to get the message.
     """
     __log(message, xbmc.LOGERROR)
+
 
 def debug(message):
     """

@@ -18,8 +18,9 @@ ss_to_code = {
     "French(France)": "fr-FR",
     "Icelandic": "is",
     "Spanish(Latin America)": "es-419",
-    "Spanish(Spain)": "es-ES"
+    "Spanish(Spain)": "es-ES",
 }
+
 
 def build_search_requests(core, service_name, meta):
     """
@@ -33,6 +34,7 @@ def build_search_requests(core, service_name, meta):
     Returns:
         list: A list of search requests.
     """
+
     def get_movie(response):
         results = response.json()
         found = results.get("found", [])
@@ -41,7 +43,12 @@ def build_search_requests(core, service_name, meta):
 
         for res in found:
             incorrect_type = res.get("type", "Movie") == "Movie" and meta.is_tvshow
-            incorrect_movie = meta.is_movie and meta.imdb_id and res.get("imdb") and res["imdb"] != meta.imdb_id
+            incorrect_movie = (
+                meta.is_movie
+                and meta.imdb_id
+                and res.get("imdb")
+                and res["imdb"] != meta.imdb_id
+            )
             if incorrect_type or incorrect_movie:
                 continue
             movie_name = res["linkName"]
@@ -54,7 +61,7 @@ def build_search_requests(core, service_name, meta):
             params["season"] = "season-" + str(season)
         return {"method": "POST", "url": __getMovie, "data": params}
 
-    name = (meta.title if meta.is_movie else meta.tvshow)
+    name = meta.title if meta.is_movie else meta.tvshow
     year = meta.tvshow_year if meta.is_tvshow else meta.year
 
     params = {"query": name + " " + year}
@@ -62,7 +69,7 @@ def build_search_requests(core, service_name, meta):
         "method": "POST",
         "url": __search,
         "data": params,
-        "next": lambda gm: get_movie(gm)
+        "next": lambda gm: get_movie(gm),
     }
     return [request]
 
@@ -96,7 +103,9 @@ def parse_search_response(core, service_name, meta, response):
         lang = result.get("lang")
 
         if lang in ss_to_code:
-            lang = core.kodi.xbmc.convertLanguage(ss_to_code[lang], core.kodi.xbmc.ENGLISH_NAME)
+            lang = core.kodi.xbmc.convertLanguage(
+                ss_to_code[lang], core.kodi.xbmc.ENGLISH_NAME
+            )
 
         if lang not in meta.languages:
             return None
@@ -110,7 +119,11 @@ def parse_search_response(core, service_name, meta, response):
             "name": name,
             "rating": rating,
             "lang_code": lang_code,
-            "sync": "true" if meta.filename_without_ext in result["releaseName"] else "false",
+            "sync": (
+                "true"
+                if meta.filename_without_ext in result["releaseName"]
+                else "false"
+            ),
             "impaired": "true" if result.get("hi", 0) != 0 else "false",
             "color": "teal",
             "action_args": {
@@ -148,7 +161,7 @@ def build_download_request(core, service_name, args):
         "method": "POST",
         "url": __getSub,
         "data": params,
-        "next": lambda dw: downloadsub(dw)
+        "next": lambda dw: downloadsub(dw),
     }
 
     return request

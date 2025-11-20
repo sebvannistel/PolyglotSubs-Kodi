@@ -1,7 +1,7 @@
 import importlib
+import re
 import sys
 import threading
-import re
 from pathlib import Path
 
 import requests
@@ -24,12 +24,12 @@ def _load_cloudscraper():
 
 cloudscraper = _load_cloudscraper()
 
+from cachetools import LRUCache as _CachetoolsLRUCache
 from cloudscraper.exceptions import (
     CloudflareChallengeError as _CloudflareChallengeError,
-    CloudflareException as _CloudflareException,
 )
+from cloudscraper.exceptions import CloudflareException as _CloudflareException
 from rapidfuzz import fuzz
-from cachetools import LRUCache as _CachetoolsLRUCache
 
 SC_BASE_URL = "https://www.subtitlecat.com"
 SC_USER_AGENT = (
@@ -124,8 +124,10 @@ class LRUCache(_CachetoolsLRUCache):
         with self._lock:
             return super().__delitem__(key)
 
+
 _CLEAN_PUNC = re.compile(r"[._-]")
 _CLEAN_CAMEL = re.compile(r"(?<=[a-z])(?=[A-Z])")
+
 
 def _is_title_close(wanted: str, got: str) -> bool:
     w_raw = wanted or ""
@@ -142,71 +144,96 @@ def _is_title_close(wanted: str, got: str) -> bool:
         return False
     return fuzz.token_set_ratio(clean_w, clean_g) >= 70
 
+
 def _get_setting(core, key, default=None):
-    if core and hasattr(core, 'settings') and core.settings is not None:
+    if core and hasattr(core, "settings") and core.settings is not None:
         return core.settings.get(key, default)
     return default
+
 
 def _post_download_fix_encoding(core, service_name, raw_bytes, outfile):
     import html
     import io
+
     _cd_module = None
     _cn_function = None
     _use_charset_normalizer_first = False
     try:
         from charset_normalizer import from_bytes as _cn_imported
+
         _cn_function = _cn_imported
         _use_charset_normalizer_first = True
     except ImportError:
         try:
             import chardet as _cd_imported
+
             _cd_module = _cd_imported
         except ImportError:
             pass
-    enc = 'utf-8'
+    enc = "utf-8"
     detected_source = "default (no detectors available or both failed import)"
     if _use_charset_normalizer_first and _cn_function:
         cn_matches = list(_cn_function(raw_bytes))
         if cn_matches and cn_matches[0].encoding:
             enc = cn_matches[0].encoding
-            cn_confidence = getattr(cn_matches[0], 'confidence', 'N/A')
+            cn_confidence = getattr(cn_matches[0], "confidence", "N/A")
             detected_source = f"charset-normalizer (confidence: {cn_confidence})"
-            core.logger.debug(f"[{service_name}] Detected by charset-normalizer: {enc} (confidence: {cn_confidence}) for {repr(outfile)}")
+            core.logger.debug(
+                f"[{service_name}] Detected by charset-normalizer: {enc} (confidence: {cn_confidence}) for {repr(outfile)}"
+            )
         elif _cd_module:
-            core.logger.debug(f"[{service_name}] charset-normalizer did not yield encoding. Falling back to chardet for {repr(outfile)}.")
+            core.logger.debug(
+                f"[{service_name}] charset-normalizer did not yield encoding. Falling back to chardet for {repr(outfile)}."
+            )
             guess = _cd_module.detect(raw_bytes)
-            chardet_confidence = guess.get('confidence') if guess else 0.0
-            chardet_enc_value = guess['encoding'] if guess else None
+            chardet_confidence = guess.get("confidence") if guess else 0.0
+            chardet_enc_value = guess["encoding"] if guess else None
             if chardet_enc_value:
                 enc = chardet_enc_value
                 detected_source = f"chardet (fallback, confidence: {chardet_confidence if chardet_confidence is not None else 'N/A'})"
-                core.logger.debug(f"[{service_name}] Detected by chardet (fallback): {enc} (confidence: {chardet_confidence if chardet_confidence is not None else 'N/A'}) for {repr(outfile)}")
+                core.logger.debug(
+                    f"[{service_name}] Detected by chardet (fallback): {enc} (confidence: {chardet_confidence if chardet_confidence is not None else 'N/A'}) for {repr(outfile)}"
+                )
             else:
                 detected_source = "default (charset-normalizer and chardet failed)"
-                core.logger.debug(f"[{service_name}] charset-normalizer and chardet (fallback) failed. Using default {enc} for {repr(outfile)}.")
+                core.logger.debug(
+                    f"[{service_name}] charset-normalizer and chardet (fallback) failed. Using default {enc} for {repr(outfile)}."
+                )
         else:
             detected_source = "default (charset-normalizer failed, chardet unavailable)"
-            core.logger.debug(f"[{service_name}] charset-normalizer failed and chardet unavailable. Using default {enc} for {repr(outfile)}.")
+            core.logger.debug(
+                f"[{service_name}] charset-normalizer failed and chardet unavailable. Using default {enc} for {repr(outfile)}."
+            )
     elif _cd_module:
         guess = _cd_module.detect(raw_bytes)
-        chardet_confidence = guess.get('confidence') if guess else 0.0
-        chardet_enc_value = guess['encoding'] if guess else None
+        chardet_confidence = guess.get("confidence") if guess else 0.0
+        chardet_enc_value = guess["encoding"] if guess else None
         if chardet_enc_value:
             enc = chardet_enc_value
             detected_source = f"chardet (primary, confidence: {chardet_confidence if chardet_confidence is not None else 'N/A'})"
-            core.logger.debug(f"[{service_name}] Detected by chardet (primary): {enc} (confidence: {chardet_confidence if chardet_confidence is not None else 'N/A'}) for {repr(outfile)}")
+            core.logger.debug(
+                f"[{service_name}] Detected by chardet (primary): {enc} (confidence: {chardet_confidence if chardet_confidence is not None else 'N/A'}) for {repr(outfile)}"
+            )
         else:
             detected_source = "default (chardet failed)"
-            core.logger.debug(f"[{service_name}] chardet (primary) failed. Using default {enc} for {repr(outfile)}.")
-    core.logger.debug(f"[{service_name}] Final encoding for decoding: '{enc}' (Source: {detected_source}) for {repr(outfile)}")
+            core.logger.debug(
+                f"[{service_name}] chardet (primary) failed. Using default {enc} for {repr(outfile)}."
+            )
+    core.logger.debug(
+        f"[{service_name}] Final encoding for decoding: '{enc}' (Source: {detected_source}) for {repr(outfile)}"
+    )
     if enc is None:
-        core.logger.debug(f"[{service_name}] Encoding resolved to None despite checks. Using 'utf-8' for {repr(outfile)}.")
-        enc = 'utf-8'
-    text = raw_bytes.decode(enc, errors='replace')
+        core.logger.debug(
+            f"[{service_name}] Encoding resolved to None despite checks. Using 'utf-8' for {repr(outfile)}."
+        )
+        enc = "utf-8"
+    text = raw_bytes.decode(enc, errors="replace")
     text = html.unescape(text)
-    bom = _get_setting(core, 'force_bom', False)
-    final_encoding = 'utf-8-sig' if bom else 'utf-8'
+    bom = _get_setting(core, "force_bom", False)
+    final_encoding = "utf-8-sig" if bom else "utf-8"
     final_bytes_to_write = text.encode(final_encoding)
-    with io.open(outfile, 'wb') as fh:
+    with io.open(outfile, "wb") as fh:
         fh.write(final_bytes_to_write)
-    core.logger.debug(f"[{service_name}] Successfully wrote processed subtitle to {repr(outfile)} with encoding {final_encoding}")
+    core.logger.debug(
+        f"[{service_name}] Successfully wrote processed subtitle to {repr(outfile)} with encoding {final_encoding}"
+    )

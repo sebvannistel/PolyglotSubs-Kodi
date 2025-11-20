@@ -20,23 +20,23 @@ from .translation import (
     DEFAULT_TRANSLATION_FAILED_PLACEHOLDER,
     GOOGLE_API_Q_PARAM_CHAR_LIMIT,
     MAX_LINES_PER_API_CALL_CONFIG,
-    _translate_text_chunk,
     _protect_subtitle_tags,
     _restore_subtitle_tags,
+    _translate_text_chunk,
     _upload_translation_to_subtitlecat,
-    warm_translation_cache,
     asyncio,
+    warm_translation_cache,
 )
 from .utils import (
     KODI_REGIONAL_LANG_MAP,
     SC_BASE_URL,
     SC_USER_AGENT,
+    SCRAPER_REQUEST_EXCEPTION,
+    SCRAPER_TIMEOUT_EXCEPTION,
     _get_session,
     _get_setting,
     _is_title_close,
     _post_download_fix_encoding,
-    SCRAPER_REQUEST_EXCEPTION,
-    SCRAPER_TIMEOUT_EXCEPTION,
 )
 
 
@@ -66,9 +66,9 @@ def build_search_requests(core, service_name, meta):
     if meta.languages:
         normalized_kodi_langs = []
         for kodi_lang in meta.languages:
-            sc_lang = KODI_REGIONAL_LANG_MAP.get(
-                kodi_lang.lower(), (None, kodi_lang)
-            )[1]
+            sc_lang = KODI_REGIONAL_LANG_MAP.get(kodi_lang.lower(), (None, kodi_lang))[
+                1
+            ]
             normalized_kodi_langs.append(sc_lang)
         meta.languages = normalized_kodi_langs
         core.logger.debug(
@@ -344,9 +344,7 @@ def parse_search_response(core, service_name, meta, response):
                 kodi_target_lang_full = "Chinese"
                 kodi_target_lang_2_letter = "zh"
             elif sc_lang_code_lower in KODI_REGIONAL_LANG_MAP:
-                map_full_name, map_iso_code = KODI_REGIONAL_LANG_MAP[
-                    sc_lang_code_lower
-                ]
+                map_full_name, map_iso_code = KODI_REGIONAL_LANG_MAP[sc_lang_code_lower]
                 kodi_target_lang_full = map_full_name
                 kodi_target_lang_2_letter = map_iso_code
             else:
@@ -788,9 +786,7 @@ def build_download_request(core, service_name, args):
                     args.get("filename"),
                 )
             except subget_bridge.SubgetError as exc:
-                core.logger.error(
-                    f"[{service_name}] Subget download failed: {exc}."
-                )
+                core.logger.error(f"[{service_name}] Subget download failed: {exc}.")
                 if args.get("url"):
                     return _save_from_subtitlecat_url(path_from_core, args["url"])
                 return False
@@ -1268,9 +1264,7 @@ def build_download_request(core, service_name, args):
                 core.logger.debug(
                     f"[{service_name}] Stored translated URL in _TRANSLATED_CACHE for key ({args.get('detail_url')}, {cache_key_lang})"
                 )
-                warmed = warm_translation_cache(
-                    core, service_name, new_url_from_sc
-                )
+                warmed = warm_translation_cache(core, service_name, new_url_from_sc)
                 if warmed:
                     core.logger.debug(
                         f"[{service_name}] Warmed translated cache entry for {new_url_from_sc}"

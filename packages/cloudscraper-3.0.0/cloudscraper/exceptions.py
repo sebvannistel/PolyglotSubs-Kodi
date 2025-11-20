@@ -72,6 +72,7 @@ class CloudflareV3Error(CloudflareException):
     Raise an error for problem with Cloudflare v3 JavaScript VM challenge.
     """
 
+
 # ------------------------------------------------------------------------------- #
 
 

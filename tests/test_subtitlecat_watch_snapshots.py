@@ -11,9 +11,17 @@ os.environ.setdefault("A4KSUBTITLES_API_MODE", json.dumps({"kodi": True}))
 
 from a4kSubtitles import api  # noqa: E402
 from a4kSubtitles.services import subtitlecat as subtitlecat_module  # noqa: E402
-from a4kSubtitles.services.subtitlecat import request as subtitlecat_request  # noqa: E402
+from a4kSubtitles.services.subtitlecat import (  # noqa: E402
+    request as subtitlecat_request,
+)
 
-SNAPSHOT_SEARCH_DIR = Path(__file__).resolve().parent / "services" / "subtitlecat" / "watch_snapshots" / "search"
+SNAPSHOT_SEARCH_DIR = (
+    Path(__file__).resolve().parent
+    / "services"
+    / "subtitlecat"
+    / "watch_snapshots"
+    / "search"
+)
 
 
 @pytest.mark.parametrize(
@@ -43,5 +51,7 @@ def test_watch_search_snapshots(snapshot_path):
         url="https://www.subtitlecat.com/layout-watch.html",
     )
 
-    results = subtitlecat_request.parse_search_response(core, "subtitlecat", meta, response)
+    results = subtitlecat_request.parse_search_response(
+        core, "subtitlecat", meta, response
+    )
     assert results, f"Parser returned no results for snapshot {snapshot_path.name}"

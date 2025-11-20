@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import sys
+import json
 import os
 import re
-import json
-import requests
+import sys
 import traceback
 
+import requests
+
 try:
-    response = requests.get('https://www.addic7ed.com', timeout=20)
+    response = requests.get("https://www.addic7ed.com", timeout=20)
     if response.status_code != 200:
         print(response.status_code)
         print(response.text)
@@ -20,8 +21,10 @@ except:
 tvshow_options = []
 
 try:
-    response = response.text.split('[Select a TV Show]')[1]
-    tvshow_options = re.findall(r'<option\s*?value="(.*?)"\s*?>(.*?)</option>', response)
+    response = response.text.split("[Select a TV Show]")[1]
+    tvshow_options = re.findall(
+        r'<option\s*?value="(.*?)"\s*?>(.*?)</option>', response
+    )
 except:
     traceback.print_exc()
 
@@ -33,7 +36,9 @@ for option in tvshow_options:
     tvshows[option[1]] = option[0]
 
 dirname = os.path.dirname(__file__)
-filepath = os.path.join(dirname, '..', 'a4kSubtitles', 'data', 'addic7ed', 'tvshows.json')
+filepath = os.path.join(
+    dirname, "..", "a4kSubtitles", "data", "addic7ed", "tvshows.json"
+)
 
-with open(filepath, 'w') as f_out:
+with open(filepath, "w") as f_out:
     json.dump(tvshows, f_out, indent=4)
