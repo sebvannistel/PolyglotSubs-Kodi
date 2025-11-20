@@ -21,6 +21,7 @@ try:
         InvalidLanguageValue,
     )
     from .third_party import chardet
+    from guessit import guessit
 except ImportError as e:
     logger.error("Failed to import third-party libraries: %s" % e)
 
@@ -428,58 +429,72 @@ def extract_zipfile_member(zipfile, filename, dest):
 
 def extract_season_episode(filename, episode_fallback=False, zfill=3):
     """
-    Extracts the season and episode number from a filename.
+    Extracts the season and episode number from a filename using guessit.
 
     Args:
         filename (str): The filename to extract the season and episode number from.
-        episode_fallback (bool, optional): Whether to fallback to a simpler episode number extraction method. Defaults to False.
+        episode_fallback (bool, optional): (Unused with guessit) Whether to fallback to a simpler episode number extraction method.
         zfill (int, optional): The number of digits to pad the season and episode numbers with. Defaults to 3.
 
     Returns:
         DictAsObject: An object containing the season and episode number.
     """
-    episode_pattern = r"(?:e|ep.?|episode.?)(\d{1,5})(?:v\d?)?"
-    season_pattern = r"(?:s|season.?)(\d{1,5})"
-    combined_pattern = (
-        r"\b(?:s|season)(\d{1,5})\s?[x|\-|\_|\s]\s?[a-z]?(\d{1,5})(?:v\d?)?\b"
-    )
-    range_episodes_pattern = r"\b(?:.{1,4}e|ep|eps|episodes|\s)?(\d{1,5}?)(?:v.?)?\s?[\-|\~]\s?(\d{1,5})(?:v.?)?\b"
-    date_pattern = r"\b(\d{2,4}-\d{1,2}-\d{2,4})\b"
+    guess = guessit(filename)
 
-    filename = re.sub(date_pattern, "", filename)
-    season_match = re.search(season_pattern, filename, re.IGNORECASE)
-    episode_match = re.search(episode_pattern, filename, re.IGNORECASE)
-    combined_match = re.search(combined_pattern, filename, re.IGNORECASE)
-    range_episodes_match = re.findall(range_episodes_pattern, filename, re.IGNORECASE)
+    season = guess.get("season")
+    episode = guess.get("episode")
 
-    season = season_match.group(1) if season_match else None
-    episode = episode_match.group(1) if episode_match else None
+    # Handle lists (multiple seasons/episodes) by taking the first one for simplicity,
+    # or handling ranges if possible. The original implementation handled ranges slightly differently.
     episodes_range = range(0)
 
-    if combined_match:
-        season = season if season else combined_match.group(1)
-        episode = episode if episode else combined_match.group(2)
+    if isinstance(season, list):
+        season = season[0]
 
-    if range_episodes_match:
-        range_start, range_end = map(int, range_episodes_match[-1])
-        episodes_range = range(range_start, range_end)
+    if isinstance(episode, list):
+        if len(episode) > 1 and all(isinstance(e, int) for e in episode):
+            episodes_range = range(min(episode), max(episode) + 1)
+        episode = episode[0]
 
-    if episode_fallback and not episode:
+    # Special handling for anime absolute numbers if 'episode' is missing
+    if episode is None and season is None:
+        # guessit often puts absolute episode numbers in 'absolute_episode' or just 'episode'
+        # If it's in 'absolute_episode', we can use it as episode.
+        absolute_episode = guess.get("absolute_episode")
+        if absolute_episode:
+             if isinstance(absolute_episode, list):
+                 episode = absolute_episode[0]
+             else:
+                 episode = absolute_episode
+    # If episode is not found but we have logic for ranges in guessit, we might need to check that.
+    # But for now, let's map simple S/E.
+
+    # If guessit returns integers, convert to string with padding.
+    season_str = str(season).zfill(zfill) if season is not None else ""
+    episode_str = str(episode).zfill(zfill) if episode is not None else ""
+
+    # Fallback logic from original if guessit fails?
+    # The original fallback logic was quite aggressive.
+    # If guessit fails, we might want to keep the original regex as a backup if truly necessary,
+    # but the goal is to replace it.
+
+    if not episode_str and episode_fallback:
+        # Original fallback logic for episode extraction
         # If no matches found, attempt to capture episode-like sequences
         fallback_pattern = re.compile(r"\bE?P?(\d{1,5})v?\d?\b", re.IGNORECASE)
-        filename = re.sub(
+        clean_filename = re.sub(
             r"[\s\.\:\;\(\)\[\]\{\}\\\/\&\€\'\`\#\@\=\$\?\!\%\+\-\_\*\^]", " ", filename
         )
-        fallback_matches = fallback_pattern.findall(filename)
+        fallback_matches = fallback_pattern.findall(clean_filename)
 
         if fallback_matches:
             # Assuming the last number in the fallback matches is the episode number
-            episode = fallback_matches[-1].lstrip("0").zfill(zfill)
+            episode_str = fallback_matches[-1].lstrip("0").zfill(zfill)
 
     return DictAsObject(
         {
-            "season": season.lstrip("0").zfill(zfill) if season else "",
-            "episode": episode.lstrip("0").zfill(zfill) if episode else "",
+            "season": season_str.lstrip("0").zfill(zfill) if season_str else "",
+            "episode": episode_str.lstrip("0").zfill(zfill) if episode_str else "",
             "episodes_range": episodes_range,
         }
     )

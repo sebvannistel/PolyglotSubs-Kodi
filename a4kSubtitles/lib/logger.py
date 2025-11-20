@@ -66,3 +66,13 @@ def debug(message):
         message (str or function): The message to log. If it's a function, it will be called to get the message.
     """
     __log(message, notice_type)
+
+
+def warning(message):
+    """
+    Logs a warning message.
+
+    Args:
+        message (str or function): The message to log. If it's a function, it will be called to get the message.
+    """
+    __log(message, xbmc.LOGWARNING)
