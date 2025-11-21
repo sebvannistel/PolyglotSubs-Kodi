@@ -222,3 +222,108 @@ def test_scrape_tvshow_year(monkeypatch, tvshow_year_cache):
 
     assert meta.tvshow_year == "2011"
     assert tvshow_year_cache["tt0944947"] == "2011"
+
+
+def test_get_episode_from_listing_invalid_input():
+    assert video.__get_episode_from_listing(None, 1, 1) is None
+    assert video.__get_episode_from_listing({}, 1, 1) is None
+    assert video.__get_episode_from_listing({"data": {}}, 1, 1) is None
+    assert video.__get_episode_from_listing({"data": {"episodes": {}}}, 1, 1) is None
+
+
+def test_get_episode_from_listing_found():
+    episode = {"title": "Test Episode"}
+    listing = {"data": {"episodes": {1: {1: episode}}}}
+    assert video.__get_episode_from_listing(listing, 1, 1) == episode
+
+    listing_str_keys = {"data": {"episodes": {"1": {"1": episode}}}}
+    assert video.__get_episode_from_listing(listing_str_keys, 1, 1) == episode
+
+
+def test_get_episode_from_listing_list_structure():
+    episode1 = {"title": "Episode 1"}
+    episode2 = {"title": "Episode 2"}
+    listing = {"data": {"episodes": {1: [episode1, episode2]}}}
+    assert video.__get_episode_from_listing(listing, 1, 1) == episode1
+    assert video.__get_episode_from_listing(listing, 1, 2) == episode2
+    assert video.__get_episode_from_listing(listing, 1, 3) is None
+
+
+def test_extract_year():
+    assert video.__extract_year(None) is None
+    assert video.__extract_year(2023) == 2023
+    assert video.__extract_year("2023") == 2023
+    assert video.__extract_year("Released in 2023") == 2023
+    assert video.__extract_year("No year here") is None
+
+
+def test_format_imdb_id():
+    assert video.__format_imdb_id(None) == ""
+    assert video.__format_imdb_id("tt1234567") == "tt1234567"
+    assert video.__format_imdb_id("1234567") == "tt1234567"
+    assert video.__format_imdb_id(1234567) == "tt1234567"
+
+
+def test_is_imdb_id():
+    assert video.__is_imdb_id("tt1234567") is True
+    assert video.__is_imdb_id("1234567") is False
+    assert video.__is_imdb_id("") is False
+
+
+def test_get_filename(monkeypatch):
+    mock_player = MagicMock()
+    mock_player.getPlayingFile.return_value = "/path/to/video/Test.Movie.2023.mkv"
+    monkeypatch.setattr(video.xbmc, "Player", lambda: mock_player)
+
+    filename = video.__get_filename("Test Movie")
+    assert filename == "Test.Movie.2023.mkv"
+
+    mock_player.getPlayingFile.return_value = "/path/to/video/Test.Movie.2023.mp4"
+    filename = video.__get_filename("Test Movie")
+    assert filename == "Test.Movie.2023.mp4"
+
+    mock_player.getPlayingFile.side_effect = Exception("Player error")
+    filename = video.__get_filename("Test Movie")
+    assert filename == "Test Movie"
+
+
+def test_set_size_and_hash_small_file(monkeypatch):
+    core = MagicMock()
+    core.progress_dialog.dialog = None
+    meta = utils.Box({}, default_box=True)
+
+    mock_file = MagicMock()
+    mock_file.size.return_value = 1000
+    mock_file.hash.side_effect = Exception("No hash method")
+
+    monkeypatch.setattr(video.xbmcvfs, "File", lambda path: mock_file)
+
+    video.__set_size_and_hash(core, meta, "/path/to/small.file")
+
+    assert meta.filesize == 1000
+    assert 'filehash' not in meta
+
+
+def test_set_size_and_hash_large_file(monkeypatch):
+    core = MagicMock()
+    core.progress_dialog.dialog = None
+    meta = utils.Box({}, default_box=True)
+
+    mock_file = MagicMock()
+    mock_file.size.return_value = 200000
+    mock_file.readBytes.return_value = b'\x01' * 8  # 64-bit int
+
+    monkeypatch.setattr(video.xbmcvfs, "File", lambda path: mock_file)
+    mock_file.hash.side_effect = Exception("No hash method")
+
+    def mock_sum(f, result):
+        result.filehash += 12345
+
+    monkeypatch.setattr(video, "__sum_64k_bytes", mock_sum)
+
+    video.__set_size_and_hash(core, meta, "/path/to/large.file")
+
+    assert meta.filesize == 200000
+    # 200000 + 12345 (first chunk) + 12345 (last chunk) = 224690
+    # hex(224690) = 0x36db2
+    assert meta.filehash == "%016x" % 224690
